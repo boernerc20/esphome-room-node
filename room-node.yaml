@@ -1,20 +1,43 @@
 substitutions:
   name: room-node
   friendly_name: "Jarvis Room Node"
+  # WS2812B status ring — NOT yet wired. When you solder it, set led_pin to the
+  # data GPIO you use and led_count to your ring's LED count (GPIO21 is free/safe).
+  led_pin: GPIO21
+  led_count: "27"
 
 esphome:
   name: ${name}
   friendly_name: ${friendly_name}
 
+globals:
+  - id: mww_pending
+    type: bool
+    restore_value: false
+    initial_value: 'false'
+
 esp32:
   board: esp32-s3-devkitc-1
   variant: ESP32S3
   framework:
-    type: arduino
+    type: esp-idf
+
+# N8R8 module: 8MB octal PSRAM — needed for full-rate audio buffers + wake word
+psram:
+  mode: octal
+  speed: 80MHz
 
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
+  # Pinned static IP so the OTA/flash target never drifts (was bouncing .190 -> .188
+  # under DHCP). Gateway = router; DNS = Pi-hole (.196) with router (.1) as fallback.
+  manual_ip:
+    static_ip: 192.168.1.188
+    gateway: 192.168.1.1
+    subnet: 255.255.255.0
+    dns1: 192.168.1.196
+    dns2: 192.168.1.1
   ap:
     ssid: "${friendly_name} Fallback"
     password: !secret ap_password
@@ -22,6 +45,9 @@ wifi:
 ota:
   - platform: esphome
     password: !secret ota_password
+    on_begin:
+      - micro_wake_word.stop:
+      - voice_assistant.stop:
 
 api:
   encryption:
@@ -40,13 +66,266 @@ spi:
   clk_pin: GPIO12
   mosi_pin: GPIO11
 
+i2s_audio:
+  - id: i2s_mic_bus
+    i2s_lrclk_pin: GPIO5
+    i2s_bclk_pin: GPIO4
+  - id: i2s_spk_bus
+    i2s_lrclk_pin: GPIO16
+    i2s_bclk_pin: GPIO17
+
+microphone:
+  - platform: i2s_audio
+    id: mic
+    i2s_audio_id: i2s_mic_bus
+    i2s_din_pin: GPIO6
+    adc_type: external
+    pdm: false
+    channel: left
+    sample_rate: 16000
+    bits_per_sample: 32bit
+    correct_dc_offset: true
+
+# Full-rate audio path: media_player (below) decodes FLAC at 48kHz and feeds the
+# mixer; the old speaker-mode VA path was hard-capped at 16kHz mono (muffled TTS).
+speaker:
+  - platform: i2s_audio
+    id: spk
+    i2s_audio_id: i2s_spk_bus
+    i2s_dout_pin: GPIO18
+    dac_type: external
+    # mono = sample duplicated to both I2S slots. The MAX98357A's SD pin is
+    # unwired -> amp averages (L+R)/2, so left-only would lose 6dB.
+    channel: mono
+    sample_rate: 48000
+    bits_per_sample: 16bit
+    timeout: never
+  - platform: mixer
+    id: mixer_spk
+    output_speaker: spk
+    num_channels: 1
+    source_speakers:
+      - id: announce_mix
+      - id: media_mix
+  - platform: resampler
+    id: announce_resampled
+    output_speaker: announce_mix
+  - platform: resampler
+    id: media_resampled
+    output_speaker: media_mix
+
+media_player:
+  - platform: speaker
+    id: node_media
+    name: "${friendly_name} Media"
+    volume_increment: 5%
+    announcement_pipeline:
+      speaker: announce_resampled
+      format: FLAC
+      sample_rate: 48000
+      num_channels: 1
+    media_pipeline:
+      speaker: media_resampled
+      format: FLAC
+      sample_rate: 48000
+      num_channels: 1
+    # MAX98357A SD pin: only powered while something is actually playing
+    on_play:
+      - output.turn_on: amp_sd
+    on_announcement:
+      - output.turn_on: amp_sd
+    on_idle:
+      - output.turn_off: amp_sd
+
+output:
+  - platform: gpio
+    id: amp_sd
+    pin: GPIO7
+
+light:
+  - platform: esp32_rmt_led_strip
+    id: ring
+    name: "${friendly_name} Ring"
+    pin: ${led_pin}
+    num_leds: ${led_count}
+    chipset: WS2812
+    rgb_order: GRB
+    restore_mode: ALWAYS_OFF
+    default_transition_length: 0s
+    effects:
+      # Listening — breathing blue
+      - addressable_lambda:
+          name: "Listening"
+          update_interval: 16ms
+          lambda: |-
+            static uint8_t b = 20;
+            static int8_t dir = 1;
+            b += dir * 4;
+            if (b >= 200) { b = 200; dir = -1; }
+            if (b <= 20)  { b = 20;  dir = 1; }
+            it.all() = Color(0, 0, b);
+      # Thinking — amber comet chasing around the ring (bright head + 5-LED fading tail)
+      - addressable_lambda:
+          name: "Thinking"
+          update_interval: 60ms
+          lambda: |-
+            static int pos = 0;
+            int n = it.size();
+            it.all() = Color(0, 0, 0);
+            float b = 1.0f;
+            for (int i = 0; i < 6; i++) {
+              it[(pos + n - i) % n] = Color(255 * b, 120 * b, 0);
+              b *= 0.55f;
+            }
+            pos = (pos + 1) % n;
+      # Speaking — pulsing green
+      - addressable_lambda:
+          name: "Speaking"
+          update_interval: 30ms
+          lambda: |-
+            static uint8_t v = 40;
+            static int8_t d = 1;
+            v += d * 6;
+            if (v >= 220) { v = 220; d = -1; }
+            if (v <= 40)  { v = 40;  d = 1; }
+            it.all() = Color(0, v, 0);
+
+micro_wake_word:
+  id: wakeword
+  microphone:
+    microphone: mic
+    channels: 0
+    gain_factor: 4
+  stop_after_detection: true
+  models:
+    - model: hey_jarvis
+      probability_cutoff: 0.5
+  on_wake_word_detected:
+    - logger.log:
+        format: "Wake word detected: %s"
+        args: [wake_word.c_str()]
+    - light.turn_on:
+        id: ring
+        effect: "Listening"
+    - voice_assistant.start:
+        wake_word: !lambda return wake_word;
+
+button:
+  - platform: safe_mode
+    name: "Restart in Safe Mode"
+
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO0
+      mode: INPUT_PULLUP
+    name: "VA Button"
+    on_press:
+      - if:
+          condition:
+            not:
+              voice_assistant.is_running:
+          then:
+            - logger.log: "VA Button pressed"
+            - logger.log: "MWW: stopping"
+            - micro_wake_word.stop:
+            - voice_assistant.start:
+
+voice_assistant:
+  id: va
+  microphone:
+    microphone: mic
+    channels: 0
+    gain_factor: 4
+  media_player: node_media
+  micro_wake_word: wakeword
+  # Far-field capture tuning: stronger AGC target + moderate noise suppression so
+  # Whisper gets a cleaner, louder signal from across the room.
+  noise_suppression_level: 2
+  auto_gain: 31dBFS
+  volume_multiplier: 2.0
+
+  on_client_connected:
+    - logger.log: "VA: HA connected"
+    - delay: 2s
+    - logger.log: "MWW: starting"
+    - micro_wake_word.start:
+
+  on_client_disconnected:
+    - logger.log: "VA: HA disconnected"
+    - light.turn_off: ring
+    - voice_assistant.stop:
+    - logger.log: "MWW: stopping"
+    - micro_wake_word.stop:
+
+  on_listening:
+    - logger.log: "VA: Listening"
+    - light.turn_on:
+        id: ring
+        effect: "Listening"
+
+  on_stt_end:
+    - logger.log: "VA: Thinking"
+    - light.turn_on:
+        id: ring
+        effect: "Thinking"
+
+  on_tts_start:
+    - logger.log: "VA: Speaking"
+    - light.turn_on:
+        id: ring
+        effect: "Speaking"
+    - logger.log: "MWW: stopping"
+    - micro_wake_word.stop:
+
+  on_tts_end:
+    - logger.log: "VA: TTS stream done"
+
+  on_end:
+    - logger.log: "VA: Pipeline ended"
+    - light.turn_off: ring
+    - lambda: 'id(mww_pending) = true;'
+
+  on_error:
+    - logger.log:
+        format: "VA error: %s - %s"
+        args: [code.c_str(), message.c_str()]
+    - light.turn_on:
+        id: ring
+        effect: "None"
+        red: 100%
+        green: 0%
+        blue: 0%
+    - lambda: 'id(mww_pending) = false;'
+    - voice_assistant.stop:
+    - delay: 500ms
+    - light.turn_off: ring
+    - logger.log: "MWW: starting"
+    - micro_wake_word.start:
+
+interval:
+  - interval: 500ms
+    then:
+      - if:
+          condition:
+            lambda: 'return id(mww_pending) && !id(va).is_running() && !id(wakeword).is_running();'
+          then:
+            - lambda: 'id(mww_pending) = false;'
+            - output.turn_off: amp_sd
+            - delay: 500ms
+            - logger.log: "MWW: starting"
+            - micro_wake_word.start:
+
 font:
   - file: "gfonts://Roboto"
     id: font_large
-    size: 28
+    size: 24
+  - file: "gfonts://Roboto"
+    id: font_medium
+    size: 20
   - file: "gfonts://Roboto"
     id: font_small
-    size: 16
+    size: 14
 
 sensor:
   - platform: aht10
@@ -73,13 +352,14 @@ display:
     reset_pin: GPIO14
     busy_pin: GPIO15
     model: 2.90inv2
-    full_update_every: 30
-    update_interval: 30s
+    rotation: 90
+    full_update_every: 1
+    update_interval: 5min
     lambda: |-
       it.fill(COLOR_OFF);
       it.printf(5, 5, id(font_large), "Bedroom");
-      if (id(room_temperature).has_state() && id(room_humidity).has_state()) {
-        it.printf(5, 45, id(font_large), "%.1f°F  %.0f%%", id(room_temperature).state, id(room_humidity).state);
-      } else {
-        it.print(5, 45, id(font_large), "Reading...");
-      }
+      it.filled_rectangle(0, 36, 296, 2);
+      it.printf(5, 48, id(font_small), "TEMP");
+      it.printf(5, 65, id(font_medium), "%.1f°F", id(room_temperature).state);
+      it.printf(155, 48, id(font_small), "HUMIDITY");
+      it.printf(155, 65, id(font_medium), "%.0f%%", id(room_humidity).state);
