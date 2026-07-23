@@ -19,6 +19,29 @@ A per-room voice satellite + environment node for Home Assistant:
 
 ---
 
+## Positioning & competition (researched 2026-07)
+
+| Competitor | Price | Display | Sensors | Notes |
+|---|---|---|---|---|
+| HA Voice Preview Edition | ~$59 | ❌ | ❌ | Official; ESP32-S3 + XMOS AEC; the price anchor |
+| FutureProofHomes Satellite1 | ~$65–90 | ❌ | some | S3 + XMOS, 4 mics, best-in-class audio; enthusiast favorite |
+| ESP32-S3-BOX-3 | ~$50 | LCD | ❌ | Devkit aesthetics, dev audience |
+| M5Stack ATOM Echo | ~$13 | ❌ | ❌ | Entry-level, poor audio |
+| Echo / Nest / HomePod | $50–99 | some | ❌ | Cloud, closed — the narrative foil |
+
+**Key insight:** "open source" is NOT the wedge vs Voice PE/Sat1 (they're open too) — it's only the wedge vs Big Tech. The defensible wedge: **no open competitor ships a persistent display or full room sensing.** We are a "room node"/ambient room instrument, useful 24/7, not a blind puck.
+
+**Brand pillars:**
+1. **Name the category** — never "smart speaker" (we lose on audio specs to XMOS rivals). It's a *room node*: the room at a glance, that you can also talk to.
+2. **Calm tech** — e-ink/paper aesthetic, no glow at night (ring sleeps on schedule), no camera, no cloud account, works offline. Openness = verifiable trust.
+3. **Sell the fleet** — one per room; e-ink shows the room's name; marketing photos show 3 units in 3 rooms. Justifies price: 3 of ours ≈ 1 HomePod.
+4. **Honest about audio** — no XMOS AEC in v1: position for commands/answers, not music playback. Physical mic-mute switch reinforces the privacy pillar.
+5. Working tagline: **"See the room. Speak to the house."**
+
+**Named risk:** reviewers will benchmark audio/barge-in vs XMOS-equipped rivals. v1 answer = positioning + mechanical mic isolation; v2 answer = AEC-capable codec or XMOS option (Phase 2 should keep board space/JST for it if cheap to do).
+
+---
+
 ## Current status (2026-07-23)
 
 **Working on breadboard:** ESP32-S3 devkit, INMP441 mic, MAX98357A + Dayton CE32A-8 8Ω speaker, AHT20, Waveshare 2.9" e-ink, 27-px WS2812B strip, hey_jarvis wake word, full HA Assist pipeline (node ↔ HA Pi5 ↔ conversation agent). Node pinned at 192.168.1.188 (manual_ip). Voice works end-to-end.
@@ -63,6 +86,20 @@ Prove the design is worth laying out. Exit criteria: clean audio, reliable wake�
 - [ ] **Repo cleanup & commit:** commit `room-node.yaml`, `HARDWARE.md`, `models/`, this file; delete `room-node.yaml.bak.*`; move `ROOM_NODE.md` → `docs/archive/`; update HARDWARE.md (27-px strip, GAIN strap, decoupling caps). Push to GitHub.
 - [ ] **Decide v1 LED count** for the product (27 was "what arrived"; pick deliberate count for enclosure perimeter + <500 mA budget or spec a bigger supply).
 - [ ] Note real-world wake-word performance (range, false triggers) — informs whether v1 ships with INMP441 or a 2-mic option later.
+
+**Hardware to acquire for Phase 0–2 (bench + v1 design):**
+- [ ] Cap kit: 470–1000 µF electrolytics + 0.1 µF ceramics (audio decoupling fix + PCB values)
+- [ ] Resistor kit incl. 330–470 Ω (LED data) and 100 kΩ (GAIN straps)
+- [ ] 74AHCT125 in DIP (validate LED level shifting on breadboard before it goes on the PCB)
+- [ ] **Second complete breadboard set** (S3 devkit + INMP441 + MAX98357A + AHT20) — dev unit, so the working bedroom node stays in service while iterating
+- [ ] USB power meter (~$15) — real current budget numbers for the power tree
+- [ ] Cheap 8-ch logic analyzer (~$15, sigrok-compatible) — I2S/I2C debugging, essential for PCB bring-up
+- [ ] **Physical mic-mute switch** (slide or latching) — v1 privacy feature, brand pillar
+- [ ] Rotary encoder w/ push (optional) — volume/mute dial à la Voice PE; decide in v1 scope
+- [ ] Final LED ring/strip at deliberate count & density for the enclosure (27 was incidental; 30/m wraps the display perimeter per HARDWARE.md)
+- [ ] Good Display GDEY029T94 (or equiv raw 2.9" panel) — second-source/BOM-cost eval vs Waveshare module
+- [ ] SHT40 breakout — accuracy + self-heating eval vs AHT20; informs sensor placement on PCB
+- [ ] ReSpeaker Lite (~$25, XMOS XU316) — benchmark unit: measure what AEC/beamforming buys before deciding v2 audio front-end
 
 ## Phase 1 — Firmware productization
 
