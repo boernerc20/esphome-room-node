@@ -147,6 +147,41 @@ residual audio after TTS. Revisit for v2 (see `PRODUCT_PLAN.md` brand pillar 4).
 
 ---
 
+## Assembly constraints — rev A is hand-built
+
+Decided 2026-07-28 (see `PRODUCT_PLAN.md` Decisions log). Rev A is assembled by hand
+on the bench, not by JLCPCB. These constraints bind layout and part selection:
+
+| Constraint | Why |
+|---|---|
+| **4-layer, solid ground plane** | Enforces the Phase 0 star-ground lesson with a Class-D amp, MEMS mic, WS2812B switching and an RF module on one board. Cost delta at 5 boards is negligible. |
+| **ENIG finish** | HASL leaves domed pads that fine-pitch parts rock on. Flat pads matter for the 0.5 mm-pitch QFN and USB-C. |
+| **Stencil ordered with the boards** | The single highest-leverage item. Paste + stencil + hot air makes the MAX98357A QFN routine instead of the failure point. |
+| **Single-sided placement** | All parts on top. Two-sided means a second reflow with the first side hanging upside down. |
+| **≥0.5 mm passive spacing**, extra around module/QFN | Hot air blows neighbouring 0603s off a DFM-tight layout. |
+| **0603 minimum**, no 0402 | Hand-placeable with tweezers. |
+| **Through-hole audio bulk cap** | A 470–1000 µF radial is easier to place, mechanically solid, and heat-tolerant in a way SMD cans aren't. |
+| **Tented thermal vias** (bottom side) | Untented vias in a pad wick solder through and starve the joint. Applies to the WROOM-1 ground pad and MAX98357A thermal pad. |
+| **Windowpaned stencil apertures** on exposed pads | ~50–70% coverage in a grid. Full coverage floats the part on molten solder and lifts the perimeter pins. |
+| **Human-readable silkscreen** | Pin-1 dots, polarity bars, legible refdes. Assembly houses ignore silkscreen; you won't. |
+
+**Known risk:** the WROOM-1 ground pad and the MAX98357A thermal pad cannot be
+inspected once placed. Marginal joints there mimic design bugs — resets under WiFi
+load, an amp that works then thermally shuts down. During bring-up, suspect those two
+joints before the schematic.
+
+**Bring-up order:** continuity-check every rail to GND for shorts → power from a
+current-limited bench supply at ~200 mA and watch the draw *before* plugging in USB →
+5 V rail → 3V3 rail → USB enumerate → flash → each peripheral in turn → audio noise
+floor vs breadboard. Use the Block 1 test points (EN, IO0, TXD0, RXD0, +3V3, +5V, GND).
+
+**Ordering:** 5 bare boards + stencil; 3–5× passives and 2–3× ICs/connectors as spares
+(the USB-C receptacle especially). PCBA returns at the Phase 4 pilot. Fallback if
+bring-up fights back: a later JLCPCB order placing *only* the module and the QFN,
+passives by hand.
+
+---
+
 ## BOM (draft — confirm LCSC stock before finalizing)
 
 | Ref | Part | Notes / LCSC-class |
