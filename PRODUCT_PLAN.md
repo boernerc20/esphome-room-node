@@ -42,15 +42,17 @@ A per-room voice satellite + environment node for Home Assistant:
 
 ---
 
-## Current status (2026-07-23)
+## Current status (2026-07-28)
+
+**Now:** Phase 0 **complete** (breadboard proven, audio verified clean, power measured — see Decisions log + Phase 0 checklist). **Phase 2 (KiCad) in progress** — schematic authored block-by-block in [`docs/schematic/`](docs/schematic/): `rev-a-architecture.md` (block diagram, power tree, strapping-checked pin map, BOM) + `block-1-mcu-power-usb.md` done, **pending review before drawing**. Workflow: net lists authored as visual docs in the repo → reviewed vs datasheets/breadboard → drawn in KiCad on the **workstation** (tailnet 100.88.81.67) → next block. **Next up: Block 2 (audio, MAX98357A)** — where the Phase 0 lessons (6 dB GAIN strap, decoupling, star ground, SD mute) get baked in. Repo pushed to GitHub (`git@github.com:boernerc20/esphome-room-node.git`) through `0be8b6b`.
 
 **Working on breadboard:** ESP32-S3 devkit, INMP441 mic, MAX98357A + Dayton CE32A-8 8Ω speaker, AHT20, Waveshare 2.9" e-ink, 27-px WS2812B strip, hey_jarvis wake word, full HA Assist pipeline (node ↔ HA Pi5 ↔ conversation agent). Node pinned at 192.168.1.188 (manual_ip). Voice works end-to-end.
 
 **Known issues / open items:**
-- Audio crackle + inconsistent volume — believed breadboard power/ground + `volume_multiplier: 2.0` digital clipping + floating GAIN pin. Fix list in Phase 0.
+- ~~Audio crackle + inconsistent volume~~ — **RESOLVED 2026-07-28**: volume_multiplier 1.0, GAIN→Vin (6 dB), 470–1000 µF + 0.1 µF at amp, star ground, SD→GPIO7 mute. Verified clean.
 - No acoustic echo cancellation (mic self-trigger during TTS) — mitigate mechanically in enclosure; evaluate `micro_wake_word` VAD / AEC options later.
-- Repo hygiene: only 1 stale commit; `room-node.yaml` (the real config), `HARDWARE.md`, models/ all uncommitted. `ROOM_NODE.md` is outdated (wrong pins, Wyoming-era) and must be archived/rewritten.
-- `HARDWARE.md` says 8-px ring; actual strip is 27 px (yaml already corrected to 27).
+- ~~Repo hygiene~~ — **DONE**: committed + pushed to GitHub through `0be8b6b`; `ROOM_NODE.md` archived to `docs/archive/`; secrets verified untracked.
+- ~~HARDWARE.md 8-px ring~~ — **DONE**: corrected to 27 px throughout.
 
 **Source of truth ranking:** `room-node.yaml` (as-flashed) > `HARDWARE.md` > everything else. `ROOM_NODE.md` is historical — do not trust its pin map.
 
