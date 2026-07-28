@@ -9,7 +9,8 @@ Source-of-truth for connections = this doc + [`../../room-node.yaml`](../../room
 per block in KiCad, wire per the tables, assign the footprints in the BOM section.
 Review each block before layout — a wrong decision here costs a board spin.
 
-**Design targets:** ESP32-S3-WROOM-1-N8R8 module, USB-C 5 V input (native USB for
+**Design targets:** ESP32-S3-WROOM-1-**N16R8** module (matches the validated breadboard
+part), USB-C 5 V input (native USB for
 flash/logs), 2-layer if routable (4-layer if audio noise demands a ground plane).
 Everything the breadboard taught us in Phase 0 is designed in from day one.
 
@@ -37,7 +38,7 @@ Everything the breadboard taught us in Phase 0 is designed in from day one.
   -S3   441  20   2.9"              │               │
    │     │    │    │                │               │
    └─────┴────┴────┴── I2S / I2C / SPI / GPIO ──────┘
-                   ESP32-S3-WROOM-1-N8R8
+                   ESP32-S3-WROOM-1-N16R8
 ```
 
 Signal buses off the S3: **I2S-mic**, **I2S-speaker**, **I2C** (AHT20), **SPI** (e-paper),
@@ -108,29 +109,41 @@ From `room-node.yaml`. **Strapping pins on ESP32-S3: GPIO0, 3, 45, 46.**
 | | RESET | GPIO14 | |
 | | BUSY | GPIO15 | input |
 | WS2812B ring | DIN (→ level shifter) | GPIO21 | 3V3 → 74AHCT125 → 5V → 330–470 Ω → strip |
-| VA button | INPUT_PULLUP | **GPIO0** | ⚠ strapping (BOOT). Dual-use as boot+user button is standard; must be HIGH at reset. |
-| Native USB | D- / D+ | GPIO19 / GPIO20 | USB-CDC logging + flashing — reserve |
+| VA button | INPUT_PULLUP | **GPIO38** (PCB) / GPIO0 (breadboard) | moved off GPIO0 for rev A — see below |
+| Boot button | INPUT_PULLUP | GPIO0 | ⚠ strapping (BOOT). Recovery/flash only, not user-facing. |
+| Native USB | D- / D+ | GPIO19 / GPIO20 | module pins **13 / 14**. USB-CDC logging + flashing — reserve |
 
-**Strapping check:** only **GPIO0** is a strapping pin in use — it's the BOOT button,
-the conventional dual-use, safe as long as it idles HIGH (pull-up present). GPIO3/45/46
-unused (good). Flash/PSRAM pins **26–37** are consumed by the N8R8 octal module — do not
-route. Free & safe for future: GPIO1, 2, 38, 41, 42, 47, 48.
+**Strapping check:** GPIO0 is the only strapping pin in use and it is now **boot/recovery
+only**. The VA button moved to **GPIO38** — on a shipped board, a user holding a
+GPIO0 voice button through a power cycle enters download mode and the node looks
+bricked, with no display feedback to explain it. Unfixable in firmware after fab.
+GPIO3/45/46 unused (good).
+
+**N16R8 pin availability:** GPIO26–32 are not broken out (flash), and **GPIO35/36/37 are
+consumed by the octal PSRAM** — the KiCad symbol labels them `PSRAM`. Do not route any of
+them. Free & safe for future: GPIO1, 2, 39–42 (JTAG — leave clear if you want debug), 47, 48.
+
+**Module pin numbers:** verified against the KiCad `RF_Module:ESP32-S3-WROOM-1` symbol.
+Notably USB_D− = pin **13**, USB_D+ = pin **14** (pins 30/31 are IO37/IO38).
 
 ---
 
-## Blocks to detail next (per-sheet net lists)
+## Blocks (per-sheet net lists)
 
-Foundation above is ready for review. I'll fill these in block by block on your go —
-each becomes a KiCad hierarchical sheet:
+Each block becomes one KiCad hierarchical sheet. **MCU, power, and USB are one sheet**
+(Block 1) — they were listed separately in an earlier draft; this numbering is canonical.
 
-1. **MCU + reset/boot** — WROOM-1 power/decoupling, EN reset RC (10 kΩ + 1 µF + button),
-   IO0 boot button, antenna keep-out, test points (TX/RX/EN/IO0/3V3/5V/GND).
-2. **USB-C + native USB + ESD** — connector, CC pull-downs, USBLC6-2, VBUS bulk.
-3. **Audio out (MAX98357A)** — I2S, GAIN→Vin (6 dB), SD→GPIO7, decoupling, speaker JST-PH.
-4. **Mic (INMP441)** — I2S, L/R→GND, placement/port-hole notes (far from speaker).
-5. **LED ring (WS2812B + 74AHCT125)** — level shift, 330–470 Ω, 1000 µF, connector.
-6. **Sensor (AHT20)** — I2C + pull-ups.
-7. **Display (2.9" e-paper)** — SPI + connector matching Waveshare cable.
+1. **MCU + power + USB** — ✅ [`block-1-mcu-power-usb.md`](block-1-mcu-power-usb.md).
+   WROOM-1 decoupling, 3V3 LDO, USB-C + ESD, EN reset RC, IO0 boot, VA button on IO38,
+   antenna keep-out, test points.
+2. **Audio out (MAX98357A)** — I2S, GAIN→Vin (6 dB), SD→GPIO7, decoupling, speaker JST-PH.
+3. **Mic (INMP441)** — I2S, L/R→GND, placement/port-hole notes (far from speaker).
+4. **LED ring (WS2812B + 74AHCT125)** — level shift, 330–470 Ω, 1000 µF, connector.
+5. **Sensor (AHT20)** — I2C + pull-ups, **thermal island** (see Block 1 LDO notes).
+6. **Display (2.9" e-paper)** — SPI + connector matching Waveshare cable.
+
+*No mic-mute switch in rev A — undesigned, and the GPIO7 SD gate already handles
+residual audio after TTS. Revisit for v2 (see `PRODUCT_PLAN.md` brand pillar 4).*
 
 ---
 
@@ -138,8 +151,8 @@ each becomes a KiCad hierarchical sheet:
 
 | Ref | Part | Notes / LCSC-class |
 |---|---|---|
-| U1 | ESP32-S3-WROOM-1-N8R8 | pre-certified module |
-| U2 | 3V3 LDO ≥1 A low-noise | AP7361-33 / TLV75901 / RT9080-33 |
+| U1 | ESP32-S3-WROOM-1-**N16R8** | pre-certified module; KiCad symbol is variant-agnostic |
+| U2 | **AP7361C-33ER-13**, SOT-223 | 3V3 LDO 1 A. Package is load-bearing — see Block 1 |
 | U3 | MAX98357AETE+ | I2S Class-D amp |
 | U4 | 74AHCT125 (SOIC/TSSOP) | LED level shifter |
 | U5 | USBLC6-2SC6 | USB ESD array |

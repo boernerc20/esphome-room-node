@@ -120,7 +120,7 @@ Make the firmware installable by strangers, not just us.
 One board, devkit replaced by module. Get to "boards that work on the bench."
 
 - [ ] **Schematic** (Opus-level review before layout):
-  - ESP32-S3-**WROOM-1**-N8R8 module (pre-certified, castellated), proper RF keep-out.
+  - ESP32-S3-**WROOM-1**-N16R8 module (pre-certified, castellated), proper RF keep-out.
   - USB-C power (+ native USB D±for flashing/logs): 5.1 kΩ CC pull-downs, ESD array (USBLC6-2), input bulk cap.
   - Power tree: 5 V rail → amp + LEDs; 3V3 via decent LDO (not AMS1117 — pick low-noise, e.g. ME6217/AP2112 class or small buck if LED budget grows); per-IC 0.1 µF + bulk per rail; **audio decoupling designed in from day 1** (this is what the breadboard taught us).
   - MAX98357A: GAIN strap footprint (choose 6 dB default), SD gate from GPIO7 as today; speaker JST-PH 2-pin.

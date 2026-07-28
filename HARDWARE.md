@@ -14,7 +14,7 @@ source of truth as wired there — keep the two in sync.
 
 | # | Component | Part | Interface | Notes |
 |---|-----------|------|-----------|-------|
-| 1 | MCU | **ESP32-S3-WROOM-1** (N8R8: 8MB flash / 8MB PSRAM recommended) | — | esp-idf framework. PSRAM matters for audio buffers + micro_wake_word. |
+| 1 | MCU | **ESP32-S3-WROOM-1-N16R8** (16MB flash / 8MB octal PSRAM) | — | esp-idf framework. PSRAM matters for audio buffers + micro_wake_word. Matches the breadboard part (Lonely Binary N16R8); PCB uses the bare WROOM-1 module. |
 | 2 | Microphone | **INMP441** I2S MEMS mic | I2S (mic bus) | Omnidirectional, digital. `L/R` pad → **GND** (selects left channel, matches `channel: left`). Far-field tuned in firmware (AGC 31 dBFS, noise-suppress 2). |
 | 3 | Amp / DAC | **MAX98357A** I2S Class-D | I2S (spk bus) | 3.2 W @ 4Ω, ~1.4 W @ 8Ω. `SD` wired to GPIO7 — high on playback, low = shutdown (mutes idle hiss). **GAIN strapped to Vin = fixed 6 dB** (Phase 0 audio fix; floating would be 9 dB + noise). |
 | 4 | Speaker | **Dayton Audio CE32A-8** — 1.25" (32mm) aluminum full-range, 8Ω / 2W RMS | wired to MAX98357A ± (BTL — do not ground either tab) | Response 240 Hz–20 kHz (clean voice, no deep bass). **31.5mm cutout, 32mm frame, 14.5mm depth** (shallow). Sealed back chamber ~20–30cc. Neo magnet, rubber surround. |
@@ -45,12 +45,21 @@ source of truth as wired there — keep the two in sync.
 | | RESET | GPIO14 |
 | | BUSY | GPIO15 |
 | **WS2812B ring** | DIN | GPIO21 |
-| Voice-assistant button | (INPUT_PULLUP) | GPIO0 |
+| Voice-assistant button | (INPUT_PULLUP) | **GPIO0** (breadboard) → **GPIO38** (PCB rev A) |
+| Boot/recovery button | (INPUT_PULLUP) | GPIO0 (PCB rev A — not user-facing) |
 
-**Avoid** for future additions: strapping pins (0, 3, 45, 46), USB (19/20 — used
-by USB-CDC logging), and PSRAM/flash pins (26–37 on the N8R8 module). Free & safe
-if you need more: GPIO1, GPIO2, GPIO38, GPIO41, GPIO42, GPIO47 (GPIO48 is the
-board's onboard LED on many devkits).
+**VA button moves off GPIO0 on the PCB.** GPIO0 is the BOOT strap: a user holding a
+GPIO0-wired voice button through a power cycle enters download mode and the node
+appears bricked, with no display feedback to explain it — unfixable in firmware after
+fab. Rev A puts the user button on **GPIO38** and keeps GPIO0 as a boot/recovery tact.
+`room-node.yaml` still binds GPIO0 (correct for the breadboard) — move it to a
+substitution when the PCB arrives.
+
+**Avoid** for future additions: strapping pins (0, 3, 45, 46), USB (19/20 = module
+pins 13/14, used by USB-CDC logging), flash pins (26–32, not broken out), and
+**PSRAM pins 35/36/37** (consumed by the N16R8 octal PSRAM — the KiCad symbol labels
+them `PSRAM`). Free & safe if you need more: GPIO1, GPIO2, GPIO39–42 (JTAG — leave
+clear if you want hardware debug), GPIO47, GPIO48.
 
 ---
 
