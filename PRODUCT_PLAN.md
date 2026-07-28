@@ -76,16 +76,16 @@ A per-room voice satellite + environment node for Home Assistant:
 
 Prove the design is worth laying out. Exit criteria: clean audio, reliable wake→reply loop, repo committed.
 
-- [ ] **Fix audio chain** (in order, test after each):
-  - [ ] `volume_multiplier: 2.0 → 1.0` in yaml, reflash, listen for crackle change (digital clipping test).
-  - [ ] Tie MAX98357A **GAIN → Vin directly (6 dB)** — kills float-noise and lowers gain. (100 kΩ→Vin = 3 dB if still hot. Never add gain: 12/15 dB settings make it worse.)
-  - [ ] **470–1000 µF electrolytic + 0.1 µF ceramic across amp Vin↔GND at the chip.**
-  - [ ] **Star ground:** amp GND straight to ESP32 GND pin — never shared/daisy-chained with the 27-px LED rail.
-  - [ ] Shortest possible I2S jumpers.
-- [ ] **End-to-end voice test** ("hey jarvis"): ring blue→amber→green, reply audible and clean; local command ("turn on the lamp") fast-path; general question falls through to conversation agent.
-- [ ] **Repo cleanup & commit:** commit `room-node.yaml`, `HARDWARE.md`, `models/`, this file; delete `room-node.yaml.bak.*`; move `ROOM_NODE.md` → `docs/archive/`; update HARDWARE.md (27-px strip, GAIN strap, decoupling caps). Push to GitHub.
-- [ ] **Decide v1 LED count** for the product (27 was "what arrived"; pick deliberate count for enclosure perimeter + <500 mA budget or spec a bigger supply).
-- [ ] Note real-world wake-word performance (range, false triggers) — informs whether v1 ships with INMP441 or a 2-mic option later.
+- [x] **Fix audio chain** — done 2026-07-28, verified clean on voice + repeated announcements (no clip/underrun in logs):
+  - [x] `volume_multiplier: 2.0 → 1.0` (digital clipping was the crackle source).
+  - [x] MAX98357A **GAIN → Vin directly (6 dB)** — killed float-noise, defined gain.
+  - [x] **470–1000 µF electrolytic + 0.1 µF ceramic across amp Vin↔GND at the chip.**
+  - [x] **Star ground:** amp GND and LED-strip GND return separately to board GND, never shared.
+  - [x] Bonus: **SD wired to GPIO7** → idle mute now active (kills between-reply hiss/pop).
+- [x] **End-to-end voice test** ("hey jarvis"): ring blue→amber→green, reply clean; fast-path + fall-through confirmed.
+- [x] **Repo cleanup & commit:** committed `3b12319` (yaml + HARDWARE.md synced); ROOM_NODE.md already archived, no `.bak`s, secrets verified untracked. **Push still pending — jarvis-node SSH key not on GitHub (3 commits ahead).**
+- [x] **Decide v1 LED count** — **27 px**, deliberate (wraps the e-ink display perimeter, sets enclosure size).
+- [ ] Note real-world wake-word performance (range, false triggers) — *partial:* detected reliably in-room across many test triggers, no false fires observed; formal range/false-trigger characterization still TBD.
 
 **Hardware to acquire for Phase 0–2 (bench + v1 design):**
 - [ ] Cap kit: 470–1000 µF electrolytics + 0.1 µF ceramics (audio decoupling fix + PCB values)
@@ -165,6 +165,7 @@ One board, devkit replaced by module. Get to "boards that work on the bench."
 - 2026-07-06: Addressable WS2812B over analog RGB strip (keeps comet effect, no MOSFETs).
 - 2026-07-15: `led_count` 27 (actual strip); static IP 192.168.1.188 via `manual_ip`.
 - 2026-07-23: GAIN strategy = tie to Vin (6 dB) not floating; product default gain 6 dB with strap options on PCB.
+- 2026-07-28: **Power tree = USB-C 5 V** (5.1 kΩ CC pull-downs, no dedicated LED supply). Measured whole-node current on bench supply: **~0.31 A** blue-breathing state, **~1.0 A** at solid-white 100% — well within USB-C headroom. Keep a firmware LED-brightness cap as insurance for legacy 500 mA USB-A sources. WS2812B **1000 µF bulk cap + 330–470 Ω DIN series resistor = PCB footprints** (validated unnecessary on a stiff bench supply / short strip, but kept for real USB-C source impedance and full-white load; bulk cap at the strip/connector, DIN resistor source-side after the level shifter).
 
 ## Risks
 
