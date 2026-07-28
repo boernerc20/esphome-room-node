@@ -94,8 +94,11 @@ speaker:
     i2s_audio_id: i2s_spk_bus
     i2s_dout_pin: GPIO18
     dac_type: external
-    # mono = sample duplicated to both I2S slots. The MAX98357A's SD pin is
-    # unwired -> amp averages (L+R)/2, so left-only would lose 6dB.
+    # mono = sample duplicated to both I2S slots, so every MAX98357A channel
+    # mode plays at full level. SD is wired to GPIO7 (amp_sd): HIGH during
+    # playback = enabled (Left mode at 3V3), LOW when idle = shutdown, which
+    # mutes idle hiss/pop. Left mode is fine here because mono duplicates the
+    # sample into both slots. GAIN strapped to Vin on the amp = fixed 6 dB.
     channel: mono
     sample_rate: 48000
     bits_per_sample: 16bit
@@ -243,7 +246,9 @@ voice_assistant:
   # Whisper gets a cleaner, louder signal from across the room.
   noise_suppression_level: 2
   auto_gain: 31dBFS
-  volume_multiplier: 2.0
+  # Phase 0 audio fix (2026-07-23): 2.0 clipped int16 TTS peaks -> crackle.
+  # Loudness is restored cleanly by the analog GAIN->Vin strap (6 dB) at the amp.
+  volume_multiplier: 1.0
 
   on_client_connected:
     - logger.log: "VA: HA connected"
