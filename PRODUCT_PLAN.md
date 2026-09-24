@@ -48,7 +48,7 @@ A per-room voice satellite + environment node for Home Assistant:
 
 Workflow: net lists authored as visual docs in the repo → reviewed vs datasheets/breadboard → drawn in KiCad → screenshots checked back against the net list → next block.
 
-**Open before rev A is fab-safe:** verify the USBLC6-2SC6 pinout against its datasheet (pins 1/6 vs 3/4 — backwards swaps D+/D−), and stock-check the USB-C receptacle and AP7361C.
+**Open before rev A is fab-safe:** stock-check the USB-C receptacle and AP7361C on LCSC/JLCPCB. (USBLC6-2SC6 pinout verified 2026-08-13 against ST DocID 11265 Rev 5 — pins 1&6 = I/O1, 3&4 = I/O2, 2 = GND, 5 = VBUS; matches what was drawn.)
 
 **Working on breadboard:** ESP32-S3 devkit, INMP441 mic, MAX98357A + Dayton CE32A-8 8Ω speaker, AHT20, Waveshare 2.9" e-ink, 27-px WS2812B strip, hey_jarvis wake word, full HA Assist pipeline (node ↔ HA Pi5 ↔ conversation agent). Node pinned at 192.168.1.188 (manual_ip). Voice works end-to-end.
 

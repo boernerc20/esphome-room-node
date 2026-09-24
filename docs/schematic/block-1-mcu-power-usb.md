@@ -47,8 +47,8 @@ Pin numbers verified against the KiCad symbol.
 | 1, 40, 41 (pad) | GND | `GND` |
 | 2 | 3V3 | `+3V3` |
 | 3 | EN | `EN` |
-| 13 | USB_D− | `USB_D-` |
-| 14 | USB_D+ | `USB_D+` |
+| 13 | USB_D− / GPIO19 | `USB_D-` |
+| 14 | USB_D+ / GPIO20 | `USB_D+` |
 | 27 | IO0 | `IO0` |
 | 31 | IO38 | `VA_BTN` |
 | 36 | RXD0 (IO44) | `RXD0` → test point |
@@ -82,18 +82,19 @@ Both D+ pins tie together, both D− pins tie together.
 
 ## U5 — USBLC6-2SC6
 
-| Pin | Net |
-|---|---|
-| 1 | `USB_D-_CONN` |
-| 2 | `GND` |
-| 3 | `USB_D+_CONN` |
-| 4 | `USB_D+` |
-| 5 | `+5V` |
-| 6 | `USB_D-` |
+✅ **Verified against ST datasheet (DocID 11265 Rev 5, Figure 1) — pins 1&6 are
+I/O1 (one line), pins 3&4 are I/O2 (the other), pin 2 = GND, pin 5 = VBUS.**
 
-⚠ **Verify against the datasheet before wiring.** Pins 1/6 must be the same internal
-I/O line and 3/4 the other. Getting this backwards swaps D+/D−. Place U5 physically
-at J1, ahead of any other trace.
+| Pin | ST name | Net |
+|---|---|---|
+| 1 | I/O1 | `USB_D-_CONN` |
+| 2 | GND | `GND` |
+| 3 | I/O2 | `USB_D+_CONN` |
+| 4 | I/O2 | `USB_D+` |
+| 5 | VBUS | `+5V` |
+| 6 | I/O1 | `USB_D-` |
+
+Place U5 physically at J1, ahead of any other trace on D+/D−.
 
 ## U2 — 3V3 LDO
 
@@ -173,9 +174,17 @@ respect it rather than overriding DRC.
 ## Cross-check before drawing
 
 - **ESP32-S3-WROOM-1 datasheet** — pin numbers above (already validated against the
-  KiCad symbol).
-- **ESP32-S3-DevKitC-1 schematic (PDF)** — canonical USB-C, EN RC, IO0 wiring; the
-  breadboard is a DevKitC, so it is the closest 1:1 reference.
+  KiCad symbol). [Espressif PDF](https://www.espressif.com/sites/default/files/documentation/esp32-s3-wroom-1_wroom-1u_datasheet_en.pdf)
+- **ESP32-S3-DevKitC-1 schematic (PDF)** — [dl.espressif.com](https://dl.espressif.com/dl/schematics/SCH_ESP32-S3-DevKitC-1_V1.1_20221130.pdf).
+  Confirms EN RC (10 kΩ + 1 µF, matches R3/C8 here) and module pin numbers
+  (GND1=1, 3V3=2, EN=3, IO19=13, IO20=14, IO0=27, GND2/EPAD=40/41).
+  **Not a valid reference for the USB-C front end** — the DevKitC-1 uses Micro-USB
+  (no CC1/CC2 pins) and a 4-channel steering-diode ESD array (`LESD5D5.0CT1G`), not
+  USBLC6-2 or a real USB-C connector. It also adds a CP2102N UART bridge with two
+  auto-program transistors (DTR/RTS → EN/IO0) that this design does not need — Block 1
+  has no UART bridge (native USB only), so the plain button+RC EN/IO0 circuit here
+  is the correct simplification, not a missing feature.
 - **ESP32-S3 Hardware Design Guidelines** — antenna keep-out, power decoupling.
-- **USBLC6-2SC6 datasheet** — pinout/orientation (flagged above).
+- **USBLC6-2SC6 datasheet** — [ST DocID 11265](https://www.st.com/resource/en/datasheet/usblc6-2.pdf).
+  Pinout verified above (pins 1&6 = I/O1, 3&4 = I/O2, 2 = GND, 5 = VBUS).
 - **AP7361C datasheet** — exact in/out cap requirements and thermal derating.

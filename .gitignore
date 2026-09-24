@@ -28,3 +28,6 @@ gerbers/
 *.gbr
 *.drl
 *.gbrjob
+
+# Vendor datasheets — copyrighted, fetch locally (see docs/datasheets/README.md)
+docs/datasheets/*.pdf
