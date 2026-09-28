@@ -20,7 +20,7 @@ source of truth as wired there — keep the two in sync.
 | 4 | Speaker | **Dayton Audio CE32A-8** — 1.25" (32mm) aluminum full-range, 8Ω / 2W RMS | wired to MAX98357A ± (BTL — do not ground either tab) | Response 240 Hz–20 kHz (clean voice, no deep bass). **31.5mm cutout, 32mm frame, 14.5mm depth** (shallow). Sealed back chamber ~20–30cc. Neo magnet, rubber surround. |
 | 5 | Temp/Humidity | **AHT20** (AHT10 driver, `variant: AHT20`) | I2C | 3.3V. Reports °F (converted in firmware) + %RH every 30s. |
 | 6 | Display | **Waveshare 2.9" e-Paper v2** (`model: 2.90inv2`, 296×128) | SPI (4-wire + BUSY) | ~89.5 × 38 × 4.7 mm module; active area 66.9 × 29.1 mm. Shows room name + temp + humidity, refresh 5 min. |
-| 7 | Status ring | **WS2812B addressable, 27 px** | 1-wire (RMT) | Wraps the e-ink display perimeter (sets enclosure size). 5V; state effects <150 mA, but full-white ≈ **1.6 A — exceeds USB 500 mA**, so the PCB must cap brightness/count or spec a bigger 5V supply. |
+| 7 | Status ring | **WS2812B addressable, 27 px** | 1-wire (RMT) | Wraps the e-ink display perimeter (sets enclosure size). 5V. Whole-node draw measured on the Phase 0 bench supply: **~0.31 A** blue-breathing, **~1.0 A** solid white — well within USB-C 5 V headroom (see Decisions log). Keep a firmware LED-brightness cap as insurance for legacy 500 mA USB-A sources. |
 | 8 | Button | Momentary tactile | GPIO (pull-up) | Manual voice-assistant trigger (bypasses wake word). |
 
 ---
@@ -68,11 +68,7 @@ clear if you want hardware debug), GPIO47, GPIO48.
 - Board + all peripherals run from a single **5V USB supply** into the S3.
 - **AHT20** and **e-paper** are 3.3V — take them from the board's **3V3** rail.
 - **INMP441** runs at 3.3V. **MAX98357A** and **WS2812B** run at **5V**.
-- **WS2812B (27 px):** powered from the board's **5V** pin (USB VBUS, ~500 mA budget).
-  State effects (breathing/comet) draw <150 mA and are fine on USB, but **full-white
-  27 px ≈ 1.6 A far exceeds the USB budget** — the PCB power tree must cap LED
-  brightness/count or provide a dedicated 5V supply. Never command the ring to 100%
-  white on USB.
+- **WS2812B (27 px):** powered from the board's **5V** rail (USB-C VBUS). Whole-node draw measured on the Phase 0 bench supply: **~0.31 A** blue-breathing, **~1.0 A** solid-white 100% — comfortably within USB-C 5 V headroom, so no dedicated LED supply. Keep a firmware LED-brightness cap as insurance for legacy 500 mA USB-A sources; don't command the ring to full white off a plain 500 mA USB-A port.
 - **Grounds:** common ground overall (non-negotiable for I2S/WS2812B/I2C), but wire it
   as a **star** — the amp GND and the LED-strip GND each return on their own lead to
   board GND near the 5V input, **never daisy-chained together**. Phase 0 confirmed LED
@@ -147,5 +143,4 @@ electrical note). [amazon.com/dp/B00BYE9AKM](https://www.amazon.com/dp/B00BYE9AK
 - INMP441 `L/R` → GND; MAX98357A `SD` → GPIO7; both amps/mic want a solid ground plane.
 - Bring **GPIO0** (button) and **EN/RESET** to accessible pads/headers for flashing +
   recovery.
-- WS2812B is 5V; ESP32 data is 3.3V — reliable on short runs, but leave a footprint for
-  a **74AHCT125** level shifter on the DIN line in case the first pixel misbehaves.
+- WS2812B is 5V; ESP32 data is 3.3V — the **74AHCT125** level shifter on the DIN line is **part of the PCB design** (see `rev-a-architecture.md` Block 4), not an optional "in case" part. Wire it with the 330–470 Ω series resistor source-side and the 1000 µF bulk cap at the strip.
