@@ -15,7 +15,7 @@ source of truth as wired there — keep the two in sync.
 | # | Component | Part | Interface | Notes |
 |---|-----------|------|-----------|-------|
 | 1 | MCU | **ESP32-S3-WROOM-1-N16R8** (16MB flash / 8MB octal PSRAM) | — | esp-idf framework. PSRAM matters for audio buffers + micro_wake_word. Matches the breadboard part (Lonely Binary N16R8); PCB uses the bare WROOM-1 module. |
-| 2 | Microphone | **INMP441** I2S MEMS mic | I2S (mic bus) | Omnidirectional, digital. `L/R` pad → **GND** (selects left channel, matches `channel: left`). Far-field tuned in firmware (AGC 31 dBFS, noise-suppress 2). |
+| 2 | Microphone | **SPH0645LM4H** (Knowles) I2S MEMS mic | I2S (mic bus) | Omnidirectional, digital, bottom-port LGA-6. `L/R` pad → **GND** (selects left channel, matches `channel: left`). Far-field tuned in firmware (AGC 31 dBFS, noise-suppress 2). Alternate suffix: `-H` (tape & reel) or `-B` (tray, industrial temp). |
 | 3 | Amp / DAC | **MAX98357A** I2S Class-D | I2S (spk bus) | 3.2 W @ 4Ω, ~1.4 W @ 8Ω. `SD` wired to GPIO7 — high on playback, low = shutdown (mutes idle hiss). **GAIN strapped to Vin = fixed 6 dB** (Phase 0 audio fix; floating would be 9 dB + noise). |
 | 4 | Speaker | **Dayton Audio CE32A-8** — 1.25" (32mm) aluminum full-range, 8Ω / 2W RMS | wired to MAX98357A ± (BTL — do not ground either tab) | Response 240 Hz–20 kHz (clean voice, no deep bass). **31.5mm cutout, 32mm frame, 14.5mm depth** (shallow). Sealed back chamber ~20–30cc. Neo magnet, rubber surround. |
 | 5 | Temp/Humidity | **AHT20** (AHT10 driver, `variant: AHT20`) | I2C | 3.3V. Reports °F (converted in firmware) + %RH every 30s. |
@@ -29,7 +29,7 @@ source of truth as wired there — keep the two in sync.
 
 | Function | Signal | GPIO |
 |----------|--------|------|
-| **I2S mic** (INMP441) | BCLK (SCK) | GPIO4 |
+| **I2S mic** (SPH0645LM4H) | BCLK (SCK) | GPIO4 |
 | | LRCLK (WS) | GPIO5 |
 | | DIN (SD) | GPIO6 |
 | **I2S speaker** (MAX98357A) | BCLK | GPIO17 |
@@ -67,7 +67,7 @@ clear if you want hardware debug), GPIO47, GPIO48.
 
 - Board + all peripherals run from a single **5V USB supply** into the S3.
 - **AHT20** and **e-paper** are 3.3V — take them from the board's **3V3** rail.
-- **INMP441** runs at 3.3V. **MAX98357A** and **WS2812B** run at **5V**.
+- **SPH0645LM4H** runs at 3.3V. **MAX98357A** and **WS2812B** run at **5V**.
 - **WS2812B (27 px):** powered from the board's **5V** pin (USB VBUS, ~500 mA budget).
   State effects (breathing/comet) draw <150 mA and are fine on USB, but **full-white
   27 px ≈ 1.6 A far exceeds the USB budget** — the PCB power tree must cap LED
@@ -93,7 +93,7 @@ Target: display + PCB + LED ring in one small box.
   the board outline and diffuser channel.
   - Print a **diffuser channel** (translucent PETG/white, ~1.5–2 mm wall) over the
     strip so the 27 discrete pixels read as a smooth glow instead of dots.
-- **Mic placement:** put the INMP441 port near a small vent hole in the front/top
+- **Mic placement:** put the SPH0645LM4H port near a small vent hole in the front/top
   face, and **mechanically isolate it from the speaker** (foam/standoff). No hardware
   echo-cancellation exists in the pipeline, so physical isolation is what keeps the
   speaker from self-triggering the mic during TTS.
@@ -127,7 +127,7 @@ electrical note). [amazon.com/dp/B00BYE9AKM](https://www.amazon.com/dp/B00BYE9AK
 - Vas is tiny (~4 cc) and Qts ~0.87, so it's forgiving: a **sealed back chamber
   ~20–30 cc** with a pinch of poly stuffing is plenty. Sealed >> open-back.
 - Gasket/foam-seal the cone to the front baffle so front/back waves don't cancel.
-- Mechanically isolate from the INMP441 (see enclosure notes) — no HW echo
+- Mechanically isolate from the SPH0645LM4H (see enclosure notes) — no HW echo
   cancellation, so speaker vibration into the mic can self-trigger during TTS.
 
 ---
@@ -144,7 +144,7 @@ electrical note). [amazon.com/dp/B00BYE9AKM](https://www.amazon.com/dp/B00BYE9AK
   GAIN→Vin (6 dB) strap and the star ground, this is what killed the breadboard
   crackle — replicate all three in copper, don't rediscover them.
 - Decouple every other IC with **0.1 µF** at its VDD; bulk **10–100 µF** per rail.
-- INMP441 `L/R` → GND; MAX98357A `SD` → GPIO7; both amps/mic want a solid ground plane.
+- SPH0645LM4H `L/R` → GND; MAX98357A `SD` → GPIO7; both amps/mic want a solid ground plane.
 - Bring **GPIO0** (button) and **EN/RESET** to accessible pads/headers for flashing +
   recovery.
 - WS2812B is 5V; ESP32 data is 3.3V — reliable on short runs, but leave a footprint for

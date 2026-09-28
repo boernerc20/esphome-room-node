@@ -3,7 +3,7 @@
 	(generator "Nora / Squarewave Labs")
 	(generator_version "10.0")
 
-	(symbol "ICS-43434"
+	(symbol "SPH0645LM4H"
 		(pin_names
 			(offset 0.254)
 		)
@@ -21,7 +21,7 @@
 				)
 			)
 		)
-		(property "Value" "ICS-43434"
+		(property "Value" "SPH0645LM4H"
 			(at 5.08 2.54 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -31,7 +31,7 @@
 				)
 			)
 		)
-		(property "Footprint" "room-node:ICS-43434"
+		(property "Footprint" "room-node:SPH0645LM4H"
 			(at 0 0 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -42,7 +42,7 @@
 				)
 			)
 		)
-		(property "Datasheet" "https://invensense.tdk.com/wp-content/uploads/2021/09/ICS-43434.pdf"
+		(property "Datasheet" "https://www.knowles.com/docs/default-source/default-document-library/sph0645lm4h-b-datasheet.pdf"
 			(at 0 0 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -53,7 +53,7 @@
 				)
 			)
 		)
-		(property "Description" "I2S output MEMS microphone, bottom-port, 3.5x2.65mm LGA"
+		(property "Description" "I2S output MEMS microphone, bottom-port, 3.5x2.65mm LGA-6, Knowles"
 			(at 0 0 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -64,7 +64,7 @@
 				)
 			)
 		)
-		(property "ki_keywords" "mems microphone i2s digital"
+		(property "ki_keywords" "mems microphone i2s digital sph0645lm4h knowles"
 			(at 0 0 0)
 			(show_name no)
 			(do_not_autoplace no)
@@ -75,7 +75,29 @@
 				)
 			)
 		)
-		(symbol "ICS-43434_0_1"
+		(property "MPN" "SPH0645LM4H-B"
+			(at 0 -2.54 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "LCSC" "TBD"
+			(at 0 -5.08 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(symbol "SPH0645LM4H_0_1"
 			(rectangle
 				(start -5.08 2.54)
 				(end 5.08 -5.08)
@@ -99,7 +121,7 @@
 				)
 			)
 		)
-		(symbol "ICS-43434_1_1"
+		(symbol "SPH0645LM4H_1_1"
 			(pin power_in line
 				(at 0 5.08 270)
 				(length 2.54)
@@ -275,6 +297,28 @@
 		)
 		(property "ki_keywords" "temperature humidity i2c sensor"
 			(at 0 0 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "MPN" "AHT20"
+			(at 0 -2.54 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(hide yes)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "LCSC" "TBD"
+			(at 0 -5.08 0)
 			(show_name no)
 			(do_not_autoplace no)
 			(hide yes)

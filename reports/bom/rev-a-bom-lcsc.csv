@@ -1,8 +1,8 @@
 Block,Ref,Part,MPN,LCSC#,JLC_Class,Price@10_est_USD,Stock_est,Lifecycle,Alternate,Notes
 "Block 1 - MCU+Power+USB",U1,"ESP32-S3 module","ESP32-S3-WROOM-1-N16R8",TBD,Extended,4.00,Moderate,Active,ESP32-S3-WROOM-1-N8R8,Stock KiCad symbol RF_Module
-"Block 1 - MCU+Power+USB",U2,"3V3 LDO 1A","AP7361C-33ER-13 (SOT-223)",TBD,Extended,0.30,High,Active,TLV75901PDRVR,Stock KiCad Regulator_Linear
+"Block 1 - MCU+Power+USB",U2,"3V3 LDO 1A","AP7361C-33ER-13 (SOT-223R)",TBD,Extended,0.30,High,Active,TLV75901PDRVR,"ER suffix only! SOT223R: 1=GND 2=OUT 3=IN. -33E-13 has wrong pinout."
 "Block 1 - MCU+Power+USB",U5,"USB ESD","USBLC6-2SC6 (SOT-23-6)",TBD,Extended,0.15,High,Active,ESD7351,Stock KiCad Power_Protection
-"Block 1 - MCU+Power+USB",J1,"USB-C receptacle","USB4085-GF-A (GCT)",TBD,Extended,0.50,High,Active,HRO TYPE-C-31-M-12,Stock KiCad connector
+"Block 1 - MCU+Power+USB",J1,"USB-C receptacle","USB4085-GF-A (GCT)",TBD,Extended,0.50,High,Active,HRO TYPE-C-31-M-12,"Footprint: Connector_USB:USB_C_Receptacle_GCT_USB4085"
 "Block 1 - MCU+Power+USB",SW1-SW3,"Tactile switch","TL3342F160QG",TBD,Extended,0.12,Good,Active,TS-1187A (Basic),Stock KiCad footprint
 "Block 1 - MCU+Power+USB",R1,R2,"0603 5.1kΩ 1%",Generic,C25919,Basic,0.002,Very High,Active,-
 "Block 1 - MCU+Power+USB",R3-R5,"0603 10kΩ 1%",Generic,C25804,Basic,0.002,Very High,Active,-
@@ -17,8 +17,7 @@ Block,Ref,Part,MPN,LCSC#,JLC_Class,Price@10_est_USD,Stock_est,Lifecycle,Alternat
 "Block 2 - Audio Out",C_amp_bulk,"TH radial 470-1000µF 16V",Generic,C144601/4,Basic,0.06,High,Active,-
 "Block 2 - Audio Out",C_amp_cer,"0603 0.1µF 50V X7R",Generic,C30722,Basic,0.002,Very High,Active,-
 "Block 2 - Audio Out",J2,"JST-PH 2-pin SMD",Generic,C420309,Basic,0.03,High,Active,-
-"Block 3 - Mic",MK1,"I2S MEMS mic","INMP441 (OBSOLETE)",-,-,-,-,OBSOLETE,"→ ICS-43434","DO NOT USE - EOL per SQU-11"
-"Block 3 - Mic",MK1_alt,"I2S MEMS mic","ICS-43434 (TDK InvenSense)",TBD,Extended,2.50,Moderate,Active,INMP441 (obsolete),Needs KiCad symbol import
+"Block 3 - Mic",MK1,"I2S MEMS mic","SPH0645LM4H-B (Knowles)",TBD,Extended,3.50,Moderate,Active,SPH0645LM4H-H,"Bottom-port LGA-6. -B=tray, -H=tape&reel. L/R→GND. Footprint includes port hole."
 "Block 4 - LED Ring",U4,"Quad level shifter","74AHCT125PW (TSSOP-14)",TBD,Extended,0.20,High,Active,74HCT125,Stock KiCad 74xx
 "Block 4 - LED Ring",R_led,"0603 330-470Ω 1%",Generic,C25727/8,Basic,0.002,Very High,Active,-
 "Block 4 - LED Ring",C_led_bulk,"TH radial 1000µF 16V",Generic,C144604,Basic,0.08,High,Active,-

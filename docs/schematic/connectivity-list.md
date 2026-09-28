@@ -79,9 +79,9 @@ are UART0). GPIO1,2,39–42(JTAG),47,48 free.
 *Not yet drawn. Signals per master pin map: I2S LRCLK→GPIO16, BCLK→GPIO17,
 DIN→GPIO18, SD(mute)→GPIO7. Append the flat rows here once wired.*
 
-## Block 3 — Mic (INMP441)
+## Block 3 — Mic (SPH0645LM4H)
 
-*Not yet drawn. BCLK→GPIO4, WS→GPIO5, DIN→GPIO6.*
+*Not yet drawn. BCLK→GPIO4, WS→GPIO5, DIN→GPIO6. L/R→GND. Knowles bottom-port LGA-6.*
 
 ## Block 4 — LED ring (WS2812B + 74AHCT125)
 

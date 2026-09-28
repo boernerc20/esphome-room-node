@@ -34,8 +34,8 @@ Everything the breadboard taught us in Phase 0 is designed in from day one.
         3V3 RAIL   speaker     WS2812B (27px)       │
      ┌──┬──┬──┐    JST-PH       ring, DIN           │
      │  │  │  │                                     │
-  ESP32 INMP AHT  e-paper ◄── SPI ──┐               │
-  -S3   441  20   2.9"              │               │
+  ESP32 SPH0645 e-paper ◄── SPI ──┐               │
+  -S3   LM4H 2.9"              │               │
    │     │    │    │                │               │
    └─────┴────┴────┴── I2S / I2C / SPI / GPIO ──────┘
                    ESP32-S3-WROOM-1-N16R8
@@ -61,7 +61,7 @@ USB-C VBUS 5V ──┬── bulk 10µF + 0.1µF (input)
                 │             └── 3V3 LDO Vin      (+ input cap per datasheet)
                 │
                 └── 3V3 LDO OUT ──┬── ESP32-S3 3V3 (+ bulk 22–47µF + per-pin 0.1µF)
-                                  ├── INMP441 VDD  (+0.1µF)
+                                  ├── SPH0645LM4H VDD  (+0.1µF)
                                   ├── AHT20 VDD    (+0.1µF)
                                   └── e-paper VCC  (+0.1µF)
 ```
@@ -93,7 +93,7 @@ From `room-node.yaml`. **Strapping pins on ESP32-S3: GPIO0, 3, 45, 46.**
 
 | Function | Signal | GPIO | Note |
 |---|---|---|---|
-| I2S mic (INMP441) | BCLK | GPIO4 | |
+| I2S mic (SPH0645LM4H) | BCLK | GPIO4 | |
 | | WS/LRCLK | GPIO5 | |
 | | DIN/SD (data in) | GPIO6 | |
 | I2S speaker (MAX98357A) | LRCLK | GPIO16 | |
@@ -137,7 +137,7 @@ Each block becomes one KiCad hierarchical sheet. **MCU, power, and USB are one s
    WROOM-1 decoupling, 3V3 LDO, USB-C + ESD, EN reset RC, IO0 boot, VA button on IO38,
    antenna keep-out, test points.
 2. **Audio out (MAX98357A)** — I2S, GAIN→Vin (6 dB), SD→GPIO7, decoupling, speaker JST-PH.
-3. **Mic (INMP441)** — I2S, L/R→GND, placement/port-hole notes (far from speaker).
+3. **Mic (SPH0645LM4H)** — I2S, L/R→GND, bottom-port LGA-6 footprint with port hole, placement (far from speaker).
 4. **LED ring (WS2812B + 74AHCT125)** — level shift, 330–470 Ω, 1000 µF, connector.
 5. **Sensor (AHT20)** — I2C + pull-ups, **thermal island** (see Block 1 LDO notes).
 6. **Display (2.9" e-paper)** — SPI + connector matching Waveshare cable.
@@ -191,7 +191,7 @@ passives by hand.
 | U3 | MAX98357AETE+ | I2S Class-D amp |
 | U4 | 74AHCT125 (SOIC/TSSOP) | LED level shifter |
 | U5 | USBLC6-2SC6 | USB ESD array |
-| MK1 | INMP441 | I2S MEMS mic (or footprint-compat upgrade path) |
+| MK1 | SPH0645LM4H | I2S MEMS mic (Knowles). Bottom-port LGA-6. Suffix: -B (tray) or -H (tape & reel). |
 | U6 | AHT20 | temp/humidity |
 | J1 | USB-C receptacle (16-pin) | power + native USB |
 | J2 | JST-PH 2-pin | speaker out |
