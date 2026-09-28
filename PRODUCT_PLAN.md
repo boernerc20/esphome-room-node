@@ -101,6 +101,7 @@ Prove the design is worth laying out. Exit criteria: clean audio, reliable wake�
 - [ ] USB power meter (~$15) — real current budget numbers for the power tree
 - [ ] Cheap 8-ch logic analyzer (~$15, sigrok-compatible) — I2S/I2C debugging, essential for PCB bring-up
 - [ ] **Physical mic-mute switch** (slide or latching) — v1 privacy feature, brand pillar
+- [ ] **SPH0645LM4H breakout** for the dev breadboard (e.g. Adafruit 3421) — so the prototype matches the rev A mic and Felix can validate the SPH0645 I2S settings before boards arrive *(Chris to confirm whether one is already on the bench)*
 - [ ] Rotary encoder w/ push (optional) — volume/mute dial à la Voice PE; decide in v1 scope
 - [ ] Final LED ring/strip at deliberate count & density for the enclosure (27 was incidental; 30/m wraps the display perimeter per HARDWARE.md)
 - [ ] Good Display GDEY029T94 (or equiv raw 2.9" panel) — second-source/BOM-cost eval vs Waveshare module
@@ -129,13 +130,15 @@ One board, devkit replaced by module. Get to "boards that work on the bench."
   - Power tree: 5 V rail → amp + LEDs; 3V3 via decent LDO (not AMS1117 — pick low-noise, e.g. ME6217/AP2112 class or small buck if LED budget grows); per-IC 0.1 µF + bulk per rail; **audio decoupling designed in from day 1** (this is what the breadboard taught us).
   - MAX98357A: GAIN strap footprint (choose 6 dB default), SD gate from GPIO7 as today; speaker JST-PH 2-pin.
   - WS2812B chain: **74AHCT125 level shifter**, 330 Ω series, 1000 µF bulk footprint.
-  - INMP441 (or footprint-compatible upgrade path), placed **far from speaker**, port hole on board edge/underside per datasheet acoustic guidance.
+  - **Knowles SPH0645LM4H** I2S mic (decision 2026-09-28; INMP441 is obsolete) — `SEL` → GND (left), 0.1 µF at VDD, 100 kΩ DATA pull-down, **bottom port: acoustic hole through the PCB** (stock KiCad footprint carries it), placed **far from speaker**. See `rev-a-architecture.md` Block 3.
+  - **USB-C CC sensing on GPIO1** (decision 2026-09-28) — CC1/CC2 summed through 2 × 100 kΩ onto one ADC pin (+100 nF, test point); firmware sets the LED brightness cap from the source's advertisement. No second ADC pin needed.
   - AHT20 + I2C pull-ups; e-ink via FPC/JST matching Waveshare cable; boot/reset buttons; GPIO0 user button; test points (TX/RX/EN/IO0/3V3/5V/GND).
 - [ ] Pin map review against strapping pins — current GPIO map in `HARDWARE.md` is the baseline; document any change in both files.
 - [ ] **Layout: 4-layer** with a solid ground plane — the plane is what enforces the Phase 0 star-ground lesson with a Class-D amp, MEMS mic, WS2812B switching and an RF module on one board; cost delta at 5 boards is negligible. Antenna clearance per Espressif appnote, I2S short runs, LED power routed away from mic/amp analog area.
 - [ ] **Design for hand assembly** (rev A is hand-built — see Decisions log): single-sided placement, ≥0.5 mm passive spacing and extra clearance around the module/QFN, 0603 minimum, through-hole for the audio bulk cap, tented thermal vias, human-readable silkscreen (pin-1 dots, polarity bars).
 - [ ] Order **5 bare boards + stencil, ENIG finish** (flat pads for the 0.5 mm-pitch QFN and USB-C). Order 3–5× passives and 2–3× ICs/connectors as spares.
 - [ ] **Bring-up checklist:** continuity-check every rail to GND → current-limited bench supply at ~200 mA before ever plugging in USB → 5 V rail → 3V3 rail → USB enumerate → flash → each peripheral → audio noise floor vs breadboard.
+- [ ] **Hot-plug inrush test** (decision 2026-09-28): plug into a laptop USB port **10+ times** — the port must never shut off and the board must boot every time. Fail → rev B soft-start switch (Decisions log). Check the CC_SENSE reading (TP8) against a 3 A charger, the laptop port and a C-to-A cable at the same time.
 - [ ] Keep DFM for **JLCPCB PCBA** in view for the Phase 4 pilot (parts from LCSC where possible; check stock/alternates before finalizing BOM). Fallback if bring-up fights back: a later JLCPCB order placing *only* the module and QFN, passives by hand.
 
 ## Phase 3 — Enclosure
@@ -179,6 +182,7 @@ One board, devkit replaced by module. Get to "boards that work on the bench."
 - 2026-07-28: **3V3 rail stays linear (AP7361C-33, SOT-223).** Average 3V3 load is ~100–150 mA → ~0.2 W dissipation, not the ~0.85 W a peak-current calc suggests, so package choice (SOT-223/DFN with copper pour, θJA ≈ 60 °C/W) carries it. A buck would save ~0.17 W of ~1.5 W total board heat, would *not* fix temp-sensor bias (the module and LED strip out-dissipate the regulator), and would inject switching noise beside the mic and Class-D amp. AHT20 gets a thermal island instead. Revisit at rev B if bring-up shows thermal trouble.
 - 2026-07-28: **Module is N16R8**, not N8R8 — matches the validated breadboard part. GPIO35/36/37 are consumed by the octal PSRAM.
 - 2026-07-28: **Power tree = USB-C 5 V** (5.1 kΩ CC pull-downs, no dedicated LED supply). Measured whole-node current on bench supply: **~0.31 A** blue-breathing state, **~1.0 A** at solid-white 100% — well within USB-C headroom. Keep a firmware LED-brightness cap as insurance for legacy 500 mA USB-A sources. WS2812B **1000 µF bulk cap + 330–470 Ω DIN series resistor = PCB footprints** (validated unnecessary on a stiff bench supply / short strip, but kept for real USB-C source impedance and full-white load; bulk cap at the strip/connector, DIN resistor source-side after the level shifter).
+- 2026-09-28: **Rev A decisions D1–D3 (Chris, SQU-2 `room-node-plan` v5 §5).** **D1 — mic = Knowles SPH0645LM4H**, replacing the obsolete INMP441. Same I2S pins (GPIO4/5/6), `SEL` → GND = left channel. Bottom port, so the PCB needs an acoustic hole under the mic (stock KiCad footprint) and the enclosure a sealed path to the board underside. Distributor listings show the SPH0645LM4H suffixes as Obsolete too — stock/alternate check with Nora (SQU-14); Chris decides whether rev A uses remaining stock or re-picks (candidate: TDK ICS-43434, compatibility unverified). **D2 — VBUS inrush accepted** (~1.5–2 mF bulk vs USB's 10 µF attach limit). No soft-start switch in rev A; bring-up hot-plugs the board 10+ times on a laptop port. **If that test fails, rev B adds a soft-start load switch on VBUS.** **D3 — GPIO1 = USB-C CC sensing:** CC1/CC2 → 2 × 100 kΩ → GPIO1 (ADC1_CH0) + 100 nF + TP. One pin reads either plug orientation (≈ 0.51 × active CC). Firmware sets the LED brightness cap from Default / 1.5 A / 3 A (thresholds from USB Type-C R2.0 Table 4-36). The mic-mute state moves to GPIO2 (SQU-10). Free GPIO left: 39–42 (JTAG), 47, 48.
 
 ## Risks
 
@@ -187,3 +191,4 @@ One board, devkit replaced by module. Get to "boards that work on the bench."
 3. **E-ink cost** (~$15–20) dominates BOM — evaluate cheaper panels or a display-less SKU.
 4. **HA Voice PE price anchor** (~$59) — our display+sensors must justify the delta; sharpen positioning early.
 5. Single-source parts (Waveshare panel, CE32A-8) — identify seconds sources during Phase 2 BOM work.
+6. **Mic lifecycle** — INMP441 is obsolete, and distributor listings show SPH0645LM4H as Obsolete too. Rev A (5 boards) can live on remaining stock; the Phase 4 pilot needs an active, footprint-checked I2S mic.
