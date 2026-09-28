@@ -83,9 +83,9 @@ DIN→GPIO18, SD(mute)→GPIO7. Append the flat rows here once wired.*
 
 *Not yet drawn. BCLK→GPIO4, WS→GPIO5, DIN→GPIO6.*
 
-## Block 4 — LED ring (WS2812B + 74AHCT125)
+## Block 4 — LED ring (WS2812B)
 
-*Not yet drawn. DIN→GPIO21 → level shifter → strip.*
+*Not yet drawn. DIN→GPIO21 → 330–470 Ω series → strip. No level shifter (D4 2026-09-28); rev B adds the 74AHCT125 back if the strip flickers at bring-up.*
 
 ## Block 5 — Sensor (AHT20)
 
