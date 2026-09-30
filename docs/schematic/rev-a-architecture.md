@@ -11,7 +11,9 @@ Review each block before layout — a wrong decision here costs a board spin.
 
 **Design targets:** ESP32-S3-WROOM-1-**N16R8** module (matches the validated breadboard
 part), USB-C 5 V input (native USB for
-flash/logs), 2-layer if routable (4-layer if audio noise demands a ground plane).
+flash/logs), **4-layer with a solid ground plane** (decision 2026-09-25 — the plane
+enforces the Phase 0 star-ground lesson with a Class-D amp, MEMS mic, WS2812B switching
+and an RF module on one board; the earlier "2-layer if routable" fallback is dropped).
 Everything the breadboard taught us in Phase 0 is designed in from day one.
 
 ---
@@ -78,10 +80,10 @@ USB-C VBUS 5V ──┬── bulk 10µF + 0.1µF (input)
   across MAX98357A Vin↔GND, **at the chip**.
 - **LED:** 1000 µF bulk at the strip connector; 330–470 Ω series on DIN (source-side,
   after the level shifter).
-- **Grounding:** single ground pour, but route the amp and LED return currents so they
-  do **not** share a path with the mic/sensor analog ground (Phase 0 star-ground lesson).
-  On a 2-layer board this means deliberate return-path planning; if it fights you, go
-  4-layer with a solid ground plane.
+- **Grounding:** **4-layer with a solid ground plane** (2026-09-25 decision). Route the
+  amp and LED return currents so they do **not** share a path with the mic/sensor analog
+  ground (Phase 0 star-ground lesson) — the plane makes that easy but doesn't draw the
+  star routing for you; the returns still have to be routed deliberately.
 - **Firmware LED cap:** keep a max-brightness clamp so a legacy 500 mA USB-A source can't
   be over-drawn by a full-white command.
 
@@ -141,9 +143,11 @@ Each block becomes one KiCad hierarchical sheet. **MCU, power, and USB are one s
 4. **LED ring (WS2812B + 74AHCT125)** — level shift, 330–470 Ω, 1000 µF, connector.
 5. **Sensor (AHT20)** — I2C + pull-ups, **thermal island** (see Block 1 LDO notes).
 6. **Display (2.9" e-paper)** — SPI + connector matching Waveshare cable.
-
-*No mic-mute switch in rev A — undesigned, and the GPIO7 SD gate already handles
-residual audio after TTS. Revisit for v2 (see `PRODUCT_PLAN.md` brand pillar 4).*
+7. **Physical mic-mute switch + state GPIO** — hardware mic cut (approved 2026-09-25,
+   decision A1). Circuit TBD by the architect; switch cuts the mic in hardware (mic
+   power or mic data), and a free GPIO (e.g. GPIO1/2/47/48) lets firmware read the
+   switch and show the state on the ring. See `PRODUCT_PLAN.md` Decisions log and
+   rendered by Iris before it becomes a sheet.
 
 ---
 

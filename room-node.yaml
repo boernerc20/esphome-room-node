@@ -74,6 +74,10 @@ i2s_audio:
     i2s_lrclk_pin: GPIO16
     i2s_bclk_pin: GPIO17
 
+# Mic: Adafruit SPH0645LM4H breakout (3421), replaced the INMP441 2026-09-30.
+# Same GPIOs: BCLK->GPIO4, LRCL->GPIO5, DOUT->GPIO6, SEL->GND (left), 3V->3V3.
+# SPH0645 sends 18-bit data in a 32-bit slot with a large DC offset, so keep
+# bits_per_sample 32bit and correct_dc_offset on.
 microphone:
   - platform: i2s_audio
     id: mic
