@@ -4,30 +4,30 @@ Block,Ref,Part,MPN,LCSC#,JLC_Class,Price@10_est_USD,Stock_est,Lifecycle,Alternat
 "Block 1 - MCU+Power+USB",U5,"USB ESD","USBLC6-2SC6 (SOT-23-6)",TBD,Extended,0.15,High,Active,ESD7351,Stock KiCad Power_Protection
 "Block 1 - MCU+Power+USB",J1,"USB-C receptacle","USB4085-GF-A (GCT)",TBD,Extended,0.50,High,Active,HRO TYPE-C-31-M-12,"Footprint: Connector_USB:USB_C_Receptacle_GCT_USB4085"
 "Block 1 - MCU+Power+USB","SW1-SW3","Tactile switch","TL3342F160QG",TBD,Extended,0.12,Good,Active,TS-1187A (Basic),Stock KiCad footprint
-"Block 1 - MCU+Power+USB","R1,R2","0603 5.1kΩ 1%",Generic,C25919,Basic,0.002,Very High,Active,-
-"Block 1 - MCU+Power+USB","R3-R5","0603 10kΩ 1%",Generic,C25804,Basic,0.002,Very High,Active,-
-"Block 1 - MCU+Power+USB",C1,"0805 10µF 16V X5R",Generic,C169506,Basic,0.015,Very High,Active,-
-"Block 1 - MCU+Power+USB",C2,"0603 0.1µF 50V X7R",Generic,C30722,Basic,0.002,Very High,Active,-
-"Block 1 - MCU+Power+USB",C3,"0603 1µF 16V X7R",Generic,C15850,Basic,0.005,Very High,Active,-
-"Block 1 - MCU+Power+USB",C4,"0805 22µF 10V X5R",Generic,C54614,Basic,0.02,High,Active,-
-"Block 1 - MCU+Power+USB","C5,C7","0603 0.1µF 50V X7R",Generic,C30722,Basic,0.002,Very High,Active,-
-"Block 1 - MCU+Power+USB",C6,"0805 22µF 10V X5R",Generic,C54614,Basic,0.02,High,Active,-
-"Block 1 - MCU+Power+USB",C8,"0603 1µF 16V X7R",Generic,C15850,Basic,0.005,Very High,Active,-
+"Block 1 - MCU+Power+USB","R1,R2","0603 5.1kΩ 1%",Generic,C25919,Basic,0.002,Very High,Active,-,
+"Block 1 - MCU+Power+USB","R3-R5","0603 10kΩ 1%",Generic,C25804,Basic,0.002,Very High,Active,-,
+"Block 1 - MCU+Power+USB",C1,"0805 10µF 16V X5R",Generic,C169506,Basic,0.015,Very High,Active,-,
+"Block 1 - MCU+Power+USB",C2,"0603 0.1µF 50V X7R",Generic,C30722,Basic,0.002,Very High,Active,-,
+"Block 1 - MCU+Power+USB",C3,"0603 1µF 16V X7R",Generic,C15850,Basic,0.005,Very High,Active,-,
+"Block 1 - MCU+Power+USB",C4,"0805 22µF 10V X5R",Generic,C54614,Basic,0.02,High,Active,-,
+"Block 1 - MCU+Power+USB","C5,C7","0603 0.1µF 50V X7R",Generic,C30722,Basic,0.002,Very High,Active,-,
+"Block 1 - MCU+Power+USB",C6,"0805 22µF 10V X5R",Generic,C54614,Basic,0.02,High,Active,-,
+"Block 1 - MCU+Power+USB",C8,"0603 1µF 16V X7R",Generic,C15850,Basic,0.005,Very High,Active,-,
 "Block 1 - MCU+Power+USB","R6,R7","0603 100kΩ 1%",Generic,C25803,Basic,0.002,Very High,Active,-,"CC1/CC2 -> CC_SENSE sum (added 2026-09-28)"
 "Block 1 - MCU+Power+USB",C9,"0603 0.1µF 50V X7R",Generic,C30722,Basic,0.002,Very High,Active,-,"CC_SENSE filter at GPIO1 (added 2026-09-28)"
 "Block 1 - MCU+Power+USB",TP8,"Test pad D1.5mm",-,-,-,0.01,High,Active,-,"CC_SENSE test point (added 2026-09-28)"
 "Block 2 - Audio Out",U3,"I2S Class-D amp","MAX98357AETE+ (TQFN-16)",TBD,Extended,4.00,Moderate,Active,MAX98357BETE+,Stock KiCad Audio:MAX98357A
-"Block 2 - Audio Out",C_amp_bulk,"TH radial 470-1000µF 16V",Generic,C144601/4,Basic,0.06,High,Active,-
-"Block 2 - Audio Out",C_amp_cer,"0603 0.1µF 50V X7R",Generic,C30722,Basic,0.002,Very High,Active,-
-"Block 2 - Audio Out",J2,"JST-PH 2-pin SMD",Generic,C420309,Basic,0.03,High,Active,-
+"Block 2 - Audio Out",C_amp_bulk,"TH radial 470-1000µF 16V",Generic,C144601/4,Basic,0.06,High,Active,-,
+"Block 2 - Audio Out",C_amp_cer,"0603 0.1µF 50V X7R",Generic,C30722,Basic,0.002,Very High,Active,-,
+"Block 2 - Audio Out",J2,"JST-PH 2-pin SMD",Generic,C420309,Basic,0.03,High,Active,-,
 "Block 3 - Mic",MK1,"I2S MEMS mic","SPH0645LM4H-B (Knowles→Syntiant)",TBD,Extended,3.50,Moderate,"Transitioned (active via Syntiant; Knowles EOL)",SPH0645LM4H-H / ICS-43434,"Bottom-port LGA-6. -B=tray, -H=tape&reel. L/R→GND. Knowles line moved to Syntiant; DigiKey 5332440 active 2026-09-30. Alternate ICS-43434 (TDK) compat. unverified."
 "Block 3 - Mic",R8,"0603 100kΩ 1%",Generic,C25803,Basic,0.002,Very High,Active,-,"Mic DATA pull-down to GND (added 2026-09-28)"
 "Block 3 - Mic","R9,R10,R11","0603 33Ω",Generic,TBD,Basic,0.002,Very High,Active,-,"I2S mic BCLK/WS/DATA damping (added 2026-09-28). LCSC# TBD: LCSC C105881 (YAGEO RC0603FR-07330RL) candidate, verify 1% tolerance or 5% acceptable."
 "Block 3 - Mic",C10,"0603 0.1µF X7R",Generic,C30722,Basic,0.002,Very High,Active,-,"Mic VDD decoupling (added 2026-09-28)"
 "Block 3 - Mic",C11,"0603 100pF C0G 50V",Generic,TBD,Basic,0.01,High,Active,-,"Mic VDD RF filter, DNP (added 2026-09-28). LCSC# TBD: verify C0G 0603 100pF availability."
-"Block 4 - LED Ring",R_led,"0603 330-470Ω 1%",Generic,C25727/8,Basic,0.002,Very High,Active,-
-"Block 4 - LED Ring",C_led_bulk,"TH radial 1000µF 16V",Generic,C144604,Basic,0.08,High,Active,-
-"Block 4 - LED Ring",LED_strip,"WS2812B 27px strip",Off-board,-,-,-,-,Active,-
+"Block 4 - LED Ring",R_led,"0603 330-470Ω 1%",Generic,C25727/8,Basic,0.002,Very High,Active,-,
+"Block 4 - LED Ring",C_led_bulk,"TH radial 1000µF 16V",Generic,C144604,Basic,0.08,High,Active,-,
+"Block 4 - LED Ring",LED_strip,"WS2812B 27px strip",Off-board,-,-,-,-,Active,-,
 "Block 5 - Sensor",U6,"Temp/humidity sensor","AHT20",TBD,Extended,0.50,High,Active,SHT30,Needs KiCad symbol import
-"Block 5 - Sensor",R_i2c,"0603 4.7kΩ 1%",Generic,C25920,Basic,0.002,Very High,Active,-
-"Block 6 - Display",J3,"FPC 24-pin 0.5mm",Generic,TBD,Extended,0.15,Good,Active,-
+"Block 5 - Sensor",R_i2c,"0603 4.7kΩ 1%",Generic,C25920,Basic,0.002,Very High,Active,-,
+"Block 6 - Display",J3,"FPC 24-pin 0.5mm",Generic,TBD,Extended,0.15,Good,Active,-,
