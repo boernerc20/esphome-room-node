@@ -39,6 +39,8 @@ Everything the breadboard taught us in Phase 0 is designed in from day one.
   ESP32 SPH  AHT  e-paper ◄── SPI ──┐               │
   -S3  0645  20   2.9"              │               │
    │     │    │    │                │               │
+   │     └─ DATA ─[SW4 mute, pole A]── GPIO6         │
+   │          SW4 pole B ── MIC_MUTE_N ── GPIO2      │
    └─────┴────┴────┴── I2S / I2C / SPI / GPIO ──────┘
                    ESP32-S3-WROOM-1-N16R8
 ```
@@ -67,7 +69,7 @@ USB-C VBUS 5V ──┬── bulk 10µF + 0.1µF (input)
                 │             └── 3V3 LDO Vin      (+ input cap per datasheet)
                 │
                 └── 3V3 LDO OUT ──┬── ESP32-S3 3V3 (+ bulk 22–47µF + per-pin 0.1µF)
-                                  ├── SPH0645 VDD  (+0.1µF; via mic-mute switch, SQU-10)
+                                  ├── SPH0645 VDD  (+0.1µF; always on — mute breaks DATA, Block 7)
                                   ├── AHT20 VDD    (+0.1µF)
                                   └── e-paper VCC  (+0.1µF)
 ```
@@ -110,7 +112,7 @@ From `room-node.yaml`. **Strapping pins on ESP32-S3: GPIO0, 3, 45, 46.**
 |---|---|---|---|
 | I2S mic (SPH0645LM4H) | BCLK | GPIO4 | module pin 4 → MK1 pin 4 |
 | | WS/LRCLK | GPIO5 | module pin 5 → MK1 pin 1 |
-| | DATA (data in) | GPIO6 | module pin 6 ← MK1 pin 6; 100 kΩ pull-down |
+| | DATA (data in) | GPIO6 | module pin 6 ← SW4 pole A ← MK1 pin 6; 100 kΩ pull-down. Held at GND via 1 kΩ when muted (Block 7) |
 | I2S speaker (MAX98357A) | LRCLK | GPIO16 | |
 | | BCLK | GPIO17 | |
 | | DIN (data to amp) | GPIO18 | |
@@ -128,7 +130,7 @@ From `room-node.yaml`. **Strapping pins on ESP32-S3: GPIO0, 3, 45, 46.**
 | Boot button | INPUT_PULLUP | GPIO0 | ⚠ strapping (BOOT). Recovery/flash only, not user-facing. |
 | Native USB | D- / D+ | GPIO19 / GPIO20 | module pins **13 / 14**. USB-CDC logging + flashing — reserve |
 | USB-C CC sensing | CC_SENSE (analog in) | **GPIO1** | module pin **39**, ADC1_CH0. Decision 2026-09-28 |
-| Mic-mute state | MUTE_STATE (input) | GPIO2 *(reserved, pending SQU-10)* | module pin 38. Not final until the mute circuit lands |
+| Mic-mute state | `MIC_MUTE_N` (input) | **GPIO2** | module pin **38**. LOW = muted, HIGH = live. 10 kΩ pull-up. Not a strapping pin on the S3. Decision SQU-10, Block 7 |
 
 **Strapping check:** GPIO0 is the only strapping pin in use and it is now **boot/recovery
 only**. The VA button moved to **GPIO38** — on a shipped board, a user holding a
@@ -138,8 +140,8 @@ GPIO3/45/46 unused (good).
 
 **N16R8 pin availability:** GPIO26–32 are not broken out (flash), and **GPIO35/36/37 are
 consumed by the octal PSRAM** — the KiCad symbol labels them `PSRAM`. Do not route any of
-them. **GPIO1 is used** (CC sensing) and **GPIO2 is reserved** for the mic-mute state
-(SQU-10). Free & safe for future: GPIO39–42 (JTAG — leave clear if you want debug), 47, 48.
+them. **GPIO1 is used** (CC sensing) and **GPIO2 is used** for the mic-mute state
+(`MIC_MUTE_N`, Block 7). Free & safe for future: GPIO39–42 (JTAG — leave clear if you want debug), 47, 48.
 None of these are ADC pins — GPIO1 and GPIO2 were the last free ADC1 channels (ADC1 =
 GPIO1–10; ADC2 = GPIO11–20 is shared with Wi-Fi and cannot be read reliably while Wi-Fi
 is on).
@@ -161,14 +163,14 @@ Each block becomes one KiCad hierarchical sheet. **MCU, power, and USB are one s
 2. **Audio out (MAX98357A)** — I2S, GAIN→Vin (6 dB), SD→GPIO7, decoupling, speaker JST-PH.
 3. **Mic (SPH0645LM4H)** — I2S, SEL→GND, 100 kΩ DATA pull-down, VDD decoupling,
    bottom-port acoustic hole, placement far from speaker. Full net list below.
+   The mic-mute switch (Block 7) is drawn on this sheet.
 4. **LED ring (WS2812B)** — GPIO21 → DIN via 330–470 Ω (no level shifter, D4 2026-09-28), 1000 µF, connector.
 5. **Sensor (AHT20)** — I2C + pull-ups, **thermal island** (see Block 1 LDO notes).
 6. **Display (2.9" e-paper)** — SPI + connector matching Waveshare cable.
 7. **Physical mic-mute switch + state GPIO** — hardware mic cut (approved 2026-09-25,
-   decision A1). Circuit TBD by the architect; switch cuts the mic in hardware (mic
-   power or mic data), and a free GPIO (e.g. GPIO1/2/47/48) lets firmware read the
-   switch and show the state on the ring. See `PRODUCT_PLAN.md` Decisions log and
-   rendered by Iris before it becomes a sheet.
+   decision A1). DPDT slide switch SW4: pole A breaks the mic DATA line and holds the
+   ESP side at GND; pole B drives `MIC_MUTE_N` → GPIO2. No sheet of its own — drawn on
+   `microphone.kicad_sch`. Full design below (SQU-10).
 
 ---
 
@@ -289,8 +291,8 @@ to the mic and seals the port. Symbol and footprint pin numbers match the datash
 | 2 | SELECT | `GND` | **SEL → GND = left channel** (DATA driven while WS low), matches `channel: left`. Tie directly — SELECT low must be within GND + 0.2 V (Table 3). |
 | 3 | GND (ring pad) | `GND` | vias straight into the plane beside the ring, never inside it |
 | 4 | BCLK | `I2S_MIC_BCLK` | ← R9 33 Ω ← U1 pin 4 (GPIO4) |
-| 5 | VDD | `MIC_VDD` | `+3V3` via the mic-mute switch (SQU-10); C10 0.1 µF + C11 100 pF DNP at the pin |
-| 6 | DATA | `I2S_MIC_DATA` | → R11 33 Ω → U1 pin 6 (GPIO6); **R8 100 kΩ to GND** |
+| 5 | VDD | `+3V3` | always powered — the mute switch breaks DATA, not VDD (Block 7); C10 0.1 µF + C11 100 pF DNP at the pin |
+| 6 | DATA | `I2S_MIC_DATA_M` | → R11 33 Ω → SW4 pole A → `I2S_MIC_DATA` → U1 pin 6 (GPIO6); **R8 100 kΩ to GND** on the ESP side |
 
 **Why each part:**
 - **C10 0.1 µF X7R** — Knowles test and application circuit (Tables 2–3, Figure 8 note 1).
@@ -300,16 +302,14 @@ to the mic and seals the port. Symbol and footprint pin numbers match the datash
   fitted, it sits closest to the pin (note 3).
 - **R8 100 kΩ DATA pull-down** — *"When operating a single microphone on an I2S bus, a
   pull down resistor (100K Ohms) should be placed from the Data pin to ground"* (p.6). It
-  also makes GPIO6 read clean zeros when the mute switch removes VDD (the mic tri-states
-  DATA when powered down, p.5).
+  sits on the ESP side of SW4, so it also holds GPIO6 low during the switch's travel
+  between positions.
 - **R9/R10/R11 33 Ω series** — the datasheet's 27–51 Ω damping resistors (p.7), each at
   its **driving** end: R9/R10 at U1, R11 at MK1. They cut ringing and slow the 3 MHz BCLK
   edges (Part 15B hygiene). They can be 0 Ω if not needed.
 
-**Constraint handed to SQU-10 (mute):** if the switch cuts **VDD**, BCLK/WS keep toggling
-at 3.3 V into an unpowered mic. Check that the mic cannot be back-powered through its
-input clamp diodes — otherwise the mute is not a hardware guarantee. Cutting DATA (with
-R8 on the ESP side) or also gating BCLK are the alternatives.
+**Mute (resolved in Block 7):** the switch breaks **DATA**, not VDD, so BCLK/WS never
+drive an unpowered mic. See [Block 7](#block-7--physical-mic-mute-switch-squ-10).
 
 **Acoustic hole and placement (respin risk if missed):**
 - **Bottom port:** sound enters through the PCB hole under the mic. The acoustic path is
@@ -338,6 +338,165 @@ BCLK 1.024–4.096 MHz (16 kHz → 1.024 MHz), so each channel slot is 32 BCLKs.
 I2S (MSB one BCLK after WS changes), 24-bit two's-complement word with 18 valid bits,
 lower bits zero — read as 32-bit, as `room-node.yaml` does today. SPH0645 needs different ESP32 I2S settings from
 INMP441 — check `room-node.yaml` on an SPH0645 breakout before the boards arrive.
+
+---
+
+## Block 7 — Physical mic-mute switch (SQU-10)
+
+Approved for rev A 2026-09-25 (SQU-2, decision A1). Circuit designed 2026-09-30 (Iris,
+SQU-10). No sheet of its own: SW4 and its three passives go on `microphone.kicad_sch`,
+next to MK1. **Status: proposed. Chris signs off.**
+
+**What it does.** One DPDT slide switch, SW4. Both poles move together.
+- **Pole A breaks the mic's DATA line.** In MUTE, the ESP side of the line (GPIO6) is held
+  at GND through 1 kΩ. No mic data can reach the ESP32, whatever the firmware does.
+- **Pole B reports the switch position** on `MIC_MUTE_N` → GPIO2 (LOW = muted). Firmware
+  uses it to show the mute state on the ring. It is read-only. Firmware cannot unmute.
+
+```
+                          SW4 pole A (pins 1-2-3)
+ MK1 pin 6 ── R11 33Ω ── I2S_MIC_DATA_SW ── 3 ┐
+   DATA      (at MK1)                         2 (common) ── I2S_MIC_DATA ──┬── U1 pin 6 (GPIO6)
+                          MIC_DATA_CLAMP ──── 1 ┘                          └── R8 100k ── GND
+                                │
+                            R12 1k ── GND
+
+                          SW4 pole B (pins 4-5-6)
+ +3V3 ── R13 10k ──┬── MIC_MUTE_SW ── 5 (common)            4 ── NC
+                   ├── C12 100n ── GND        6 ── GND
+                   └── R14 1k ── MIC_MUTE_N ── U1 pin 38 (GPIO2)
+
+ MUTE position = pins 2↔1 and 5↔6.   LIVE position = pins 2↔3 and 5↔4.
+```
+
+| State | GPIO6 sees | GPIO2 (`MIC_MUTE_N`) |
+|---|---|---|
+| LIVE | mic DATA through R11 | HIGH (R13 pull-up) |
+| MUTE | GND through R12 1 kΩ (reads all zeros) | LOW |
+| Mid-travel (contacts open) | R8 100 kΩ to GND (zeros) | HIGH, via C12 ramp (τ = 1 ms) |
+| Switch or joint broken open | zeros (fails muted) | HIGH = reports "live" (fails safe: never shows muted while live) |
+
+**Why DATA, not VDD** (lens: privacy by hardware):
+- **A VDD cut would work for the SPH0645, but only because of that part.** Knowles
+  Table 1 rates BCLK/WS/SELECT to **ground** (−0.3 to +5.0 V), not to VDD. The
+  "Powered Down Mode" text (p.5) says *"The presence of CLK, WS and SELECT, have no effect
+  on this mode and the DATA pin is tri-stated."* So the back-powering worry raised in
+  SQU-15 does not apply to this mic.
+- **Why DATA anyway:** the SPH0645 is Obsolete at distributors (Block 3). A replacement
+  I2S mic may rate its inputs to VDD + 0.3 V (**Assumption** for ICS-43434, not checked).
+  Then a VDD cut would feed clock current into an unpowered part and the mute would depend
+  on firmware stopping the clocks. DATA is the mic's only output, so breaking it at the ESP
+  side is a complete cut **for any I2S mic**, with no dependency on part-specific behaviour.
+- **The mic stays powered** (0.6 mA). Unmute has no 50 ms power-up (Table 2 t_POWERUP), and
+  C10 is never hot-plugged onto +3V3. If firmware stops BCLK while muted, the mic drops to
+  sleep (3 µA typ., DATA high-Z; Table 2, p.5).
+- **GND clamp, not just an open contact.** Leakage across the open contacts: the switch's
+  contact capacitance (**Assumption:** ≤ 2 pF, not in the datasheet) forms a divider with
+  the GPIO6 node (~10 pF of trace and pad). An edge couples in at most ~0.55 V and decays
+  in ~12 ns (1 kΩ × 12 pF). The ESP samples DATA half a BCLK period (~490 ns at 16 kHz)
+  after the mic changes it. So nothing readable gets through: 0.55 V is below V_IL
+  (0.25 × VDD = 0.83 V, ESP32-S3 datasheet §5 DC characteristics). A bare R8 100 kΩ
+  would not guarantee this.
+- **Why 1 kΩ, not a hard short:** if firmware ever sets GPIO6 as an output HIGH, the
+  current is limited to 3.3 mA. The contact type (break-before-make) is not stated in the
+  JS datasheet, and it doesn't matter here: in a make-before-break moment the mic DATA sees
+  1.03 kΩ to GND, and Knowles Table 1 allows DATA shorted to GND "indefinite".
+
+**Why pole B is wired this way.**
+- **LOW = muted, so a broken switch fails safe.** An open contact or cracked joint reads
+  HIGH = "live". The ring may then show "live" when the mic is actually cut off, but
+  never "muted" when it is live.
+- **R13 10 kΩ + C12 100 nF:** 1 ms debounce RC. C12 is also the first ESD sink at the
+  switch.
+- **R14 1 kΩ in series, at SW4:** limits current into GPIO2's clamp diodes if ESD reaches
+  the contacts (lens: ESD and user touch). The JS housing and actuator are **nylon, with no
+  metal frame** (C&K JS datasheet "Materials"; dielectric 500 VAC min.). The user
+  touches only plastic, and there is no frame tab to ground.
+
+**GPIO2 check** (lens: pin and bus allocation):
+- Module pin **38** = IO2. Verified against the KiCad `RF_Module:ESP32-S3-WROOM-1` symbol.
+- **Not a strapping pin on the S3.** S3 straps are GPIO0, 3, 45, 46 (ESP32-S3 datasheet,
+  "Strapping Pins"). *GPIO2 **is** a strap on the classic ESP32*, so don't carry that rule
+  over. It is not a flash or PSRAM pin on N16R8 (26–32 and 33–37), and not JTAG (39–42).
+- The external R13 pull-up sets the level from power-on, whatever the pin's reset pull
+  state.
+- It is ADC1_CH1, the last free ADC pin. SQU-15 settled on one ADC pin for CC sensing
+  (GPIO1), so no conflict. **Fallback:** if bring-up shows CC sensing needs a second ADC
+  pin, mute moves to GPIO47. That needs only a global label change; GPIO47 is plain
+  3.3 V digital I/O on N16R8.
+
+**Power** (lens: power budget first): +3V3 load changes by +0.33 mA worst case (R13 when
+muted). The mic's 0.6 mA is unchanged. Negligible next to the ~0.5 A Wi-Fi TX peak.
+
+**Part 15B:** no new clocks and no switching regulator. When muted, the mic still drives
+DATA into the open stub R11 → SW4 pin 3 (a few mm). Firmware should stop the I2S RX clock
+while muted. That kills the stub activity, but emissions do not depend on it.
+
+### Switch part
+
+| | Primary | Alternate |
+|---|---|---|
+| MPN | **C&K JS202011AQN** | **E-Switch EG2219** |
+| Type | DPDT, 2-position, right-angle, THT | DPDT, 2-position, right-angle, THT |
+| Rating | 0.3 A @ 6 VDC; 5,000 cycles electrical | 0.5 A @ 15 VDC; 10,000 cycles |
+| Size | 9.0 × 3.5 mm body, 2.0 mm travel | 13.8 × 6.5 × 8.5 mm, 4 mm travel |
+| Housing | nylon housing + actuator, no metal | metal frame, 4 mounting tabs |
+| KiCad footprint (stock) | `Button_Switch_THT:SW_CK_JS202011AQN_DPDT_Angled` | `Button_Switch_THT:SW_E-Switch_EG2219_DPDT_Angled` (**not** a drop-in — different pitch, bigger) |
+| LCSC | **C221662**, 7,082 in stock, Active | not checked on LCSC |
+| Price (1 / 10 / 100) | $0.96 / $0.76 / $0.57 (LCSC) | not readable (distributor pages 403) |
+| Stock (public pages, 2026-09-30) | LCSC 7,082. A second distributor listing (via web search) shows ~7.4k; DigiKey itself returns 403 | listed by DigiKey, Mouser, TME, Newark; counts not readable |
+| Lifecycle | Active (LCSC); in production since 2007 | Active per listings; **Nora confirms** |
+
+Pinout for both: pins 2 and 5 are the commons; pins 1/6 and 3/4 are the throws at each
+end. The stock symbol `Switch:SW_DPDT_x2` matches (unit 1 = pins 1-2-3, unit 2 = pins
+4-5-6, common = B = pins 2/5).
+
+**Why JS202011AQN:** right-angle, so the actuator comes out through a slot in the
+enclosure side wall. THT legs take the user's push force better than SMD pads. It's small,
+all-plastic (no ESD path through a metal frame), stocked at LCSC and has a stock KiCad
+footprint. **Trade-offs:** 5,000 rated cycles at full load (≈ 2.7 years at 5 toggles a
+day; **Assumption:** logic-level loads wear only mechanically, so the real life is longer).
+Silver contacts at µA loads rely on the sliding wipe to stay clean. The EG2219 is the
+fallback if either shows up at bring-up or in the pilot. Using it means a footprint change
+and grounding its frame tabs. LCSC also lists **SHOU HAN MSK-22D18G2 051** as an
+alternative; its pinout and size are **unverified**, so Nora checks it.
+
+### Placement and mechanical constraints
+
+- **SW4 at the board edge, on the mic side**, close to MK1. Keep the DATA run
+  MK1 → R11 → SW4 → GPIO6 over solid ground. Keep SW4 far from the speaker connector,
+  the amp outputs and the antenna. A finger near the antenna detunes it.
+- R12 and C12/R13/R14 sit at SW4. R8 stays near U1.
+- **Enclosure (for the enclosure role):** a side-wall slot for the actuator plus its
+  2.0 mm travel. Print a **red mark that is visible only in the MUTE position**, so the
+  switch itself shows mute state with no power and no firmware. **Open question:** how far
+  the actuator sticks out past the PCB edge. Read it from the JS datasheet drawing (the
+  text extraction could not read it) and hold the part to a ruler.
+- Silkscreen: `MIC` and an arrow marking the MUTE side.
+
+### Firmware interface (Felix, Phase 1 — PCB only, not the breadboard)
+
+- `binary_sensor` on **GPIO2**, `inverted: true` (ON = muted). External pull-up fitted;
+  internal pull-up optional. Filter `delayed_on_off: 20ms`.
+- Read it **at boot, before** starting `micro_wake_word`. On muted: stop wake word and the
+  voice assistant, stop I2S RX, and show mute on the ring. On live: restart them.
+- HA gets a **read-only** "Mic muted" entity. Do not add a software "unmute" control; it
+  could not override pole A anyway.
+- Never configure GPIO6 as an output.
+- Optional fault check: if the switch reads live but I2S returns exact zeros for more than
+  ~5 s, raise a "mic fault" diagnostic.
+- `room-node.yaml` (as-flashed, breadboard) is unchanged. This goes in with the PCB
+  substitutions.
+
+### Bring-up checks
+
+1. Before power: DMM on `I2S_MIC_DATA` (R8 pad) to GND: **~1 kΩ in MUTE, ~100 kΩ in LIVE**.
+   This confirms pole A and which slider end is MUTE, and fixes the silkscreen/enclosure mark.
+2. Powered: GPIO2 logs LOW in MUTE and HIGH in LIVE. Toggle 20×. There should be exactly
+   one state change per toggle (debounce works).
+3. With audio running: MUTE → the wake word never fires and the I2S samples are exact
+   zeros. LIVE → normal noise floor, the same as before SW4 was added (the switch contacts
+   add no audible noise).
 
 ---
 
@@ -410,5 +569,10 @@ passives by hand.
 | R9, R10, R11 | 33 Ω 0603 | I2S mic BCLK / WS / DATA damping (Block 3) |
 | C10 | 0.1 µF X7R 0603 | mic VDD decoupling (Block 3) |
 | C11 | 100 pF C0G 0603, **DNP** | mic VDD RF filter footprint (Block 3) |
+| SW4 | **C&K JS202011AQN** (LCSC C221662), DPDT slide, right-angle THT | mic-mute switch (Block 7). Alt: E-Switch EG2219 (different footprint) |
+| R12 | 1 kΩ 0603 | `I2S_MIC_DATA` clamp to GND in MUTE (Block 7) |
+| R13 | 10 kΩ 0603 | `MIC_MUTE_SW` pull-up (Block 7) |
+| R14 | 1 kΩ 0603 | `MIC_MUTE_N` series to GPIO2 (Block 7) |
+| C12 | 100 nF X7R 0603 | `MIC_MUTE_SW` debounce / ESD (Block 7) |
 
 *(Speaker = Dayton CE32A-8 off-board via J2; ring = 27-px WS2812B off-board via connector.)*
