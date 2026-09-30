@@ -1,0 +1,3 @@
+(fp_lib_table
+	(lib (name "room-node")(type "KiCad")(uri "${KIPRJMOD}/lib/footprints/room-node.pretty")(options "")(descr "Project-specific footprints"))
+)

@@ -70,7 +70,7 @@ you want hardware debug), GPIO47, GPIO48 — none of these has an ADC.
 
 - Board + all peripherals run from a single **5V USB supply** into the S3.
 - **AHT20** and **e-paper** are 3.3V — take them from the board's **3V3** rail.
-- **INMP441** runs at 3.3V. **MAX98357A** and **WS2812B** run at **5V**.
+- **SPH0645LM4H** runs at 3.3V. **MAX98357A** and **WS2812B** run at **5V**.
 - **WS2812B (27 px):** powered from the board's **5V** rail (USB-C VBUS). Whole-node draw measured on the Phase 0 bench supply: **~0.31 A** blue-breathing, **~1.0 A** solid-white 100% — comfortably within USB-C 5 V headroom, so no dedicated LED supply. Keep a firmware LED-brightness cap as insurance for legacy 500 mA USB-A sources; don't command the ring to full white off a plain 500 mA USB-A port.
 - **Grounds:** common ground overall (non-negotiable for I2S/WS2812B/I2C), but wire it
   as a **star** — the amp GND and the LED-strip GND each return on their own lead to

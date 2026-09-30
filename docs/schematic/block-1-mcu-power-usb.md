@@ -20,7 +20,7 @@ validated breadboard part, not the N8R8 earlier drafts named.
 | U1 | `RF_Module:ESP32-S3-WROOM-1` | `RF_Module:ESP32-S3-WROOM-1` | ESP32-S3-WROOM-1-N16R8 | set Value to the N16R8 string |
 | U2 | `Regulator_Linear:AP1117-33` | `Package_TO_SOT_SMD:SOT-223-3_TabPin2` | AP7361C-33ER-13 | pin-compatible with AP1117; see LDO section |
 | U5 | `Power_Protection:USBLC6-2SC6` | `Package_TO_SOT_SMD:SOT-23-6` | USBLC6-2SC6 | USB ESD array |
-| J1 | `Connector:USB_C_Receptacle_USB2.0_16P` | `Connector_USB:USB_C_Receptacle_GCT_USB4085-GF-A` | USB4085-GF-A | JLCPCB alt: HRO TYPE-C-31-M-12 |
+| J1 | `Connector:USB_C_Receptacle_USB2.0_16P` | `Connector_USB:USB_C_Receptacle_GCT_USB4085` | USB4085-GF-A | JLCPCB alt: HRO TYPE-C-31-M-12 |
 | R1, R2 | `Device:R` | 0603 | 5.1 kΩ 1% | CC1/CC2 pull-downs |
 | R3, R4, R5 | `Device:R` | 0603 | 10 kΩ | EN / IO0 / VA_BTN pull-ups |
 | C1 | `Device:C` | 0805 | 10 µF 16 V X5R | VBUS bulk |
