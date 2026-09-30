@@ -162,4 +162,4 @@ electrical note). [amazon.com/dp/B00BYE9AKM](https://www.amazon.com/dp/B00BYE9AK
 - USB-C CC1/CC2 → 2 × 100 kΩ → GPIO1 (+ 100 nF, test point) for source-current sensing.
 - Bring **GPIO0** (button) and **EN/RESET** to accessible pads/headers for flashing +
   recovery.
-- WS2812B is 5V; ESP32 data is 3.3V — the **74AHCT125** level shifter on the DIN line is **part of the PCB design** (see `rev-a-architecture.md` Block 4), not an optional "in case" part. Wire it with the 330–470 Ω series resistor source-side and the 1000 µF bulk cap at the strip.
+- WS2812B is 5V; ESP32 data is 3.3V. Rev A drives DIN **directly from GPIO21** through a **330–470 Ω series resistor** (source-side, near the GPIO) — **no level shifter** (decision D4, 2026-09-28). 3.3 V is just below the WS2812B "1" threshold (~3.5 V at 5 V), so if the strip flickers at bring-up, rev B adds the 74AHCT125 back. Keep the 1000 µF bulk cap at the strip.

@@ -17,6 +17,13 @@ A per-room voice satellite + environment node for Home Assistant:
 
 **Positioning:** the open, hackable alternative to a Home Assistant Voice Preview Edition with a *display* and *sensors* built in. Open-source firmware, sold as assembled hardware. Revenue = hardware margin (open firmware is the marketing, not the product).
 
+## Product direction (2026-09-25)
+
+- **v1 is simple and Home Assistant-only.** The node talks to Home Assistant only, via the native API. Most buyers use HA. No direct links from the node to other services in v1.
+- **Intelligence stays on the server, later.** Hermes and other AI agents connect *behind* HA (via the Assist conversation agent), not in v1 scope. The node does not change for it.
+- **Users can select the wake word.** Firmware ships several `micro_wake_word` models plus a select entity in HA. Default is **"Hey Jarvis"** (`hey_jarvis`); users can change it. This is a **Phase 1 firmware item**, not now.
+- **Focus now: hardware.** Keep KiCad rev A in sync with the working prototype (`room-node.yaml` + breadboard). Product name still open (decision A4).
+
 ---
 
 ## Positioning & competition (researched 2026-07)
@@ -96,7 +103,6 @@ Prove the design is worth laying out. Exit criteria: clean audio, reliable wake�
 **Hardware to acquire for Phase 0–2 (bench + v1 design):**
 - [ ] Cap kit: 470–1000 µF electrolytics + 0.1 µF ceramics (audio decoupling fix + PCB values)
 - [ ] Resistor kit incl. 330–470 Ω (LED data) and 100 kΩ (GAIN straps)
-- [ ] 74AHCT125 in DIP (validate LED level shifting on breadboard before it goes on the PCB)
 - [ ] **Second complete breadboard set** (S3 devkit + INMP441 + MAX98357A + AHT20) — dev unit, so the working bedroom node stays in service while iterating
 - [ ] USB power meter (~$15) — real current budget numbers for the power tree
 - [ ] Cheap 8-ch logic analyzer (~$15, sigrok-compatible) — I2S/I2C debugging, essential for PCB bring-up
@@ -113,6 +119,7 @@ Prove the design is worth laying out. Exit criteria: clean audio, reliable wake�
 Make the firmware installable by strangers, not just us.
 
 - [ ] Restructure yaml with ESPHome **`packages:`** (core/audio/display/ring/sensors) so users can override cleanly; put user-tweakables in `substitutions:`.
+- [ ] **Selectable wake word:** ship several `micro_wake_word` models + a select entity in HA; default "Hey Jarvis" (`hey_jarvis`), user can change it (product direction 2026-09-25). `room-node.yaml` stays as-flashed until Phase 1.
 - [ ] Add **`project:`** block (`chris.room_node`, semver version) + **`dashboard_import:`** so ESPHome Dashboard offers the config by name.
 - [ ] Add **Improv** provisioning (`improv_serial` + `esp32_improv` BLE) → Wi-Fi setup from phone/browser, no secrets.yaml.
 - [ ] Add `captive_portal:`, `web_server:` (or at least captive portal on the fallback AP — currently a warning).
@@ -129,7 +136,7 @@ One board, devkit replaced by module. Get to "boards that work on the bench."
   - USB-C power (+ native USB D±for flashing/logs): 5.1 kΩ CC pull-downs, ESD array (USBLC6-2), input bulk cap.
   - Power tree: 5 V rail → amp + LEDs; 3V3 via **AP7361C-33** (SOT-223, 1 A low-noise — see Decisions log 2026-07-28; linear, not a buck); per-IC 0.1 µF + bulk per rail; **audio decoupling designed in from day 1** (this is what the breadboard taught us).
   - MAX98357A: GAIN strap footprint (choose 6 dB default), SD gate from GPIO7 as today; speaker JST-PH 2-pin.
-  - WS2812B chain: **74AHCT125 level shifter**, 330 Ω series, 1000 µF bulk footprint.
+  - WS2812B chain: **no level shifter in rev A (D4 2026-09-28)** — GPIO21 → 330–470 Ω series → DIN direct; 1000 µF bulk footprint. Rev B adds the 74AHCT125 back if the strip flickers at bring-up.
   - **Knowles SPH0645LM4H** I2S mic (decision 2026-09-28; INMP441 is obsolete) — `SEL` → GND (left), 0.1 µF at VDD, 100 kΩ DATA pull-down, **bottom port: acoustic hole through the PCB** (stock KiCad footprint carries it), placed **far from speaker**. See `rev-a-architecture.md` Block 3.
   - **USB-C CC sensing on GPIO1** (decision 2026-09-28) — CC1/CC2 summed through 2 × 100 kΩ onto one ADC pin (+100 nF, test point); firmware sets the LED brightness cap from the source's advertisement. No second ADC pin needed.
   - AHT20 + I2C pull-ups; e-ink via FPC/JST matching Waveshare cable; boot/reset buttons; GPIO0 user button; test points (TX/RX/EN/IO0/3V3/5V/GND).
@@ -182,9 +189,11 @@ One board, devkit replaced by module. Get to "boards that work on the bench."
 - 2026-07-28: **VA button moves GPIO0 → GPIO38 on the PCB.** A user holding a GPIO0-wired voice button through a power cycle enters download mode; the node looks bricked with no display feedback to explain it, and it is unfixable in firmware after fab. GPIO0 stays boot/recovery only. `room-node.yaml` still binds GPIO0 for the breadboard — move to a substitution when the PCB arrives.
 - 2026-07-28: **3V3 rail stays linear (AP7361C-33, SOT-223).** Average 3V3 load is ~100–150 mA → ~0.2 W dissipation, not the ~0.85 W a peak-current calc suggests, so package choice (SOT-223/DFN with copper pour, θJA ≈ 60 °C/W) carries it. A buck would save ~0.17 W of ~1.5 W total board heat, would *not* fix temp-sensor bias (the module and LED strip out-dissipate the regulator), and would inject switching noise beside the mic and Class-D amp. AHT20 gets a thermal island instead. Revisit at rev B if bring-up shows thermal trouble.
 - 2026-07-28: **Module is N16R8**, not N8R8 — matches the validated breadboard part. GPIO35/36/37 are consumed by the octal PSRAM.
-- 2026-07-28: **Power tree = USB-C 5 V** (5.1 kΩ CC pull-downs, no dedicated LED supply). Measured whole-node current on bench supply: **~0.31 A** blue-breathing state, **~1.0 A** at solid-white 100% — well within USB-C headroom. Keep a firmware LED-brightness cap as insurance for legacy 500 mA USB-A sources. WS2812B **1000 µF bulk cap + 330–470 Ω DIN series resistor = PCB footprints** (validated unnecessary on a stiff bench supply / short strip, but kept for real USB-C source impedance and full-white load; bulk cap at the strip/connector, DIN resistor source-side after the level shifter).
+- 2026-07-28: **Power tree = USB-C 5 V** (5.1 kΩ CC pull-downs, no dedicated LED supply). Measured whole-node current on bench supply: **~0.31 A** blue-breathing state, **~1.0 A** at solid-white 100% — well within USB-C headroom. Keep a firmware LED-brightness cap as insurance for legacy 500 mA USB-A sources. WS2812B **1000 µF bulk cap + 330–470 Ω DIN series resistor = PCB footprints** (validated unnecessary on a stiff bench supply / short strip, but kept for real USB-C source impedance and full-white load; bulk cap at the strip/connector, DIN resistor source-side at GPIO21).
 - 2026-09-25: **SQU-2 decision replies (market + additions).** A1 — **physical mic-mute switch in rev A** on a free GPIO (circuit TBD by Iris; hardware mic cut preferred, not just a firmware flag). A3 — **landed cost per unit** line added to the `docs/bom.csv` work: BOM + enclosure + packaging + Tindie/CrowdSupply fees + shipping + returns + compliance share. A4 — **product name chosen before Phase 1** `project:` / `dashboard_import:` work; ESPHome project id = `squarewave.<product>`; wake word decided together with the name (`hey_jarvis` stays as-flashed until then). A5 — **second independent review + Chris sign-off before every order** (added to the Phase 2 and Phase 4 order steps). A6 — **repo model routing is the agent rule**: Iris = schematic/layout/compliance at Opus/Fable level, Felix = firmware at Sonnet level, Nora = docs/BOM/research at Sonnet level. A7 — the **5 rev A boards are the apartment fleet** (no separate apartment build). Market: **US only first — CE/RED out of scope** (repo Phase 5 unchanged).
+- 2026-09-25: **Product direction (v1).** v1 is simple and **HA-only** (node talks to Home Assistant via the native API; no direct links to other services in v1). Intelligence (Hermes, other AI agents) connects **behind HA later** via the Assist conversation agent — not v1 scope; the node doesn't change for it. **Users can select the wake word**: several `micro_wake_word` models + a select entity in HA; default "Hey Jarvis" (`hey_jarvis`), user-changeable (Phase 1 firmware item). Current focus: hardware (rev A) and keeping it in sync with the prototype. Product name still open (A4).
 - 2026-09-28: **Rev A decisions D1–D3 (Chris, SQU-2 `room-node-plan` v5 §5).** **D1 — mic = Knowles SPH0645LM4H**, replacing the obsolete INMP441. Same I2S pins (GPIO4/5/6), `SEL` → GND = left channel. Bottom port, so the PCB needs an acoustic hole under the mic (stock KiCad footprint) and the enclosure a sealed path to the board underside. Distributor listings show the SPH0645LM4H suffixes as Obsolete too — stock/alternate check with Nora (SQU-14); Chris decides whether rev A uses remaining stock or re-picks (candidate: TDK ICS-43434, compatibility unverified). **D2 — VBUS inrush accepted** (~1.5–2 mF bulk vs USB's 10 µF attach limit). No soft-start switch in rev A; bring-up hot-plugs the board 10+ times on a laptop port. **If that test fails, rev B adds a soft-start load switch on VBUS.** **D3 — GPIO1 = USB-C CC sensing:** CC1/CC2 → 2 × 100 kΩ → GPIO1 (ADC1_CH0) + 100 nF + TP. One pin reads either plug orientation (≈ 0.51 × active CC). Firmware sets the LED brightness cap from Default / 1.5 A / 3 A (thresholds from USB Type-C R2.0 Table 4-36). The mic-mute state moves to GPIO2 (SQU-10). Free GPIO left: 39–42 (JTAG), 47, 48.
+- 2026-09-28: **D4 — no level shifter in rev A.** The 74AHCT125 (U4) is removed from rev A; GPIO21 drives the WS2812B DIN directly with a 330–470 Ω series resistor (source-side, near the GPIO), as proven on the breadboard. U4 and its decoupling cap come out of the BOM. **Risk (small):** 3.3 V is just below the WS2812B "1" threshold (~3.5 V at 5 V). **Rev B adds the 74AHCT125 back if the strip flickers at bring-up** (heat, long wire, supply).
 
 ## Risks
 

@@ -126,9 +126,9 @@ Refs are provisional — KiCad annotation on the sheet wins.
 Net naming: `_R` = the mic side of a series resistor, `_M` = the mic side of the data
 resistor. If the 33 Ω parts are dropped, merge each pair into one net.
 
-## Block 4 — LED ring (WS2812B + 74AHCT125)
+## Block 4 — LED ring (WS2812B)
 
-*Not yet drawn. DIN→GPIO21 → level shifter → strip.*
+*Not yet drawn. DIN→GPIO21 → 330–470 Ω series → strip. No level shifter (D4 2026-09-28); rev B adds the 74AHCT125 back if the strip flickers at bring-up.*
 
 ## Block 5 — Sensor (AHT20)
 

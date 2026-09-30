@@ -30,12 +30,12 @@ Everything the breadboard taught us in Phase 0 is designed in from day one.
         │   (amp, LEDs, 3V3 LDO in)   │            │
         └──┬──────────┬───────────┬───┘            │
            │          │           │                │
-     [3V3 LDO]   [MAX98357A]  [74AHCT125]          │
-     low-noise    +decoupl.   level shift          │
+     [3V3 LDO]   [MAX98357A]   WS2812B (27px)      │
+     low-noise    +decoupl.     ring, DIN          │
            │          │           │                │
-        3V3 RAIL   speaker     WS2812B (27px)       │
-     ┌──┬──┬──┐    JST-PH       ring, DIN           │
-     │  │  │  │                                     │
+        3V3 RAIL   speaker        │                │
+     ┌──┬──┬──┐    JST-PH        └──── 330–470 Ω ◄── GPIO21
+     │  │  │  │                                    │
   ESP32 SPH  AHT  e-paper ◄── SPI ──┐               │
   -S3  0645  20   2.9"              │               │
    │     │    │    │                │               │
@@ -43,8 +43,13 @@ Everything the breadboard taught us in Phase 0 is designed in from day one.
                    ESP32-S3-WROOM-1-N16R8
 ```
 
+DIN path (rev A): **GPIO21 → 330–470 Ω series → WS2812B DIN directly. No level shifter**
+(D4, 2026-09-28 — proven on the breadboard). If the strip flickers at bring-up, rev B
+adds the 74AHCT125 back.
+
 Signal buses off the S3: **I2S-mic**, **I2S-speaker**, **I2C** (AHT20), **SPI** (e-paper),
-**1-wire** (WS2812B via level shifter), **native USB** (D+/D-), plus GPIO straps.
+**1-wire** (WS2812B, GPIO21 → DIN direct — no level shifter, D4 2026-09-28), **native USB**
+(D+/D-), plus GPIO straps.
 
 ---
 
@@ -59,7 +64,6 @@ USB-C VBUS 5V ──┬── bulk 10µF + 0.1µF (input)
                 │
                 ├── 5V RAIL ──┬── MAX98357A Vin  (+470–1000µF electrolytic + 0.1µF at chip)
                 │             ├── WS2812B 5V      (+1000µF bulk at strip connector)
-                │             ├── 74AHCT125 Vcc   (+0.1µF)
                 │             └── 3V3 LDO Vin      (+ input cap per datasheet)
                 │
                 └── 3V3 LDO OUT ──┬── ESP32-S3 3V3 (+ bulk 22–47µF + per-pin 0.1µF)
@@ -87,8 +91,8 @@ USB-C VBUS 5V ──┬── bulk 10µF + 0.1µF (input)
   TX bursts. Low-noise matters — the amp and mic reference this rail's cleanliness.
 - **Audio decoupling (Phase 0 lesson):** 470–1000 µF electrolytic + 0.1 µF ceramic
   across MAX98357A Vin↔GND, **at the chip**.
-- **LED:** 1000 µF bulk at the strip connector; 330–470 Ω series on DIN (source-side,
-  after the level shifter).
+- **LED:** 1000 µF bulk at the strip connector; 330–470 Ω series on DIN at GPIO21
+  (source-side, near the GPIO) — no level shifter (D4 2026-09-28).
 - **Grounding:** **4-layer with a solid ground plane** (2026-09-25 decision). Route the
   amp and LED return currents so they do **not** share a path with the mic/sensor analog
   ground (Phase 0 star-ground lesson) — the plane makes that easy but doesn't draw the
@@ -119,7 +123,7 @@ From `room-node.yaml`. **Strapping pins on ESP32-S3: GPIO0, 3, 45, 46.**
 | | DC | GPIO13 | |
 | | RESET | GPIO14 | |
 | | BUSY | GPIO15 | input |
-| WS2812B ring | DIN (→ level shifter) | GPIO21 | 3V3 → 74AHCT125 → 5V → 330–470 Ω → strip |
+| WS2812B ring | DIN | GPIO21 | 3V3 → 330–470 Ω → strip; no level shifter (D4 2026-09-28) |
 | VA button | INPUT_PULLUP | **GPIO38** (PCB) / GPIO0 (breadboard) | moved off GPIO0 for rev A — see below |
 | Boot button | INPUT_PULLUP | GPIO0 | ⚠ strapping (BOOT). Recovery/flash only, not user-facing. |
 | Native USB | D- / D+ | GPIO19 / GPIO20 | module pins **13 / 14**. USB-CDC logging + flashing — reserve |
@@ -157,7 +161,7 @@ Each block becomes one KiCad hierarchical sheet. **MCU, power, and USB are one s
 2. **Audio out (MAX98357A)** — I2S, GAIN→Vin (6 dB), SD→GPIO7, decoupling, speaker JST-PH.
 3. **Mic (SPH0645LM4H)** — I2S, SEL→GND, 100 kΩ DATA pull-down, VDD decoupling,
    bottom-port acoustic hole, placement far from speaker. Full net list below.
-4. **LED ring (WS2812B + 74AHCT125)** — level shift, 330–470 Ω, 1000 µF, connector.
+4. **LED ring (WS2812B)** — GPIO21 → DIN via 330–470 Ω (no level shifter, D4 2026-09-28), 1000 µF, connector.
 5. **Sensor (AHT20)** — I2C + pull-ups, **thermal island** (see Block 1 LDO notes).
 6. **Display (2.9" e-paper)** — SPI + connector matching Waveshare cable.
 7. **Physical mic-mute switch + state GPIO** — hardware mic cut (approved 2026-09-25,
@@ -391,7 +395,6 @@ passives by hand.
 | U1 | ESP32-S3-WROOM-1-**N16R8** | pre-certified module; KiCad symbol is variant-agnostic |
 | U2 | **AP7361C-33ER-13**, SOT-223 | 3V3 LDO 1 A. Package is load-bearing — see Block 1 |
 | U3 | MAX98357AETE+ | I2S Class-D amp |
-| U4 | 74AHCT125 (SOIC/TSSOP) | LED level shifter |
 | U5 | USBLC6-2SC6 | USB ESD array |
 | MK1 | **SPH0645LM4H** (Knowles/Syntiant), LGA-6 3.5×2.65 mm | I2S MEMS mic, bottom port (decision 2026-09-28; replaces obsolete INMP441). ⚠ lifecycle — see Block 3. Candidate alternate: TDK ICS-43434 (compat. unverified). Part number + stock: Nora, SQU-14 |
 | U6 | AHT20 | temp/humidity |
