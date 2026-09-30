@@ -10,8 +10,9 @@ to match if they ever disagree, don't trust this over the drawn schematic.
 Companion docs: [`rev-a-architecture.md`](rev-a-architecture.md) (block diagram, power
 tree, rationale), `block-N-*.md` (per-block parts + wiring diagrams).
 
-**Status:** Block 1 complete (drawn + reviewed). Blocks 2-6 not yet added — append as
-each is designed.
+**Status:** Block 1 complete (drawn + reviewed); **CC sensing rows added 2026-09-28 —
+not yet drawn** (R6, R7, C9, TP8). Block 3 (mic, SPH0645LM4H) rows added 2026-09-28 —
+designed, not yet drawn. Blocks 2, 4–6 not yet added — append as each is designed.
 
 ---
 
@@ -38,10 +39,18 @@ each is designed.
 | `GND` | C1–C8 | 2 | − | all decoupling returns |
 | `GND` | SW1,SW2,SW3 | 2 | — | button returns |
 | `GND` | TP7 | 1 | — | test point |
+| `GND` | C9 | 2 | − | CC_SENSE filter return *(added 2026-09-28)* |
 | `CC1` | J1 | A5 | CC1 | → R1 → GND |
 | `CC1` | R1 | 1 | — | 5.1 kΩ |
+| `CC1` | R6 | 1 | — | 100 kΩ to CC_SENSE *(added 2026-09-28)* |
 | `CC2` | J1 | B5 | CC2 | → R2 → GND |
 | `CC2` | R2 | 1 | — | 5.1 kΩ |
+| `CC2` | R7 | 1 | — | 100 kΩ to CC_SENSE *(added 2026-09-28)* |
+| `CC_SENSE` | R6 | 2 | — | *(added 2026-09-28)* |
+| `CC_SENSE` | R7 | 2 | — | *(added 2026-09-28)* |
+| `CC_SENSE` | C9 | 1 | + | 0.1 µF, at U1 |
+| `CC_SENSE` | U1 | 39 | GPIO1 | ADC1_CH0 — USB-C current advertisement |
+| `CC_SENSE` | TP8 | 1 | — | test point |
 | `USB_D+_CONN` | J1 | A6,B6 | D+ | connector side |
 | `USB_D+_CONN` | U5 | 3 | — | ESD array in |
 | `USB_D-_CONN` | J1 | A7,B7 | D− | connector side |
@@ -68,9 +77,13 @@ each is designed.
 | `TXD0` | TP3 | 1 | — | test point |
 | — | J1 | A8,B8 | SBU1,SBU2 | no connect |
 
+Drawn refs in `mcu.kicad_sch` carry a 2xx prefix (R1 → R201, …); the additions become
+R206, R207, C209, TP208.
+
 **Unused/reserved on U1 for this block:** GPIO26–32 (flash, not broken out),
 GPIO35/36/37 (PSRAM — *GPIO* numbers, distinct from module *pin* 36/37 above, which
-are UART0). GPIO1,2,39–42(JTAG),47,48 free.
+are UART0). **GPIO1 used** (`CC_SENSE`). **GPIO2 reserved** for the mic-mute state
+(SQU-10, module pin 38). Free: GPIO39–42 (JTAG), 47, 48.
 
 ---
 
@@ -79,9 +92,39 @@ are UART0). GPIO1,2,39–42(JTAG),47,48 free.
 *Not yet drawn. Signals per master pin map: I2S LRCLK→GPIO16, BCLK→GPIO17,
 DIN→GPIO18, SD(mute)→GPIO7. Append the flat rows here once wired.*
 
-## Block 3 — Mic (INMP441)
+## Block 3 — Mic (SPH0645LM4H)
 
-*Not yet drawn. BCLK→GPIO4, WS→GPIO5, DIN→GPIO6.*
+*Designed 2026-09-28, not yet drawn.* Sheet `microphone.kicad_sch`. Symbol
+`Sensor_Audio:SPH0645LM4H`, footprint `Sensor_Audio:Knowles_SPH0645LM4H-6_3.5x2.65mm`
+(includes the 0.5 mm acoustic NPTH; pad 3 is the GND seal ring). Rationale, placement
+and acoustic-hole rules: [`rev-a-architecture.md` → Block 3](rev-a-architecture.md#block-3--mic-sph0645lm4h).
+Refs are provisional — KiCad annotation on the sheet wins.
+
+| Net | Ref | Pin | Pin name | Notes |
+|---|---|---|---|---|
+| `MIC_VDD` | MK1 | 5 | VDD | `+3V3` through the mic-mute switch (SQU-10). Until SQU-10 lands, treat `MIC_VDD` = `+3V3` |
+| `MIC_VDD` | C10 | 1 | + | 0.1 µF X7R, at MK1 pin 5 |
+| `MIC_VDD` | C11 | 1 | + | 100 pF C0G, **DNP**, closest to MK1 pin 5 |
+| `GND` | MK1 | 3 | GND | seal ring around the acoustic hole; vias beside the ring, not in it |
+| `GND` | MK1 | 2 | SELECT | SEL → GND = **left channel** (matches `channel: left`) |
+| `GND` | C10, C11 | 2 | − | via straight to the plane |
+| `GND` | R8 | 2 | — | DATA pull-down return |
+| `I2S_MIC_BCLK` | U1 | 4 | GPIO4 | |
+| `I2S_MIC_BCLK` | R9 | 1 | — | 33 Ω, placed at U1 (driver end) |
+| `I2S_MIC_BCLK_R` | R9 | 2 | — | |
+| `I2S_MIC_BCLK_R` | MK1 | 4 | BCLK | |
+| `I2S_MIC_WS` | U1 | 5 | GPIO5 | |
+| `I2S_MIC_WS` | R10 | 1 | — | 33 Ω, placed at U1 (driver end) |
+| `I2S_MIC_WS_R` | R10 | 2 | — | |
+| `I2S_MIC_WS_R` | MK1 | 1 | WS | |
+| `I2S_MIC_DATA_M` | MK1 | 6 | DATA | |
+| `I2S_MIC_DATA_M` | R11 | 1 | — | 33 Ω, placed at MK1 (driver end) |
+| `I2S_MIC_DATA` | R11 | 2 | — | |
+| `I2S_MIC_DATA` | R8 | 1 | — | 100 kΩ pull-down (Knowles p.6, single mic on the bus) |
+| `I2S_MIC_DATA` | U1 | 6 | GPIO6 | |
+
+Net naming: `_R` = the mic side of a series resistor, `_M` = the mic side of the data
+resistor. If the 33 Ω parts are dropped, merge each pair into one net.
 
 ## Block 4 — LED ring (WS2812B)
 
