@@ -70,9 +70,8 @@ All other GPIO go to their peripheral sheets — see the master pin map in
 
 **Unusable pins on N16R8:** 26–32 not broken out (flash); **35/36/37 consumed by
 octal PSRAM** (the symbol labels them `PSRAM`). Strapping: 0, 3, 45, 46.
-IO1 = `CC_SENSE` (this sheet). IO2 (pin 38) = `MIC_MUTE_N`, a global label from the mic
-sheet (mute switch SW4, SQU-10). No parts for it on this sheet.
-Free after all assignments: IO39–42 (JTAG), IO47, IO48 — none of them ADC-capable.
+IO1 = `CC_SENSE` (this sheet). Free after all assignments: IO2 (pin 38, ADC1_CH1),
+IO39–42 (JTAG), IO47, IO48 — only IO2 is ADC-capable.
 
 ## J1 — USB-C receptacle
 
