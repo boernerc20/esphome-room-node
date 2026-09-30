@@ -18,7 +18,6 @@ Block,Ref,Part,MPN,LCSC#,JLC_Class,Price@10_est_USD,Stock_est,Lifecycle,Alternat
 "Block 2 - Audio Out",C_amp_cer,"0603 0.1µF 50V X7R",Generic,C30722,Basic,0.002,Very High,Active,-
 "Block 2 - Audio Out",J2,"JST-PH 2-pin SMD",Generic,C420309,Basic,0.03,High,Active,-
 "Block 3 - Mic",MK1,"I2S MEMS mic","SPH0645LM4H-B (Knowles)",TBD,Extended,3.50,Moderate,Active,SPH0645LM4H-H,"Bottom-port LGA-6. -B=tray, -H=tape&reel. L/R→GND. Footprint includes port hole."
-"Block 4 - LED Ring",U4,"Quad level shifter","74AHCT125PW (TSSOP-14)",TBD,Extended,0.20,High,Active,74HCT125,Stock KiCad 74xx
 "Block 4 - LED Ring",R_led,"0603 330-470Ω 1%",Generic,C25727/8,Basic,0.002,Very High,Active,-
 "Block 4 - LED Ring",C_led_bulk,"TH radial 1000µF 16V",Generic,C144604,Basic,0.08,High,Active,-
 "Block 4 - LED Ring",LED_strip,"WS2812B 27px strip",Off-board,-,-,-,-,Active,-
