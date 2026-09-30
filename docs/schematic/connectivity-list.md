@@ -12,7 +12,7 @@ tree, rationale), `block-N-*.md` (per-block parts + wiring diagrams).
 
 **Status:** Block 1 complete (drawn + reviewed); **CC sensing rows added 2026-09-28 —
 not yet drawn** (R6, R7, C9, TP8). Block 3 (mic, SPH0645LM4H) rows added 2026-09-28 —
-designed, not yet drawn. **Block 7 (mic-mute switch SW4) rows added 2026-09-30** — drawn on
+designed, not yet drawn. **Block 7 (mic-mute switch SW4) rows added 2026-09-30** — goes on
 the Block 3 sheet, not yet drawn. Blocks 2, 4–6 not yet added — append as each is designed.
 
 ---
