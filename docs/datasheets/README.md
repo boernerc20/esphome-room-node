@@ -12,5 +12,7 @@ PDFs are gitignored (vendor copyright). Download from the manufacturer into this
 | usb4085-gf-a.pdf | USB4085-GF-A USB-C receptacle | GCT |
 | 74ahct125.pdf | 74AHCT125 level shifter (LED data) | TI / Nexperia |
 | aht20.pdf | AHT20 temp/humidity | Aosong |
-| inmp441.pdf | INMP441 I2S MEMS mic | TDK InvenSense |
+| inmp441.pdf | INMP441 I2S MEMS mic (breadboard only — obsolete) | TDK InvenSense |
+| sph0645lm4h-b.pdf | SPH0645LM4H-B I2S MEMS mic (rev A), datasheet Rev C | Knowles (now Syntiant). knowles.com links 404 as of 2026-09-28; DigiKey mirrors the Knowles PDF |
+| usb-type-c-r2.0.pdf | USB Type-C Cable and Connector Spec R2.0 (CC thresholds: §4.11.3, Tables 4-24/4-25/4-36) | USB-IF (usb.org) |
 | max98357a.pdf | MAX98357A I2S amp | Analog Devices |

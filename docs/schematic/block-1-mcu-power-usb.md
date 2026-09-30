@@ -32,6 +32,13 @@ validated breadboard part, not the N8R8 earlier drafts named.
 | C8 | `Device:C` | 0603 | 1 µF 16 V X7R | EN RC |
 | SW1–SW3 | `Switch:SW_Push` | `Button_Switch_SMD:SW_SPST_TL3342` | TL3342F160QG | RESET / BOOT / VA button |
 | TP1–TP7 | `Connector:TestPoint` | `TestPoint:TestPoint_Pad_D1.5mm` | — | EN, IO0, TXD0, RXD0, +3V3, +5V, GND |
+| R6, R7 | `Device:R` | 0603 | 100 kΩ 1% | CC1/CC2 → `CC_SENSE` sum (added 2026-09-28) |
+| C9 | `Device:C` | 0603 | 0.1 µF 50 V X7R | `CC_SENSE` filter at GPIO1 (added 2026-09-28) |
+| TP8 | `Connector:TestPoint` | `TestPoint:TestPoint_Pad_D1.5mm` | — | `CC_SENSE` (added 2026-09-28) |
+
+*Doc refs vs drawn refs:* the drawn `mcu.kicad_sch` annotates with a 2xx prefix
+(R1 → R201, C1 → C201, TP1 → TP201, …). The 2026-09-28 additions become R206, R207,
+C209, TP208 there.
 
 *Class-correct choices, not stock-checked — verify LCSC/JLCPCB availability and
 basic-vs-extended part status before finalizing the BOM.*
@@ -50,6 +57,7 @@ Pin numbers verified against the KiCad symbol.
 | 13 | USB_D− / GPIO19 | `USB_D-` |
 | 14 | USB_D+ / GPIO20 | `USB_D+` |
 | 27 | IO0 | `IO0` |
+| 39 | IO1 (ADC1_CH0) | `CC_SENSE` — USB-C CC voltage (added 2026-09-28) |
 | 31 | IO38 | `VA_BTN` |
 | 36 | RXD0 (IO44) | `RXD0` → test point |
 | 37 | TXD0 (IO43) | `TXD0` → test point |
@@ -62,7 +70,8 @@ All other GPIO go to their peripheral sheets — see the master pin map in
 
 **Unusable pins on N16R8:** 26–32 not broken out (flash); **35/36/37 consumed by
 octal PSRAM** (the symbol labels them `PSRAM`). Strapping: 0, 3, 45, 46.
-Free after all assignments: IO1, IO2, IO39–42 (JTAG), IO47, IO48.
+IO1 = `CC_SENSE` (this sheet). IO2 reserved for the mic-mute state (SQU-10).
+Free after all assignments: IO39–42 (JTAG), IO47, IO48 — none of them ADC-capable.
 
 ## J1 — USB-C receptacle
 
@@ -70,8 +79,8 @@ Free after all assignments: IO1, IO2, IO39–42 (JTAG), IO47, IO48.
 |---|---|
 | A4, B4, A9, B9 (VBUS) | `+5V` |
 | A1, B1, A12, B12 (GND) | `GND` |
-| A5 (CC1) | `CC1` → R1 5.1 kΩ → `GND` |
-| B5 (CC2) | `CC2` → R2 5.1 kΩ → `GND` |
+| A5 (CC1) | `CC1` → R1 5.1 kΩ → `GND`; → R6 100 kΩ → `CC_SENSE` |
+| B5 (CC2) | `CC2` → R2 5.1 kΩ → `GND`; → R7 100 kΩ → `CC_SENSE` |
 | A6, B6 (D+) | `USB_D+_CONN` |
 | A7, B7 (D−) | `USB_D-_CONN` |
 | SBU1, SBU2 | no connect |
@@ -79,6 +88,13 @@ Free after all assignments: IO1, IO2, IO39–42 (JTAG), IO47, IO48.
 
 Dumb 5 V source — the 5.1 kΩ CC pull-downs are the whole sink advertisement, no PD.
 Both D+ pins tie together, both D− pins tie together.
+
+**CC sensing (added 2026-09-28):** R6/R7 sum CC1 and CC2 onto `CC_SENSE` → IO1 with
+C9 0.1 µF to GND at the module and TP8. The node reads ≈ 0.51 × the active CC voltage
+in either plug orientation. Firmware uses it to pick the LED brightness cap. Full
+derivation, thresholds and ADC settings:
+[`rev-a-architecture.md` → USB-C CC sensing](rev-a-architecture.md#usb-c-cc-sensing-block-1-addition).
+Place R6/R7 near J1, C9/TP8 near U1 pin 39.
 
 ## U5 — USBLC6-2SC6
 
@@ -158,7 +174,8 @@ tightens and a buck starts earning its place.*
   lands in download mode and the node looks bricked, with no display feedback to
   explain it. Unfixable in firmware after fab. IO38 has no strapping, JTAG, or PSRAM
   conflict.
-- Bring **EN, IO0, TXD0, RXD0, +3V3, +5V, GND** to test points for recovery.
+- Bring **EN, IO0, TXD0, RXD0, +3V3, +5V, GND** to test points for recovery, plus
+  **CC_SENSE** (TP8) to check the CC reading against a DMM at bring-up.
 
 > **Firmware follow-up:** `room-node.yaml` still binds the VA button to GPIO0 (correct
 > for the breadboard). Move it to a substitution so the PCB build can select IO38
