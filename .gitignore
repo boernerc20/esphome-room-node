@@ -31,3 +31,6 @@ gerbers/
 
 # Vendor datasheets — copyrighted, fetch locally (see docs/datasheets/README.md)
 docs/datasheets/*.pdf
+
+# Claude Code local agent state
+.claude/
