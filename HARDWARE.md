@@ -22,6 +22,7 @@ source of truth as wired there — keep the two in sync.
 | 6 | Display | **Waveshare 2.9" e-Paper v2** (`model: 2.90inv2`, 296×128) | SPI (4-wire + BUSY) | ~89.5 × 38 × 4.7 mm module; active area 66.9 × 29.1 mm. Shows room name + temp + humidity, refresh 5 min. |
 | 7 | Status ring | **WS2812B addressable, 27 px** | 1-wire (RMT) | Wraps the e-ink display perimeter (sets enclosure size). 5V. Whole-node draw measured on the Phase 0 bench supply: **~0.31 A** blue-breathing, **~1.0 A** solid white — well within USB-C 5 V headroom (see Decisions log). Keep a firmware LED-brightness cap as insurance for legacy 500 mA USB-A sources. |
 | 8 | Button | Momentary tactile | GPIO (pull-up) | Manual voice-assistant trigger (bypasses wake word). |
+| 9 | Mic-mute switch | **PCB rev A only: C&K JS202011AQN** DPDT slide, right-angle THT | GPIO (pull-up) | Hardware privacy mute. One pole breaks the mic DATA line and holds GPIO6 at GND; the other reports the position on GPIO2 (LOW = muted). Firmware can read it but cannot override it. See `docs/schematic/rev-a-architecture.md` Block 7. |
 
 ---
 
@@ -48,7 +49,7 @@ source of truth as wired there — keep the two in sync.
 | Voice-assistant button | (INPUT_PULLUP) | **GPIO0** (breadboard) → **GPIO38** (PCB rev A) |
 | Boot/recovery button | (INPUT_PULLUP) | GPIO0 (PCB rev A — not user-facing) |
 | USB-C CC sensing | CC_SENSE (ADC1_CH0, analog) | **GPIO1** (PCB rev A only — not on the breadboard) |
-| Mic-mute state | (input) | GPIO2 — *reserved, PCB rev A, pending SQU-10* |
+| Mic-mute state | `MIC_MUTE_N` (input, LOW = muted) | **GPIO2** (PCB rev A only — not on the breadboard) |
 
 **VA button moves off GPIO0 on the PCB.** GPIO0 is the BOOT strap: a user holding a
 GPIO0-wired voice button through a power cycle enters download mode and the node
@@ -60,8 +61,8 @@ substitution when the PCB arrives.
 **Avoid** for future additions: strapping pins (0, 3, 45, 46), USB (19/20 = module
 pins 13/14, used by USB-CDC logging), flash pins (26–32, not broken out), and
 **PSRAM pins 35/36/37** (consumed by the N16R8 octal PSRAM — the KiCad symbol labels
-them `PSRAM`). **GPIO1 is used on the PCB** (USB-C CC sensing) and **GPIO2 is reserved**
-for the mic-mute state. Free & safe if you need more: GPIO39–42 (JTAG — leave clear if
+them `PSRAM`). **GPIO1 is used on the PCB** (USB-C CC sensing) and **GPIO2 is used on the
+PCB** (mic-mute state). Free & safe if you need more: GPIO39–42 (JTAG — leave clear if
 you want hardware debug), GPIO47, GPIO48 — none of these has an ADC.
 
 ---
@@ -77,8 +78,8 @@ you want hardware debug), GPIO47, GPIO48 — none of these has an ADC.
   board GND near the 5V input, **never daisy-chained together**. Phase 0 confirmed LED
   switching current sharing the amp's ground = audible noise. Amp + LEDs isolated; mic
   + sensors on the quiet side.
-- **PCB rev A mic:** SPH0645LM4H on the **3V3** rail (1.62–3.6 V, ~0.6 mA) through the
-  mic-mute switch.
+- **PCB rev A mic:** SPH0645LM4H on the **3V3** rail (1.62–3.6 V, ~0.6 mA), always
+  powered. The mic-mute switch breaks the mic DATA line, not its supply.
 - **USB-C current sensing (PCB rev A):** CC1/CC2 are summed through 2 × 100 kΩ onto
   GPIO1 (ADC). Firmware reads the source's advertisement (Default / 1.5 A / 3 A) and
   sets the LED brightness cap from it. The ring stays capped on a Default (500/900 mA)
@@ -160,6 +161,9 @@ electrical note). [amazon.com/dp/B00BYE9AKM](https://www.amazon.com/dp/B00BYE9AK
 - SPH0645 is **bottom-port**: keep the stock footprint's acoustic hole and GND seal ring,
   place it far from the speaker, and never wash the board after it is fitted.
 - USB-C CC1/CC2 → 2 × 100 kΩ → GPIO1 (+ 100 nF, test point) for source-current sensing.
+- **Mic-mute switch** (SW4, DPDT slide) at the board edge next to the mic. Pole A in the
+  mic DATA line (MUTE = GPIO6 held at GND via 1 kΩ), pole B → GPIO2. The enclosure needs a
+  side slot for the actuator and a mark that shows in the MUTE position.
 - Bring **GPIO0** (button) and **EN/RESET** to accessible pads/headers for flashing +
   recovery.
 - WS2812B is 5V; ESP32 data is 3.3V. Rev A drives DIN **directly from GPIO21** through a **330–470 Ω series resistor** (source-side, near the GPIO) — **no level shifter** (decision D4, 2026-09-28). 3.3 V is just below the WS2812B "1" threshold (~3.5 V at 5 V), so if the strip flickers at bring-up, rev B adds the 74AHCT125 back. Keep the 1000 µF bulk cap at the strip.
