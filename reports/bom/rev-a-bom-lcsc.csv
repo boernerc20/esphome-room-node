@@ -22,12 +22,16 @@ Block,Ref,Part,MPN,LCSC#,JLC_Class,Price@10_est_USD,Stock_est,Lifecycle,Alternat
 "Block 2 - Audio Out",J2,"JST-PH 2-pin SMD",Generic,C420309,Basic,0.03,High,Active,-,
 "Block 3 - Mic",MK1,"I2S MEMS mic","SPH0645LM4H-B (Knowles→Syntiant)",TBD,Extended,3.50,Moderate,"Transitioned (active via Syntiant; Knowles EOL)",SPH0645LM4H-H / ICS-43434,"Bottom-port LGA-6. -B=tray, -H=tape&reel. L/R→GND. Knowles line moved to Syntiant; DigiKey 5332440 active 2026-09-30. Alternate ICS-43434 (TDK) compat. unverified."
 "Block 3 - Mic",R8,"0603 100kΩ 1%",Generic,C25803,Basic,0.002,Very High,Active,-,"Mic DATA pull-down to GND (added 2026-09-28)"
-"Block 3 - Mic","R9,R10,R11","0603 33Ω",Generic,TBD,Basic,0.002,Very High,Active,-,"I2S mic BCLK/WS/DATA damping (added 2026-09-28). LCSC# TBD: LCSC C105881 (YAGEO RC0603FR-07330RL) candidate, verify 1% tolerance or 5% acceptable."
+"Block 3 - Mic","R9,R10,R11","0603 33Ω 1%","YAGEO RC0603FR-07330RL",C105881,Basic,0.003,Very High,Active,-,"Value confirmed: 33Ω (Yageo SMD code 330 = 33×10^0). Datasheet: LCSC C105881. Checked 2026-09-30."
 "Block 3 - Mic",C10,"0603 0.1µF X7R",Generic,C30722,Basic,0.002,Very High,Active,-,"Mic VDD decoupling (added 2026-09-28)"
-"Block 3 - Mic",C11,"0603 100pF C0G 50V",Generic,TBD,Basic,0.01,High,Active,-,"Mic VDD RF filter, DNP (added 2026-09-28). LCSC# TBD: verify C0G 0603 100pF availability."
+"Block 3 - Mic",C11,"0603 100pF C0G 50V",Generic,TBD,Basic,0.01,High,Active,-,"Mic VDD RF filter, DNP (added 2026-09-28). LCSC# TBD: LCSC site JS-rendered; could not scrape. Search LCSC for '100pF 0603 C0G 50V Basic class'. Candidate: check C0G/NP0 5% (e.g. Samsung/Murata). Iris to confirm."
 "Block 4 - LED Ring",R_led,"0603 330-470Ω 1%",Generic,C25727/8,Basic,0.002,Very High,Active,-,
 "Block 4 - LED Ring",C_led_bulk,"TH radial 1000µF 16V",Generic,C144604,Basic,0.08,High,Active,-,
 "Block 4 - LED Ring",LED_strip,"WS2812B 27px strip",Off-board,-,-,-,-,Active,-,
 "Block 5 - Sensor",U6,"Temp/humidity sensor","AHT20",TBD,Extended,0.50,High,Active,SHT30,Needs KiCad symbol import
 "Block 5 - Sensor",R_i2c,"0603 4.7kΩ 1%",Generic,C25920,Basic,0.002,Very High,Active,-,
-"Block 6 - Display",J3,"FPC 24-pin 0.5mm",Generic,TBD,Extended,0.15,Good,Active,-,
+"Block 6 - Display",J3,"FPC 24-pin 0.5mm",Generic,TBD,Extended,0.15,Good,Active,-,-
+"Block 7 - Mic Mute",SW4,"Slide switch DPDT","C&K JS202011AQN",C221662,Extended,0.76,Moderate,Active,"E-Switch EG2219","DPDT slide switch, right-angle THT. LCSC C221662 confirmed 2026-09-30. Alternate EG2219 has different footprint."
+"Block 7 - Mic Mute","R12,R14","0603 1kΩ 1%",Generic,C211904,Basic,0.002,Very High,Active,-,"R12: DATA clamp GND. R14: GPIO2 series. Uniroyal 0603WAF1001T5E."
+"Block 7 - Mic Mute",R13,"0603 10kΩ 1%",Generic,C25804,Basic,0.002,Very High,Active,-,"MIC_MUTE_SW pull-up; same value as R3-R5."
+"Block 7 - Mic Mute",C12,"0603 0.1µF 50V X7R",Generic,C30722,Basic,0.002,Very High,Active,-,"MIC_MUTE_SW debounce; same value as C2/C5/C7."
