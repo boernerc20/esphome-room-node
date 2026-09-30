@@ -31,7 +31,3 @@ Block,Ref,Part,MPN,LCSC#,JLC_Class,Price@10_est_USD,Stock_est,Lifecycle,Alternat
 "Block 5 - Sensor",U6,"Temp/humidity sensor","AHT20",TBD,Extended,0.50,High,Active,SHT30,Needs KiCad symbol import
 "Block 5 - Sensor",R_i2c,"0603 4.7kΩ 1%",Generic,C23162,Basic,0.003,Very High,Active,-,Corrected from C25920 (7.87k 0402)
 "Block 6 - Display",J3,"FPC 24-pin 0.5mm",Generic,TBD,Extended,0.15,Good,Active,-,-
-"Block 7 - Mic Mute",SW4,"Slide switch DPDT","C&K JS202011AQN",C221662,Extended,0.76,Moderate,Active,"E-Switch EG2219","DPDT slide switch, right-angle THT. LCSC C221662 confirmed 2026-09-30. Alternate EG2219 has different footprint."
-"Block 7 - Mic Mute","R12,R14","0603 1kΩ 1%",Generic,C21190,Basic,0.003,Very High,Active,-,"Corrected from C211904 (TE connector housing). R12: DATA clamp GND. R14: GPIO2 series."
-"Block 7 - Mic Mute",R13,"0603 10kΩ 1%",Generic,C25804,Basic,0.002,Very High,Active,-,"MIC_MUTE_SW pull-up; same value as R3-R5."
-"Block 7 - Mic Mute",C12,"0603 0.1µF 50V X7R",Generic,C14663,Basic,0.012,Very High,Active,-,"MIC_MUTE_SW debounce; corrected from C30722 (not found)"
