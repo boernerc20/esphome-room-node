@@ -130,7 +130,7 @@ From `room-node.yaml`. **Strapping pins on ESP32-S3: GPIO0, 3, 45, 46.**
 | Boot button | INPUT_PULLUP | GPIO0 | ⚠ strapping (BOOT). Recovery/flash only, not user-facing. |
 | Native USB | D- / D+ | GPIO19 / GPIO20 | module pins **13 / 14**. USB-CDC logging + flashing — reserve |
 | USB-C CC sensing | CC_SENSE (analog in) | **GPIO1** | module pin **39**, ADC1_CH0. Decision 2026-09-28 |
-| Mic-mute state | `MIC_MUTE_N` (input) | **GPIO2** | module pin **38**. LOW = muted, HIGH = live. 10 kΩ pull-up. Not a strapping pin on the S3. Decision SQU-10, Block 7 |
+| Mic-mute state | `MIC_MUTE_N` (input) | **GPIO2** | module pin **38**. LOW = muted, HIGH = live. 10 kΩ pull-up. Not a strapping pin on the S3. Proposed in SQU-10 (Block 7), pending Chris sign-off |
 
 **Strapping check:** GPIO0 is the only strapping pin in use and it is now **boot/recovery
 only**. The VA button moved to **GPIO38** — on a shipped board, a user holding a
