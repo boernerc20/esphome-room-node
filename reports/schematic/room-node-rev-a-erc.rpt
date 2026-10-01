@@ -1,0 +1,28 @@
+ERC report (2026-10-01T03:49:47, Encoding UTF8)
+Report includes: Errors, Warnings, Exclusions
+
+***** Sheet /
+
+***** Sheet /MCU, Power, & USB/
+
+***** Sheet /Audio Out/
+[pin_to_pin]: Pins of type Unspecified and Power input are connected
+    ; warning
+    @(154.94 mm, 114.30 mm): Symbol U3 Pin 17 [PAD, Unspecified, Line]
+    @(154.94 mm, 116.84 mm): Symbol #PWR037 Pin 1 [Power input, Line]
+
+***** Sheet /Microphone/
+
+***** Sheet /LED Ring/
+
+***** Sheet /Sensors/
+
+***** Sheet /Display/
+
+ ** ERC messages: 1  Errors 0  Warnings 1
+
+ ** Ignored checks:
+    - Global label only appears once in the schematic
+    - Four connection points are joined together
+    - SPICE model issue
+    - Assigned footprint doesn't match footprint filters

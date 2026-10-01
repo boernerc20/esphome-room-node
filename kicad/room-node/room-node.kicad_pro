@@ -492,36 +492,6 @@
         "filename": "room-node.kicad_sch",
         "name": "Root",
         "uuid": "6d179eb5-7270-43ed-87f9-4c8c8f594a50"
-      },
-      {
-        "filename": "mcu.kicad_sch",
-        "name": "MCU, Power, & USB",
-        "uuid": "6e4155bd-8fb2-4762-8c51-ee8d461ea521"
-      },
-      {
-        "filename": "audio_out.kicad_sch",
-        "name": "Audio Out",
-        "uuid": "091e7ceb-ccb8-4573-beb1-f5c5b298c896"
-      },
-      {
-        "filename": "microphone.kicad_sch",
-        "name": "Microphone",
-        "uuid": "ab1c3527-05b8-4636-adbb-5f5af995813c"
-      },
-      {
-        "filename": "led_ring.kicad_sch",
-        "name": "LED Ring",
-        "uuid": "729097bc-1d91-4a1a-a063-a5a1cb0b03b7"
-      },
-      {
-        "filename": "sensors.kicad_sch",
-        "name": "Sensors",
-        "uuid": "e41ece1e-b858-45ea-8b22-0008b8091a8c"
-      },
-      {
-        "filename": "display.kicad_sch",
-        "name": "Display",
-        "uuid": "e74e9e1d-6de4-4ee0-964b-ec77420ee193"
       }
     ],
     "used_designators": "#PWR201-215,SW201-203,C201-208,TP201-208,R201-205,J201,U201-203",

@@ -4,25 +4,14 @@ One section per KiCad sheet in `kicad/room-node/`. Each section lists the parts 
 every connection. Use the net names as global labels. Pin map: [`pinout.md`](pinout.md).
 Part numbers and LCSC: [`../../reports/bom/rev-a-bom-lcsc.csv`](../../reports/bom/rev-a-bom-lcsc.csv).
 
-**Status:** MCU sheet is placed but **not wired correctly yet** (ERC 2026-10-01: 76
-items). CC sense parts R6, R7, C9, TP8 are still to add. All other sheets are empty.
-The root sheet `room-node.kicad_sch` does not yet include the sub-sheets; add them so
-project ERC works.
+**Status (2026-10-01, SQU-27):** all 6 sheets are drawn from this doc and included in
+the root sheet `room-node.kicad_sch`. Project ERC: 0 errors, 1 explained warning
+([`reports/schematic/`](../../reports/schematic/)). The netlist matches `pinout.md`
+(`python3 tools/check_pinout.py`). The earlier MCU sheet (2xx refs, wiring errors) was
+redrawn from scratch. Chris reviews and tidies.
 
-Fix these on `mcu.kicad_sch` (from its netlist) before the other sheets connect to it:
-- U202 (LDO) is on neither rail. C203 sits in series between `+5V` and U202 pin 3, and
-  C204/C205 in series between U202 pin 2 and `+3V3`. Each cap goes from its rail to **GND**.
-- C201, C202, C206, C207 are not connected. They go from their rail to GND.
-- `EN`: R203 and C208 are not on the EN pin; SW201 sits in series between them.
-  Wire R203, C208 and SW201 each from `EN` (U201 pin 3), as in the drawing below.
-- `IO0`: R204/SW202 are not on U201 pin 27. `IO38`: R205/SW203 are not connected.
-- **U201 pins 33 and 34 (GPIO40, GPIO41) are on GND.** They must be not connected.
-- TP203–TP207 are not connected.
-- Names: the sheet uses `+3.3V` and `IO38`; this doc uses `+3V3` and `VA_BTN`. Pick one
-  name per net and use it on every sheet, or the rail splits into two nets.
-
-**Refs:** the refs here are the doc refs. The drawn MCU sheet uses a 2xx prefix
-(R1 → R201). KiCad annotation wins.
+**Refs:** the schematic uses the refs in this doc (R1, C1, U1 …). Net names are the
+ones in this doc (`+3V3`, `VA_BTN`).
 
 **Rules for all sheets**
 - Passives are 0603 minimum (hand assembly). No 0402.
@@ -141,9 +130,8 @@ C20 + C21 + the star ground removed the breadboard crackle. Keep all three.
 ## Sheet 3 — Microphone (`microphone.kicad_sch`)
 
 Use the **stock** symbol `Sensor_Audio:SPH0645LM4H` and footprint
-`Sensor_Audio:Knowles_SPH0645LM4H-6_3.5x2.65mm`. **Do not use the SPH0645 in the
-project library** (`lib/room-node-lib`): its pin numbers do not match the datasheet and
-its footprint has no sound hole.
+`Sensor_Audio:Knowles_SPH0645LM4H-6_3.5x2.65mm`. The SPH0645 that was in the project
+library (wrong pin numbers, no sound hole) was removed in SQU-27.
 
 | Ref | Value | Footprint |
 |---|---|---|
@@ -186,14 +174,13 @@ Mic mute is software only. There is no mute switch.
 
 | Ref | Value | Footprint |
 |---|---|---|
-| U6 | AHT20 | 3 × 3 mm DFN-6, 1.0 mm pitch (LCSC C2757850, re-import pending) |
+| U6 | AHT20 | `room-node:AHT20`, 3 × 3 mm DFN-6, 1.0 mm pitch (LCSC C2757850) |
 | R40, R41 | 4.7 kΩ | 0603 |
 | C40 | 0.1 µF | 0603 |
 
-**Do not use the AHT20 now in the project library.** Its symbol has 4 pins
-(1 VDD, 2 GND, 3 SCL, 4 SDA) and its footprint has 4 pads. The real part has 6 pads.
-On that pair, VDD lands on an NC pad and GND lands on the real VDD pad. Nora re-imports
-it from LCSC C2757850 (checked: pins and pads match the Aosong datasheet, Fig. 8).
+The project-library AHT20 was wrong (4 pins, 4 invented pads). It is now replaced
+(SQU-27) with a 6-pin symbol and a 6-pad footprint made from the LCSC C2757850 import,
+pin 1 top-left as in the Aosong datasheet v1.1 §3. Pins 1 and 6 are no-connect pins.
 
 | U6 pin | Name | Net |
 |---|---|---|
