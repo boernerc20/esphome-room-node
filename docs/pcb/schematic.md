@@ -4,9 +4,22 @@ One section per KiCad sheet in `kicad/room-node/`. Each section lists the parts 
 every connection. Use the net names as global labels. Pin map: [`pinout.md`](pinout.md).
 Part numbers and LCSC: [`../../reports/bom/rev-a-bom-lcsc.csv`](../../reports/bom/rev-a-bom-lcsc.csv).
 
-**Status:** MCU sheet is drawn (CC sense parts R6, R7, C9, TP8 still to add). All other
-sheets are empty. The root sheet `room-node.kicad_sch` does not yet include the
-sub-sheets; add them so project ERC works.
+**Status:** MCU sheet is placed but **not wired correctly yet** (ERC 2026-10-01: 76
+items). CC sense parts R6, R7, C9, TP8 are still to add. All other sheets are empty.
+The root sheet `room-node.kicad_sch` does not yet include the sub-sheets; add them so
+project ERC works.
+
+Fix these on `mcu.kicad_sch` (from its netlist) before the other sheets connect to it:
+- U202 (LDO) is on neither rail. C203 sits in series between `+5V` and U202 pin 3, and
+  C204/C205 in series between U202 pin 2 and `+3V3`. Each cap goes from its rail to **GND**.
+- C201, C202, C206, C207 are not connected. They go from their rail to GND.
+- `EN`: R203 and C208 are not on the EN pin; SW201 sits in series between them.
+  Wire R203, C208 and SW201 each from `EN` (U201 pin 3), as in the drawing below.
+- `IO0`: R204/SW202 are not on U201 pin 27. `IO38`: R205/SW203 are not connected.
+- **U201 pins 33 and 34 (GPIO40, GPIO41) are on GND.** They must be not connected.
+- TP203–TP207 are not connected.
+- Names: the sheet uses `+3.3V` and `IO38`; this doc uses `+3V3` and `VA_BTN`. Pick one
+  name per net and use it on every sheet, or the rail splits into two nets.
 
 **Refs:** the refs here are the doc refs. The drawn MCU sheet uses a 2xx prefix
 (R1 → R201). KiCad annotation wins.
@@ -111,13 +124,13 @@ TP6 +5V, TP7 GND, TP8 CC_SENSE.
 |---|---|---|
 | 1 | DIN | `I2S_SPK_DIN` (GPIO18) |
 | 2 | GAIN_SLOT | `+5V` → **6 dB gain** (tested on the breadboard; 9 dB clips) |
-| 4 | SD_MODE | `AMP_SD` (GPIO7). R20 100 kΩ to GND keeps the amp off during boot |
+| 4 | SD_MODE | `AMP_SD` (GPIO7). R20 100 kΩ to GND keeps the amp off during boot (the chip also has an internal 100 kΩ pull-down). GPIO HIGH = left channel |
 | 7, 8 | VDD | `+5V`. C20, C21, C22 to GND, **at the chip** |
 | 9 | OUTP | J2 pin 1 |
 | 10 | OUTN | J2 pin 2 |
 | 14 | LRCLK | `I2S_SPK_LRCLK` (GPIO16) |
 | 16 | BCLK | `I2S_SPK_BCLK` (GPIO17) |
-| 3, 11, 15, EP | GND | `GND`. Vias in the pad |
+| 3, 11, 15, 17 (EP) | GND | `GND`. EP is pin 17 (`PAD`) on the stock symbol; it is not connected inside the chip, so wire it. Vias in the pad |
 | 5, 6, 12, 13 | NC | no connect |
 
 Speaker: Dayton CE32A-8 (8 Ω) on J2. Do not connect either speaker wire to GND.
@@ -173,16 +186,26 @@ Mic mute is software only. There is no mute switch.
 
 | Ref | Value | Footprint |
 |---|---|---|
-| U6 | AHT20 | project library `AHT20` (pins to check, see below) |
+| U6 | AHT20 | 3 × 3 mm DFN-6, 1.0 mm pitch (LCSC C2757850, re-import pending) |
 | R40, R41 | 4.7 kΩ | 0603 |
 | C40 | 0.1 µF | 0603 |
 
-- VDD → `+3V3`, C40 0.1 µF at the pin. GND → GND.
-- SDA → `I2C_SDA` (GPIO8), R40 4.7 kΩ to `+3V3`.
-- SCL → `I2C_SCL` (GPIO9), R41 4.7 kΩ to `+3V3`.
+**Do not use the AHT20 now in the project library.** Its symbol has 4 pins
+(1 VDD, 2 GND, 3 SCL, 4 SDA) and its footprint has 4 pads. The real part has 6 pads.
+On that pair, VDD lands on an NC pad and GND lands on the real VDD pad. Nora re-imports
+it from LCSC C2757850 (checked: pins and pads match the Aosong datasheet, Fig. 8).
+
+| U6 pin | Name | Net |
+|---|---|---|
+| 1 | NC | no connect |
+| 2 | VDD | `+3V3`, C40 0.1 µF to GND at the pin |
+| 3 | SCL | `I2C_SCL` (GPIO9), R41 4.7 kΩ to `+3V3` |
+| 4 | SDA | `I2C_SDA` (GPIO8), R40 4.7 kΩ to `+3V3` |
+| 5 | GND | `GND` |
+| 6 | NC | no connect |
+
 - I2C address 0x38.
-- ⚠ Check the project-library AHT20 symbol and footprint pin numbers against the
-  Aosong datasheet before you draw. Iris checks this.
+- Source: Aosong AHT20 datasheet v1.1, §3 pin diagram (top view).
 - Place U6 on a board edge, far from U1, U2, U3 and J4, with slots on three sides
   (heat from the board reads as room temperature).
 
@@ -212,6 +235,12 @@ circuit; not for rev A.)
 
 ⚠ Check the pin order and pin count on your cable. Newer Waveshare modules have a
 9th pin (PWR); if yours has it, use a 9-pin connector and tie PWR to `+3V3`.
+
+⚠ **Cable.** The breadboard cable has a PH plug only at the module end; the other end
+is loose jumper wires. For J3 as drawn you need a PH-to-PH 8-pin cable that maps
+pin 1 to pin 1 (some ready-made cables reverse it: beep it out before power-on).
+The other option is a 1×8 2.54 mm pin header (`Connector_PinHeader_2.54mm:PinHeader_1x08_P2.54mm_Vertical`)
+that takes the existing jumper ends. Same pin order either way.
 
 ---
 
