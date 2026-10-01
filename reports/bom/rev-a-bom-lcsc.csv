@@ -1,9 +1,9 @@
 Block,Ref,Part,MPN,LCSC#,JLC_Class,Price@10_est_USD,Stock_est,Lifecycle,Alternate,Notes
-"Block 1 - MCU+Power+USB",U1,"ESP32-S3 module","ESP32-S3-WROOM-1-N16R8",TBD,Extended,4.00,Moderate,Active,ESP32-S3-WROOM-1-N8R8,Stock KiCad symbol RF_Module
-"Block 1 - MCU+Power+USB",U2,"3V3 LDO 1A","AP7361C-33ER-13 (SOT-223R)",TBD,Extended,0.30,High,Active,TLV75901PDRVR,"ER suffix only! SOT223R: 1=GND 2=OUT 3=IN. -33E-13 has wrong pinout."
-"Block 1 - MCU+Power+USB",U5,"USB ESD","USBLC6-2SC6 (SOT-23-6)",TBD,Extended,0.15,High,Active,ESD7351,Stock KiCad Power_Protection
-"Block 1 - MCU+Power+USB",J1,"USB-C receptacle","USB4085-GF-A (GCT)",TBD,Extended,0.50,High,Active,HRO TYPE-C-31-M-12,"Footprint: Connector_USB:USB_C_Receptacle_GCT_USB4085"
-"Block 1 - MCU+Power+USB","SW1-SW3","Tactile switch","TL3342F160QG",TBD,Extended,0.12,Good,Active,TS-1187A (Basic),Stock KiCad footprint
+"Block 1 - MCU+Power+USB",U1,"ESP32-S3 module","ESP32-S3-WROOM-1-N16R8",C2913202,Extended,2.12,Moderate,Active,ESP32-S3-WROOM-1-N8R8,"Stock KiCad symbol RF_Module. Checked 2026-10-01: https://www.lcsc.com/product-detail/WiFi-Modules_Espressif-Systems-ESP32-S3-WROOM-1-N16R8_C2913202.html"
+"Block 1 - MCU+Power+USB",U2,"3V3 LDO 1A","AP7361C-33ER-13 (SOT-223R)",C3743528,Extended,0.32,High,Active,TLV75901PDRVR,"ER suffix only! SOT223R: 1=GND 2=OUT 3=IN. -33E-13 has wrong pinout. Checked 2026-10-01: https://www.lcsc.com/product-detail/C3743528.html"
+"Block 1 - MCU+Power+USB",U5,"USB ESD","USBLC6-2SC6 (SOT-23-6)",C7519,Extended,0.10,High,Active,ESD7351,"Stock KiCad Power_Protection. Checked 2026-10-01: https://www.lcsc.com/product-detail/ESD-and-Surge-Protection-TVS-ESD_STMicroelectronics-USBLC6-2SC6_C7519.html"
+"Block 1 - MCU+Power+USB",J1,"USB-C receptacle","USB4085-GF-A (GCT)",C7095263,Extended,0.80,High,Active,HRO TYPE-C-31-M-12,"Footprint: Connector_USB:USB_C_Receptacle_GCT_USB4085. Checked 2026-10-01: https://www.lcsc.com/product-detail/C7095263.html"
+"Block 1 - MCU+Power+USB","SW1-SW3","Tactile switch","TL3342F160QG",C2886898,Extended,0.55,Good,Active,TS-1187A (Basic),"Stock KiCad footprint. Checked 2026-10-01: https://www.lcsc.com/product-detail/Tactile-Switches_E-Switch-TL3342F160QG_C2886898.html"
 "Block 1 - MCU+Power+USB","R1,R2","0603 5.1kΩ 1%",Generic,C23186,Basic,0.0015,Very High,Active,-,Corrected from C25919 (7.68k 0402)
 "Block 1 - MCU+Power+USB","R3-R5","0603 10kΩ 1%",Generic,C25804,Basic,0.002,Very High,Active,-,
 "Block 1 - MCU+Power+USB",C1,"0805 10µF 16V X5R",Generic,C15850,Basic,0.065,Very High,Active,-,Corrected from C169506 (MB14S bridge rectifier)
@@ -16,18 +16,23 @@ Block,Ref,Part,MPN,LCSC#,JLC_Class,Price@10_est_USD,Stock_est,Lifecycle,Alternat
 "Block 1 - MCU+Power+USB","R6,R7","0603 100kΩ 1%",Generic,C25803,Basic,0.002,Very High,Active,-,"CC1/CC2 -> CC_SENSE sum (added 2026-09-28)"
 "Block 1 - MCU+Power+USB",C9,"0603 0.1µF 50V X7R",Generic,C14663,Basic,0.012,Very High,Active,-,"CC_SENSE filter at GPIO1; corrected from C30722 (not found)"
 "Block 1 - MCU+Power+USB",TP8,"Test pad D1.5mm",-,-,-,0.01,High,Active,-,"CC_SENSE test point (added 2026-09-28)"
-"Block 2 - Audio Out",U3,"I2S Class-D amp","MAX98357AETE+ (TQFN-16)",TBD,Extended,4.00,Moderate,Active,MAX98357BETE+,Stock KiCad Audio:MAX98357A
+"Block 2 - Audio Out",U3,"I2S Class-D amp","MAX98357AETE+ (TQFN-16)",C910544,Extended,0.82,Moderate,Active,MAX98357BETE+,"Stock KiCad Audio:MAX98357A. LCSC carries +T (tape) variant. Checked 2026-10-01: https://www.lcsc.com/product-detail/C910544.html"
 "Block 2 - Audio Out",C_amp_bulk,"TH radial 470-1000µF 16V","SamYoung NXB16V470M8*11.5 3.5TP",C346937,Extended,0.153,High,Active,-,Corrected from C144601/4 (resistors)
 "Block 2 - Audio Out",C_amp_cer,"0603 0.1µF 50V X7R",Generic,C14663,Basic,0.012,Very High,Active,-,Corrected from C30722 (not found)
+"Block 2 - Audio Out",C22,"0805 10µF 16V X5R",Generic,C15850,Basic,0.065,Very High,Active,-,"U3 VDD decoupling, added in PR #15. Iris assumption C15850 confirmed."
+"Block 2 - Audio Out",R20,"0603 100kΩ 1%",Generic,C25803,Basic,0.002,Very High,Active,-,"U3 SD_MODE pull-down, added in PR #15. Iris assumption C25803 confirmed."
 "Block 2 - Audio Out",J2,"JST-PH 2-pin SMD","JST B2B-PH-SM4-TB(LF)(SN)",C160352,Extended,0.214,Very High,Active,-,Corrected from C420309 (not found)
-"Block 3 - Mic",MK1,"I2S MEMS mic","SPH0645LM4H-B (Knowles→Syntiant)",TBD,Extended,3.50,Moderate,"Transitioned (active via Syntiant; Knowles EOL)",SPH0645LM4H-H / ICS-43434,"Bottom-port LGA-6. -B=tray, -H=tape&reel. L/R→GND. Knowles line moved to Syntiant; DigiKey 5332440 active 2026-09-30. Alternate ICS-43434 (TDK) compat. unverified."
+"Block 3 - Mic",MK1,"I2S MEMS mic","SPH0645LM4H-B (Knowles->Syntiant)",TBD,Extended,3.50,Moderate,"Transitioned (active via Syntiant; Knowles EOL)",SPH0645LM4H-H / ICS-43434,"Bottom-port LGA-6. -B=tray, -H=tape&reel. L/R->GND. Not on LCSC; order from DigiKey/Mouser."
 "Block 3 - Mic",R8,"0603 100kΩ 1%",Generic,C25803,Basic,0.002,Very High,Active,-,"Mic DATA pull-down to GND (added 2026-09-28)"
 "Block 3 - Mic","R9,R10,R11","0603 33Ω 1%","Uniroyal 0603WAF330JT5E",C23140,Basic,0.003,Very High,Active,-,"Corrected from C105881 (Yageo 330Ω RC0603FR-07330RL). Checked 2026-09-30."
 "Block 3 - Mic",C10,"0603 0.1µF X7R",Generic,C14663,Basic,0.012,Very High,Active,-,"Mic VDD decoupling; corrected from C30722 (not found)"
 "Block 3 - Mic",C11,"0603 100pF C0G 50V",Generic,C14858,Basic,0.009,Very High,Active,-,Corrected from TBD; Samsung CL10C101JB8NNNC
 "Block 4 - LED Ring",R_led,"0603 470Ω 1%",Generic,C23179,Basic,0.002,Very High,Active,-,Corrected from C25727/8 (not found); 470Ω within 330-470Ω spec
 "Block 4 - LED Ring",C_led_bulk,"TH radial 1000µF 16V","SamYoung NHA16V1000M10*16 LO",C2835709,Extended,0.225,High,Active,-,Corrected from C144604 (33Ω resistor)
+"Block 4 - LED Ring",J4,"JST-XH 3-pin TH","JST B3B-XH-A(LF)(SN)",C144394,Extended,0.054,Very High,Active,-,"LED strip connector. 3A rated, 2.5mm pitch. Stock ~85k. Checked 2026-10-01: https://www.lcsc.com/product-detail/C144394.html"
 "Block 4 - LED Ring",LED_strip,"WS2812B 27px strip",Off-board,-,-,-,-,Active,-,
-"Block 5 - Sensor",U6,"Temp/humidity sensor","AHT20",TBD,Extended,0.50,High,Active,SHT30,Needs KiCad symbol import
-"Block 5 - Sensor",R_i2c,"0603 4.7kΩ 1%",Generic,C23162,Basic,0.003,Very High,Active,-,Corrected from C25920 (7.87k 0402)
-"Block 6 - Display",J3,"FPC 24-pin 0.5mm",Generic,TBD,Extended,0.15,Good,Active,-,-
+"Block 5 - Sensor",U6,"Temp/humidity sensor","AHT20",C2757850,Extended,0.50,High,Active,SHT30,"Symbol and footprint re-imported from LCSC C2757850 via easyeda2kicad (SQU-27). 6-pin DFN-6, pin 1 top-left per Aosong datasheet."
+"Block 5 - Sensor","R40,R41","0603 4.7kΩ 1%",Generic,C23162,Basic,0.003,Very High,Active,-,Corrected from C25920 (7.87k 0402)
+"Block 5 - Sensor",C40,"0603 0.1µF 50V X7R",Generic,C14663,Basic,0.012,Very High,Active,-,"U6 VDD decoupling, added in PR #15."
+"Block 6 - Display",J3,"JST-PH 8-pin SMD","JST B8B-PH-SM4-TB(LF)(SN)",C495548,Extended,0.29,Good,Active,-,"Changed from FPC 24-pin to JST-PH 8-pin (PR #15). Waveshare e-paper cable connector. Checked 2026-10-01: https://www.lcsc.com/product-detail/wire-to-board-connector_jst-b8b-ph-sm4-tb-lf-sn_C495548.html"
+"Block 6 - Display",C50,"0603 0.1µF 50V X7R",Generic,C14663,Basic,0.012,Very High,Active,-,"J3 VCC decoupling, added in PR #15."
