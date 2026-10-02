@@ -57,10 +57,6 @@ logger:
   level: DEBUG
   hardware_uart: USB_CDC
 
-# Rev A PCB only: GPIO2 is unwired on the breadboard, so this is harmless there.
-status_led:
-  pin: GPIO2
-
 i2c:
   sda: GPIO8
   scl: GPIO9
@@ -182,6 +178,13 @@ switch:
             - micro_wake_word.start:
 
 light:
+  # Rev A PCB only (D1 on GPIO2); unwired on the breadboard, so harmless there.
+  # Steady on while running; blinks on warning/error.
+  - platform: status_led
+    name: "${friendly_name} Status LED"
+    pin: GPIO2
+    restore_mode: ALWAYS_ON
+
   - platform: esp32_rmt_led_strip
     id: ring
     name: "${friendly_name} Ring"
