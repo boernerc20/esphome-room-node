@@ -57,6 +57,10 @@ logger:
   level: DEBUG
   hardware_uart: USB_CDC
 
+# Rev A PCB only: GPIO2 is unwired on the breadboard, so this is harmless there.
+status_led:
+  pin: GPIO2
+
 i2c:
   sda: GPIO8
   scl: GPIO9
