@@ -10,6 +10,8 @@ the root sheet `room-node.kicad_sch`. Project ERC: 0 errors, 1 explained warning
 (`python3 tools/check_pinout.py`). The earlier MCU sheet (2xx refs, wiring errors) was
 redrawn from scratch. Chris reviews and tidies.
 
+**2026-10-02 (SQU-29):** status LED D1 + R12 on GPIO2 added to the MCU sheet.
+
 **Refs:** the schematic uses the refs in this doc (R1, C1, U1 …). Net names are the
 ones in this doc (`+3V3`, `VA_BTN`).
 
@@ -30,6 +32,8 @@ USB-C 5V ──┬── ESD (D+/D−) ─────────────�
                  │                   └── J3 e-paper (SPI)
                  ├── U3 MAX98357A (I2S out) → J2 speaker
                  └── J4 LED strip (DIN ← GPIO21 via 470 Ω)
+
+U1 GPIO2 → R12 1 kΩ → D1 status LED (green) → GND
 ```
 
 ---
@@ -51,6 +55,8 @@ USB-C 5V ──┬── ESD (D+/D−) ─────────────�
 | C4, C6 | 22 µF 10 V | `Device:C` | 0805 |
 | SW1, SW2, SW3 | TL3342 (RESET, BOOT, VOICE) | `Switch:SW_Push` | `Button_Switch_SMD:SW_SPST_TL3342` |
 | TP1–TP8 | test pad | `Connector:TestPoint` | `TestPoint:TestPoint_Pad_D1.5mm` |
+| R12 | 1 kΩ | `Device:R` | 0603 |
+| D1 | KT-0805G green LED | `Device:LED` | `LED_SMD:LED_0805_2012Metric` |
 
 **USB-C (J1)**
 - VBUS A4, B4, A9, B9 → `+5V`. C1 10 µF + C2 0.1 µF to GND at J1.
@@ -92,6 +98,24 @@ Other pins: see [`pinout.md`](pinout.md).
   GND         GND         GND
 ```
 EN = pin 3, IO0 = pin 27, VA_BTN = pin 31 (GPIO38). SW1 and C8 both go from EN to GND.
+
+**Status LED (D1)** — U1 pin 38 (GPIO2) → `STATUS_LED` → R12 1 kΩ → D1 anode (pin 2);
+D1 cathode (pin 1) → GND. HIGH = on.
+- GPIO2 is not a strapping pin on the S3 (straps: GPIO0, 3, 45, 46). It is an input
+  with no pull at reset, so D1 is off until firmware drives it.
+- Current: (3.3 V − Vf) / 1 kΩ. Vf is about 2.4 V at 1 mA (typical curve) and up to
+  about 2.8 V for the highest Vf bin, so **0.5–0.9 mA**. The ESP32-S3 GPIO is good for
+  tens of mA, so this is no load. At 1 mA the LED gives roughly a tenth of its 20 mA
+  brightness, which is plenty for an indicator in a bedroom. Firmware can dim it further with PWM (LEDC).
+- **Why 0805, not 0603:** JLC has no green or blue 0603 LED in its Basic library
+  (checked 2026-10-02: only red C2286 and white C2290 at 0603). KT-0805G (C2297) is the
+  green Basic part. 0805 is easier to hand-solder. If you want 0603, use KT-0603G
+  (C12624, Extended) and change the footprint to `LED_SMD:LED_0603_1608Metric`.
+- **Polarity:** the KENTO datasheet numbers the anode pad ① ("+"); KiCad numbers the
+  cathode pad 1. Do not go by pad numbers. The green corner mark on the LED is the
+  cathode: place it on the cathode (pad 1) side of the footprint.
+- Put D1 where it can be seen through the case (a light pipe or a thin wall).
+  It is not near the antenna and not near U6.
 
 **Test points:** TP1 EN, TP2 IO0, TP3 TXD0 (pin 37), TP4 RXD0 (pin 36), TP5 +3V3,
 TP6 +5V, TP7 GND, TP8 CC_SENSE.
@@ -235,7 +259,7 @@ that takes the existing jumper ends. Same pin order either way.
 
 - [ ] `+5V`, `+3V3`, `GND`
 - [ ] `USB_D+`, `USB_D-`, `USB_D+_CONN`, `USB_D-_CONN`, `CC1`, `CC2`, `CC_SENSE`
-- [ ] `EN`, `IO0`, `VA_BTN`, `TXD0`, `RXD0`
+- [ ] `EN`, `IO0`, `VA_BTN`, `TXD0`, `RXD0`, `STATUS_LED`
 - [ ] `I2S_MIC_BCLK`, `I2S_MIC_WS`, `I2S_MIC_DATA`
 - [ ] `I2S_SPK_BCLK`, `I2S_SPK_LRCLK`, `I2S_SPK_DIN`, `AMP_SD`
 - [ ] `I2C_SDA`, `I2C_SCL`
@@ -246,4 +270,4 @@ that takes the existing jumper ends. Same pin order either way.
 
 ESP32-S3-WROOM-1 and ESP32-S3 Hardware Design Guidelines (Espressif), AP7361C (Diodes),
 USBLC6-2 (ST), MAX98357A (Analog Devices), SPH0645LM4H-B (Knowles, DigiKey mirror),
-AHT20 (Aosong), USB Type-C spec R2.0 §4.11.3 (CC voltages).
+AHT20 (Aosong), KT-0805G LED (Hubei KENTO, rev A.0, 2018-12-06), USB Type-C spec R2.0 §4.11.3 (CC voltages).

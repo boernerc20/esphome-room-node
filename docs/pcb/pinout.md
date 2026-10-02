@@ -36,6 +36,7 @@ except the voice button (GPIO0 on the breadboard, GPIO38 on the PCB).
 | 31 | 38 | `VA_BTN` | voice button, 10 kΩ pull-up | MCU |
 | 36 | 44 (RXD0) | `RXD0` | test point | MCU |
 | 37 | 43 (TXD0) | `TXD0` | test point | MCU |
+| 38 | 2 | `STATUS_LED` | status LED D1 through R12 1 kΩ. HIGH = on | MCU |
 | 39 | 1 | `CC_SENSE` | USB-C CC sense (analog, ADC1_CH0) | MCU |
 
 ## Do not use
@@ -50,14 +51,22 @@ except the voice button (GPIO0 on the breadboard, GPIO38 on the PCB).
 
 | Pin | GPIO | Note |
 |---|---|---|
-| 38 | 2 | Last free ADC1 pin. |
 | 32–35 | 39–42 | JTAG. Keep free if you want hardware debug. |
 | 24, 25 | 47, 48 | No ADC. |
 
-Leave free pins not connected. A test pad on GPIO2 is optional.
+Leave free pins not connected. There is no free ADC1 pin left (GPIO1 = CC sense,
+GPIO2 = status LED).
 
 ## Why GPIO38 for the voice button
 
 GPIO0 is the BOOT strap. If a user holds a GPIO0 button during power-on, the chip
 enters flash mode and looks dead. Firmware cannot fix that after the board is made.
 So GPIO0 is only the BOOT button, and the voice button is on GPIO38.
+
+## Why GPIO2 for the status LED
+
+GPIO2 is not a strapping pin on the ESP32-S3 (the straps are GPIO0, 3, 45 and 46;
+ESP32-S3 datasheet, "Strapping Pins"). It is an input with no pull at reset, so the
+LED stays off until firmware drives it. (On the older ESP32, GPIO2 *is* a strap; not
+on the S3.) The LED takes about 0.5–0.9 mA, far below the GPIO drive limit. The cost:
+GPIO2 was the last free ADC1 pin.
