@@ -16,6 +16,8 @@ Block,Ref,Part,MPN,LCSC#,JLC_Class,Price@10_est_USD,Stock_est,Lifecycle,Alternat
 "Block 1 - MCU+Power+USB","R6,R7","0603 100kΩ 1%",Generic,C25803,Basic,0.002,Very High,Active,-,"CC1/CC2 -> CC_SENSE sum (added 2026-09-28)"
 "Block 1 - MCU+Power+USB",C9,"0603 0.1µF 50V X7R",Generic,C14663,Basic,0.012,Very High,Active,-,"CC_SENSE filter at GPIO1; corrected from C30722 (not found)"
 "Block 1 - MCU+Power+USB",TP8,"Test pad D1.5mm",-,-,-,0.01,High,Active,-,"CC_SENSE test point (added 2026-09-28)"
+"Block 1 - MCU+Power+USB",R12,"0603 1kΩ 1%","UNI-ROYAL 0603WAF1001T5E",C21190,Basic,0.0026,Very High,Active,-,"Status LED series resistor on GPIO2 (SQU-29). Checked 2026-10-02: JLC Basic, ~21.6M at JLC, ~3.2M at LCSC. https://www.lcsc.com/product-detail/C21190.html"
+"Block 1 - MCU+Power+USB",D1,"0805 LED green 525nm","Hubei KENTO KT-0805G",C2297,Basic,0.0165,Very High,Active,"KT-0603G C12624 (0603, Extended)","Status LED on GPIO2, active HIGH, ~0.5-0.9 mA (SQU-29). No green/blue 0603 LED in JLC Basic, so 0805. Datasheet pad 1 = anode; KiCad pad 1 = cathode: place by the cathode mark. Checked 2026-10-02: JLC Basic, ~3.1M at JLC, ~2.5M at LCSC. https://www.lcsc.com/product-detail/C2297.html"
 "Block 2 - Audio Out",U3,"I2S Class-D amp","MAX98357AETE+ (TQFN-16)",C910544,Extended,0.82,Moderate,Active,MAX98357BETE+,"Stock KiCad Audio:MAX98357A. LCSC carries +T (tape) variant. Checked 2026-10-01: https://www.lcsc.com/product-detail/C910544.html"
 "Block 2 - Audio Out",C_amp_bulk,"TH radial 470-1000µF 16V","SamYoung NXB16V470M8*11.5 3.5TP",C346937,Extended,0.153,High,Active,-,Corrected from C144601/4 (resistors)
 "Block 2 - Audio Out",C_amp_cer,"0603 0.1µF 50V X7R",Generic,C14663,Basic,0.012,Very High,Active,-,Corrected from C30722 (not found)
