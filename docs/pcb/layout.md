@@ -14,10 +14,7 @@ For later, when the schematic is done. Rev A is 5 boards, built by hand.
 Stack-up: **JLC04161H-7628**, 1.6 mm, 1 oz outer / 0.5 oz inner.
 L1 signals + parts, L2 GND plane, L3 power (+5V / +3V3 pours) + slow signals, L4 signals.
 
-Set the layer count once, in the PCB editor (it lives in the `.kicad_pcb` file):
-**File → Board Setup → Board Stackup → Physical Stackup → Copper layers: 4.**
-
-The DRC rules below are already in `room-node.kicad_pro` (Board Setup → Design Rules).
+The 4 copper layers are set in `room-node.kicad_pcb`. The DRC rules below are already in `room-node.kicad_pro` (Board Setup → Design Rules).
 
 | Rule | Value |
 |---|---|
@@ -31,13 +28,43 @@ The DRC rules below are already in `room-node.kicad_pro` (Board Setup → Design
 | Net class | Nets | Track | Clearance | Via |
 |---|---|---|---|---|
 | Default | all others | 0.2 | 0.15 | 0.6 / 0.3 |
-| Power | +5V, +3V3, GND | 0.6 | 0.2 | 0.8 / 0.4 |
+| Power | +5V, +3V3, GND | 0.6 | 0.15 (USB-C J1 pads are 0.15 apart) | 0.8 / 0.4 |
 | Audio | speaker out (J2) | 0.4 | 0.2 | 0.8 / 0.4 |
 | USB | USB_D± | 0.2, diff gap 0.15 (~90 Ω on L1 over L2) | 0.15 | 0.6 / 0.3 |
 | LED | LED_DIN, J4 data | 0.2 | 0.15 | 0.6 / 0.3 |
 
 The Audio and LED patterns use KiCad's auto net names (`Net-(J2-Pin_*)`, `Net-(J4-Pin_2)`).
 If you rename those nets in the schematic, update the pattern in Board Setup → Net Classes.
+
+## Board setup (done)
+
+`tools/pcb_setup.py` made the starting board. It runs once; it refuses to overwrite a board
+that has parts. From here on, the board is edited by hand in KiCad.
+
+- **Outline:** 90 × 50 mm, 2 mm corner radius. **Placeholder** — change it to fit the case.
+- **Holes:** 4 × M3 (H1–H4), 3.5 mm from each corner. Board-only footprints.
+- **Parts:** all 55 schematic parts, linked to their symbols. **F8** (Update PCB from
+  Schematic) updates them in place; it does not add copies.
+- **U1 antenna:** overhangs the top edge. The board edge is at the line between the antenna
+  and the pads, so the footprint keep-out is fully off the board. Do not move the edge up.
+- **Planes** (saved unfilled; press **B** to fill):
+
+| Layer | Zone | Priority |
+|---|---|---|
+| F.Cu (L1) | GND fill | 0 |
+| In1.Cu (L2) | GND plane, whole board | 0 |
+| In2.Cu (L3) | +5V: USB/LDO strip (left), band at y 124–128, amp/LED side (right) | 1 |
+| In2.Cu (L3) | +3V3: rest of the board | 0 |
+| B.Cu (L4) | GND fill | 0 |
+
+- **Stitching:** GND vias every 5 mm along the edge, 1.2 mm in, not under parts.
+  Add more GND vias in the board area after routing.
+- **Rough placement** by function: USB-C + ESD + CC resistors at the left edge, LDO below
+  them, mic bottom-left, sensor and display connector on the bottom edge, buttons and test
+  pads under U1, amp + speaker connector bottom-right, LED connector top-right.
+  Silkscreen is not tidied.
+- **DRC at hand-over:** 0 errors except unrouted nets (90). 0 schematic-parity issues.
+  Warnings: silkscreen only, plus 4 small +3V3 islands on L3 (removed on fill).
 
 ## Placement
 
