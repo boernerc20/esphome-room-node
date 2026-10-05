@@ -12,8 +12,11 @@ redrawn from scratch. Chris reviews and tidies.
 
 **2026-10-02 (SQU-29):** status LED D1 + R12 on GPIO2 added to the MCU sheet.
 
+**2026-10-05 (SQU-17):** voice button SW3 + R5 removed (wake word only). U1 pin 31
+(GPIO38) is now not connected.
+
 **Refs:** the schematic uses the refs in this doc (R1, C1, U1 …). Net names are the
-ones in this doc (`+3V3`, `VA_BTN`).
+ones in this doc (`+3V3`, `EN`).
 
 **Rules for all sheets**
 - Passives are 0603 minimum (hand assembly). No 0402.
@@ -47,13 +50,13 @@ U1 GPIO2 → R12 1 kΩ → D1 status LED (green) → GND
 | U5 | USBLC6-2SC6 | `Power_Protection:USBLC6-2SC6` | `Package_TO_SOT_SMD:SOT-23-6` |
 | J1 | USB4085-GF-A | `Connector:USB_C_Receptacle_USB2.0_16P` | `Connector_USB:USB_C_Receptacle_GCT_USB4085` |
 | R1, R2 | 5.1 kΩ 1% | `Device:R` | 0603 |
-| R3, R4, R5 | 10 kΩ | `Device:R` | 0603 |
+| R3, R4 | 10 kΩ | `Device:R` | 0603 |
 | R6, R7 | 100 kΩ 1% | `Device:R` | 0603 |
 | C1 | 10 µF 16 V | `Device:C` | 0805 |
 | C2, C5, C7, C9 | 0.1 µF | `Device:C` | 0603 |
 | C3, C8 | 1 µF | `Device:C` | 0603 |
 | C4, C6 | 22 µF 10 V | `Device:C` | 0805 |
-| SW1, SW2, SW3 | TL3342 (RESET, BOOT, VOICE) | `Switch:SW_Push` | `Button_Switch_SMD:SW_SPST_TL3342` |
+| SW1, SW2 | TL3342 (RESET, BOOT) | `Switch:SW_Push` | `Button_Switch_SMD:SW_SPST_TL3342` |
 | TP1–TP8 | test pad | `Connector:TestPoint` | `TestPoint:TestPoint_Pad_D1.5mm` |
 | R12 | 1 kΩ | `Device:R` | 0603 |
 | D1 | KT-0805G green LED | `Device:LED` | `LED_SMD:LED_0805_2012Metric` |
@@ -88,16 +91,17 @@ pinout). Give the tab a copper pour (heat).
 **Module (U1)** — pin 2 ← `+3V3`, C6 22 µF + C7 0.1 µF at the pin. Pins 1, 40, 41 → GND.
 Other pins: see [`pinout.md`](pinout.md).
 
-**Reset, boot, voice button**
+**Reset and boot buttons**
 ```
- +3V3        +3V3        +3V3
-  R3 10k      R4 10k      R5 10k
-  ├─ EN       ├─ IO0      ├─ VA_BTN
-  C8 1µF      SW2 BOOT    SW3 VOICE
-  SW1 RESET   │           │
-  GND         GND         GND
+ +3V3        +3V3
+  R3 10k      R4 10k
+  ├─ EN       ├─ IO0
+  C8 1µF      SW2 BOOT
+  SW1 RESET   │
+  GND         GND
 ```
-EN = pin 3, IO0 = pin 27, VA_BTN = pin 31 (GPIO38). SW1 and C8 both go from EN to GND.
+EN = pin 3, IO0 = pin 27. SW1 and C8 both go from EN to GND. No voice button: wake
+word only. Pin 31 (GPIO38) has a no-connect flag.
 
 **Status LED (D1)** — U1 pin 38 (GPIO2) → `STATUS_LED` → R12 1 kΩ → D1 anode (pin 2);
 D1 cathode (pin 1) → GND. HIGH = on.
@@ -230,7 +234,7 @@ circuit; not for rev A.)
 
 | Ref | Value | Footprint |
 |---|---|---|
-| J3 | 8-pin JST-PH (Waveshare cable) | `Connector_JST:JST_PH_B8B-PH-SM4-TB_1x08-1MP_P2.00mm_Vertical` |
+| J3 | 8-pin JST-PH **side entry** (Waveshare cable) | `Connector_JST:JST_PH_S8B-PH-SM4-TB_1x08-1MP_P2.00mm_Horizontal` |
 | C50 | 0.1 µF | 0603 |
 
 | J3 pin | Waveshare name | Net |
@@ -243,6 +247,12 @@ circuit; not for rev A.)
 | 6 | DC | `EPD_DC` (GPIO13) |
 | 7 | RST | `EPD_RST` (GPIO14) |
 | 8 | BUSY | `EPD_BUSY` (GPIO15) |
+
+**Side entry (Chris, 2026-10-05, SQU-32).** J3 is the horizontal **S8B-PH-SM4-TB**, not the
+top-entry B8B. The board sits on ~10 mm M2 standoffs behind the display, parts side facing
+away from it, so the cable has to leave the board edge towards the display. The connector
+mouth faces out over the **bottom** board edge. Pinout and pin numbering are unchanged:
+pin 1 is still pin 1.
 
 ⚠ Check the pin order and pin count on your cable. Newer Waveshare modules have a
 9th pin (PWR); if yours has it, use a 9-pin connector and tie PWR to `+3V3`.
@@ -259,7 +269,7 @@ that takes the existing jumper ends. Same pin order either way.
 
 - [ ] `+5V`, `+3V3`, `GND`
 - [ ] `USB_D+`, `USB_D-`, `USB_D+_CONN`, `USB_D-_CONN`, `CC1`, `CC2`, `CC_SENSE`
-- [ ] `EN`, `IO0`, `VA_BTN`, `TXD0`, `RXD0`, `STATUS_LED`
+- [ ] `EN`, `IO0`, `TXD0`, `RXD0`, `STATUS_LED`
 - [ ] `I2S_MIC_BCLK`, `I2S_MIC_WS`, `I2S_MIC_DATA`
 - [ ] `I2S_SPK_BCLK`, `I2S_SPK_LRCLK`, `I2S_SPK_DIN`, `AMP_SD`
 - [ ] `I2C_SDA`, `I2C_SCL`

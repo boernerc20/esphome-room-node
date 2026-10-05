@@ -808,7 +808,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Connector_JST:JST_PH_B8B-PH-SM4-TB_1x08-1MP_P2.00mm_Vertical"
+		(property "Footprint" "Connector_JST:JST_PH_S8B-PH-SM4-TB_1x08-1MP_P2.00mm_Horizontal"
 			(at 203.2 101.6 0)
 			(hide yes)
 			(show_name no)
@@ -841,7 +841,7 @@
 				)
 			)
 		)
-		(property "MPN" "JST B8B-PH-SM4-TB(LF)(SN)"
+		(property "MPN" "JST S8B-PH-SM4-TB(LF)(SN)"
 			(at 203.2 101.6 0)
 			(hide yes)
 			(show_name no)
@@ -852,7 +852,7 @@
 				)
 			)
 		)
-		(property "LCSC" "TBD"
+		(property "LCSC" "C265121"
 			(at 203.2 101.6 0)
 			(hide yes)
 			(show_name no)

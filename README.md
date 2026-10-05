@@ -14,7 +14,7 @@ and humidity, e-ink display, LED status ring.
 | [`docs/breadboard.md`](docs/breadboard.md) | Breadboard wiring |
 | [`docs/pcb/pinout.md`](docs/pcb/pinout.md) | Rev A PCB pinout |
 | [`docs/pcb/schematic.md`](docs/pcb/schematic.md) | Rev A schematic, sheet by sheet — draw from this |
-| [`docs/pcb/layout.md`](docs/pcb/layout.md) | Layout, assembly and bring-up (later) |
+| [`docs/pcb/layout.md`](docs/pcb/layout.md) | Rev A board (placed + routed), assembly and bring-up |
 | [`docs/enclosure.md`](docs/enclosure.md) | Enclosure notes |
 | `kicad/room-node/` | KiCad project |
 | `reports/bom/rev-a-bom-lcsc.csv` | Rev A BOM with LCSC numbers |
