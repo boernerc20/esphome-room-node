@@ -67,14 +67,14 @@ The bottom side (no parts) faces the display. All parts face the back of the cas
 | Area | Parts |
 |---|---|
 | Left edge | J1 USB-C, U5 ESD, R1/R2/R6/R7 (CC), C1/C2 |
-| Left, lower | U2 LDO (3 vias in the tab), C3/C4/C5 |
+| Left, lower | U2 LDO (tab on a F.Cu +3V3 copper area with 5 vias to L3), C3/C4/C5 |
 | Bottom-left corner | MK1 mic + R8/R11/C10/C11. Sound hole through the board |
 | Centre-left, top edge | U1 module; C6/C7/R3/C8 and R9/R10 at its left pins |
 | Under U1 | TP1–TP7 row, R30, J3 display connector on the bottom edge |
 | Right of U1 | C9/TP8 (CC sense), SW2 BOOT / SW1 RESET, R4/R12, D1 |
 | Bottom centre | U6 AHT20 + C40 on an island: slots left and right, no copper pour |
 | Right, top | J4 LED connector, C30 1000 µF |
-| Right, bottom | U3 amp + C21/C22/R20, C20 470 µF, J2 speaker |
+| Right, bottom | U3 amp + C21/C22 at VDD pins 7/8, R20, C20 470 µF, J2 speaker |
 
 **Layers**
 
@@ -85,15 +85,31 @@ The bottom side (no parts) faces the display. All parts face the back of the cas
 | In2.Cu (L3) | +3V3 plane, solid. No tracks |
 | B.Cu (L4) | Signals, +5V trunk to C30/J4/C20, GND fill |
 
-- **+5V** is a track, not a plane: 0.6–1.0 mm from J1 to the LDO, the amp and J4.
-  Short 0.25–0.4 mm stubs only at the amp pins (0.5 mm pitch) and the J1 VBUS loop.
+- **+5V** is a track, not a plane. LED / amp path: J1 → C1 on F.Cu and B.Cu in parallel
+  (0.7–0.9 mm each through the USB-C pin row and shell pads, then 1.2 mm), 1.0–1.2 mm to
+  C3 and along the bottom row, **1.5 mm** from TP6 to C20, 1.0 mm B.Cu to C30/J4, 1.0 mm
+  up to the amp. 1.5 mm carries about 3.2 A at a 10 °C rise (IPC-2221, 1 oz).
+  Thin parts: 0.25–0.4 mm stubs at the amp pins (0.5 mm pitch), the J1 VBUS loop, and
+  0.6 mm to amp pin 2 (GAIN_SLOT, no current) and to U5.
 - **GND / +3V3:** every SMD pad has its own via to its plane (fan-out). GND stitching
   vias on a 5 mm grid and along the edge.
 - **Speaker pair** U3 → J2: 0.4–0.5 mm, side by side, no vias.
-- **USB D±:** about 9 mm, 0.2 mm tracks. USB is Full Speed (12 Mbit/s), so length
+- **USB D±:** about 18–19 mm per line from J1 to U1 (about 9 mm on the MCU side of U5),
+  0.2 mm tracks, matched to about 1 mm. USB is Full Speed (12 Mbit/s), so length
   match and impedance are not critical.
 
-**DRC at hand-over:** 0 errors, 0 unconnected, 0 schematic-parity issues. 53 warnings,
+- **LDO heat:** the U2 tab sits on a F.Cu +3V3 copper area (about 6 × 3.3 mm, full
+  connection) with 5 vias (0.3 mm drill) to the L3 plane, next to the tab, not in it
+  (no solder wicking). C4/C5 +3V3 pads are on the same area.
+- **Amp decoupling:** C21 (0.1 µF) 0.7 mm below VDD pins 7/8, C22 (10 µF) right below it,
+  both on the +5V feed to the pins. Each GND pad has its own via to L2.
+
+**Design review fixes (Iris, SQU-31, 2026-10-05):** M1 C21/C22 moved to U3 pins 7/8;
+M2 0.6 mm +5V sections on the LED path widened or rerouted (see +5V above); M3 U2 tab
+copper area + vias; M4 AMP_SD under U1 moved to y = 106.4 (0.76 mm from the module's
+GND pad, was 0.15 mm).
+
+**DRC at hand-over:** 0 errors, 0 unconnected, 0 schematic-parity issues. 51 warnings,
 all silkscreen (reference text overlaps pads or other text). Report:
 `reports/pcb/room-node-drc.rpt`. Pictures: `reports/pcb/room-node-top.png`,
 `room-node-copper-top.png`, `room-node-copper-bottom.png`.

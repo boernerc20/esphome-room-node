@@ -1,8 +1,8 @@
 ** Drc report for room-node.kicad_pcb **
-** Created on 2026-10-05T00:52:13 **
+** Created on 2026-10-05T01:05:53 **
 ** Report includes: Errors, Warnings, Exclusions **
 
-** Found 53 DRC violations **
+** Found 51 DRC violations **
 [silk_edge_clearance]: Silkscreen clipped by board edge (board setup constraints silk clearance 0.1500 mm; actual 0.0000 mm)
     Rule: board setup constraints silk; warning
     @(101.0000 mm, 100.0000 mm): Segment on Edge.Cuts
@@ -83,18 +83,14 @@
     Rule: board setup constraints silk; warning
     @(109.9250 mm, 132.9500 mm): Segment of MK1 on F.Silkscreen
     @(109.5700 mm, 132.2000 mm): Reference field of C10
-[silk_overlap]: Silkscreen clearance (board setup constraints silk clearance 0.1500 mm; actual 0.0000 mm)
-    Rule: board setup constraints silk; warning
-    @(158.1225 mm, 132.2373 mm): Segment of R40 on F.Silkscreen
-    @(157.9700 mm, 132.0000 mm): Reference field of R41
 [silk_overlap]: Silkscreen clearance (board setup constraints silk clearance 0.1500 mm; actual 0.0871 mm)
     Rule: board setup constraints silk; warning
     @(169.4400 mm, 101.5400 mm): Rectangle of J4 on F.Silkscreen
     @(180.5000 mm, 107.2500 mm): Reference field of C30
 [silk_overlap]: Silkscreen clearance (board setup constraints silk clearance 0.1500 mm; actual 0.0000 mm)
     Rule: board setup constraints silk; warning
-    @(164.9387 mm, 124.1350 mm): Segment of C22 on F.Silkscreen
-    @(166.0000 mm, 124.1700 mm): Reference field of R20
+    @(158.1225 mm, 132.2373 mm): Segment of R40 on F.Silkscreen
+    @(157.9700 mm, 132.0000 mm): Reference field of R41
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
     @(116.3000 mm, 108.1700 mm): Reference field of C8
@@ -211,10 +207,6 @@
     Local override; warning
     @(151.1300 mm, 135.0000 mm): Reference field of C40
     @(151.6000 mm, 135.0000 mm): Pad 2 [+3V3] of U6 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(166.0000 mm, 124.1700 mm): Reference field of R20
-    @(166.1500 mm, 123.4000 mm): Pad 2 [GND] of C22 on F.Cu
 
 ** Found 0 unconnected pads **
 

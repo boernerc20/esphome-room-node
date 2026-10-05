@@ -457,7 +457,7 @@ def fanout(board, nets):
             if ref == 'U1' and p.GetNumber() == '41':
                 continue
             # LDO tab: 3 extra vias in the pad carry heat into the L3 +3V3 plane
-            if ref == 'U2' and p.GetNumber() == '2' and p.GetSize().x > mm(2):
+            if ref == 'U2' and p.GetNumber() == '2' and p.GetSize().y > mm(2):     # the 2.0 x 3.8 mm tab
                 for dy in (-1.0, 0.0, 1.0):
                     via(board, net, VECTOR2I(q.x, q.y + mm(dy)))
                     count += 1
