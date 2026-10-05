@@ -36,5 +36,5 @@ Block,Ref,Part,MPN,LCSC#,JLC_Class,Price@10_est_USD,Stock_est,Lifecycle,Alternat
 "Block 5 - Sensor",U6,"Temp/humidity sensor","AHT20",C2757850,Extended,0.50,High,Active,SHT30,"Symbol and footprint re-imported from LCSC C2757850 via easyeda2kicad (SQU-27). 6-pin DFN-6, pin 1 top-left per Aosong datasheet."
 "Block 5 - Sensor","R40,R41","0603 4.7kΩ 1%",Generic,C23162,Basic,0.003,Very High,Active,-,Corrected from C25920 (7.87k 0402)
 "Block 5 - Sensor",C40,"0603 0.1µF 50V X7R",Generic,C14663,Basic,0.012,Very High,Active,-,"U6 VDD decoupling, added in PR #15."
-"Block 6 - Display",J3,"JST-PH 8-pin SMD","JST B8B-PH-SM4-TB(LF)(SN)",C495548,Extended,0.29,Good,Active,-,"Changed from FPC 24-pin to JST-PH 8-pin (PR #15). Waveshare e-paper cable connector. Checked 2026-10-01: https://www.lcsc.com/product-detail/wire-to-board-connector_jst-b8b-ph-sm4-tb-lf-sn_C495548.html"
+"Block 6 - Display",J3,"JST-PH 8-pin SMD side entry","JST S8B-PH-SM4-TB(LF)(SN)",C265121,Extended,0.3674,Good,Active,C20089303,"Switched from top-entry B8B (SQU-32). PS: Waveshare module ships PH-to-PH 8-pin cable; no separate PHR-8 housing if using that. Checked 2026-10-05: https://www.lcsc.com/product-detail/wire-to-board-connector_jst-s8b-ph-sm4-tb-lf-sn_C265121.html"
 "Block 6 - Display",C50,"0603 0.1µF 50V X7R",Generic,C14663,Basic,0.012,Very High,Active,-,"J3 VCC decoupling, added in PR #15."
