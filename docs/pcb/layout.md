@@ -71,7 +71,7 @@ The bottom side (no parts) faces the display. All parts face the back of the cas
 | Bottom-left corner | MK1 mic + R8/R11/C10/C11. Sound hole through the board |
 | Centre-left, top edge | U1 module; C6/C7/R3/C8 and R9/R10 at its left pins |
 | Under U1 | TP1–TP7 row, R30, J3 display connector on the bottom edge |
-| Right of U1 | C9/TP8 (CC sense), SW2 BOOT / SW1 RESET / SW3 VOICE, R4/R5/R12, D1 |
+| Right of U1 | C9/TP8 (CC sense), SW2 BOOT / SW1 RESET, R4/R12, D1 |
 | Bottom centre | U6 AHT20 + C40 on an island: slots left and right, no copper pour |
 | Right, top | J4 LED connector, C30 1000 µF |
 | Right, bottom | U3 amp + C21/C22/R20, C20 470 µF, J2 speaker |
@@ -103,8 +103,8 @@ Gerbers + drill (JLCPCB): `reports/fab/room-node-rev-a-gerbers.zip`.
 1. Hole positions are from the Waveshare drawing. Check them on the real module.
 2. Mic sound hole faces the display (bottom side). The case needs an air path from the
    room to the gap between the boards, near the bottom-left corner.
-3. SW1–SW3 and D1 face the back of the case. The VOICE button and the status LED are
-   not reachable / visible from the front. Plan a case opening or a light pipe.
+3. SW1/SW2 (RESET/BOOT, only for flashing) and D1 face the back of the case. The
+   voice button was removed (2026-10-05, wake word only).
 4. Some F.Cu tracks run under U1 (under the module's solder mask). Normal for this
    module, but Iris checks it.
 5. Silkscreen is not tidied.

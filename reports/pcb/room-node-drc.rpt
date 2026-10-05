@@ -1,6 +1,6 @@
 ** Drc report for room-node.kicad_pcb **
-** Created on 2026-10-04T21:31:20 **
-** Report includes: Errors, Warnings **
+** Created on 2026-10-05T00:52:13 **
+** Report includes: Errors, Warnings, Exclusions **
 
 ** Found 53 DRC violations **
 [silk_edge_clearance]: Silkscreen clipped by board edge (board setup constraints silk clearance 0.1500 mm; actual 0.0000 mm)
@@ -201,10 +201,6 @@
     @(157.6000 mm, 131.1750 mm): Pad 2 [I2C_SDA] of R40 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(166.0000 mm, 124.1700 mm): Reference field of R20
-    @(166.1500 mm, 123.4000 mm): Pad 2 [GND] of C22 on F.Cu
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
     @(151.1300 mm, 135.0000 mm): Reference field of C40
     @(151.6000 mm, 136.0000 mm): Pad 3 [I2C_SCL] of U6 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
@@ -215,6 +211,10 @@
     Local override; warning
     @(151.1300 mm, 135.0000 mm): Reference field of C40
     @(151.6000 mm, 135.0000 mm): Pad 2 [+3V3] of U6 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
+    @(166.0000 mm, 124.1700 mm): Reference field of R20
+    @(166.1500 mm, 123.4000 mm): Pad 2 [GND] of C22 on F.Cu
 
 ** Found 0 unconnected pads **
 

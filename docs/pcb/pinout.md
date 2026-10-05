@@ -4,8 +4,9 @@ One row per module pin. **Pin** = module pin number on the KiCad symbol
 `RF_Module:ESP32-S3-WROOM-1` (verified). **GPIO** = the ESP32 GPIO number. They are
 two different numbers; always check which one you read.
 
-The breadboard uses the same GPIOs (see [`../breadboard.md`](../breadboard.md)),
-except the voice button (GPIO0 on the breadboard, GPIO38 on the PCB).
+The breadboard uses the same GPIOs (see [`../breadboard.md`](../breadboard.md)).
+The PCB has no voice button (wake word only); the BOOT button on GPIO0 can still
+start the voice assistant, same as on the breadboard.
 
 ## Used pins
 
@@ -33,7 +34,6 @@ except the voice button (GPIO0 on the breadboard, GPIO38 on the PCB).
 | 22 | 14 | `EPD_RST` | e-paper RST | Display |
 | 23 | 21 | `LED_DIN` | LED strip DIN (through 470 Ω) | LED |
 | 27 | 0 | `IO0` | BOOT button, 10 kΩ pull-up. ⚠ strapping pin | MCU |
-| 31 | 38 | `VA_BTN` | voice button, 10 kΩ pull-up | MCU |
 | 36 | 44 (RXD0) | `RXD0` | test point | MCU |
 | 37 | 43 (TXD0) | `TXD0` | test point | MCU |
 | 38 | 2 | `STATUS_LED` | status LED D1 through R12 1 kΩ. HIGH = on | MCU |
@@ -51,17 +51,12 @@ except the voice button (GPIO0 on the breadboard, GPIO38 on the PCB).
 
 | Pin | GPIO | Note |
 |---|---|---|
+| 31 | 38 | Was the voice button (removed 2026-10-05, wake word only). |
 | 32–35 | 39–42 | JTAG. Keep free if you want hardware debug. |
 | 24, 25 | 47, 48 | No ADC. |
 
 Leave free pins not connected. There is no free ADC1 pin left (GPIO1 = CC sense,
 GPIO2 = status LED).
-
-## Why GPIO38 for the voice button
-
-GPIO0 is the BOOT strap. If a user holds a GPIO0 button during power-on, the chip
-enters flash mode and looks dead. Firmware cannot fix that after the board is made.
-So GPIO0 is only the BOOT button, and the voice button is on GPIO38.
 
 ## Why GPIO2 for the status LED
 

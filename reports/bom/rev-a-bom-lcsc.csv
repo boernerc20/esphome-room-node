@@ -3,9 +3,9 @@ Block,Ref,Part,MPN,LCSC#,JLC_Class,Price@10_est_USD,Stock_est,Lifecycle,Alternat
 "Block 1 - MCU+Power+USB",U2,"3V3 LDO 1A","AP7361C-33ER-13 (SOT-223R)",C3743528,Extended,0.32,High,Active,TLV75901PDRVR,"ER suffix only! SOT223R: 1=GND 2=OUT 3=IN. -33E-13 has wrong pinout. Checked 2026-10-01: https://www.lcsc.com/product-detail/C3743528.html"
 "Block 1 - MCU+Power+USB",U5,"USB ESD","USBLC6-2SC6 (SOT-23-6)",C7519,Extended,0.10,High,Active,ESD7351,"Stock KiCad Power_Protection. Checked 2026-10-01: https://www.lcsc.com/product-detail/ESD-and-Surge-Protection-TVS-ESD_STMicroelectronics-USBLC6-2SC6_C7519.html"
 "Block 1 - MCU+Power+USB",J1,"USB-C receptacle","USB4085-GF-A (GCT)",C7095263,Extended,0.80,High,Active,HRO TYPE-C-31-M-12,"Footprint: Connector_USB:USB_C_Receptacle_GCT_USB4085. Checked 2026-10-01: https://www.lcsc.com/product-detail/C7095263.html"
-"Block 1 - MCU+Power+USB","SW1-SW3","Tactile switch","TL3342F160QG",C2886898,Extended,0.55,Good,Active,TS-1187A (Basic),"Stock KiCad footprint. Checked 2026-10-01: https://www.lcsc.com/product-detail/Tactile-Switches_E-Switch-TL3342F160QG_C2886898.html"
+"Block 1 - MCU+Power+USB","SW1-SW2","Tactile switch","TL3342F160QG",C2886898,Extended,0.55,Good,Active,TS-1187A (Basic),"Stock KiCad footprint. Checked 2026-10-01: https://www.lcsc.com/product-detail/Tactile-Switches_E-Switch-TL3342F160QG_C2886898.html"
 "Block 1 - MCU+Power+USB","R1,R2","0603 5.1kΩ 1%",Generic,C23186,Basic,0.0015,Very High,Active,-,Corrected from C25919 (7.68k 0402)
-"Block 1 - MCU+Power+USB","R3-R5","0603 10kΩ 1%",Generic,C25804,Basic,0.002,Very High,Active,-,
+"Block 1 - MCU+Power+USB","R3-R4","0603 10kΩ 1%",Generic,C25804,Basic,0.002,Very High,Active,-,
 "Block 1 - MCU+Power+USB",C1,"0805 10µF 16V X5R",Generic,C15850,Basic,0.065,Very High,Active,-,Corrected from C169506 (MB14S bridge rectifier)
 "Block 1 - MCU+Power+USB",C2,"0603 0.1µF 50V X7R",Generic,C14663,Basic,0.012,Very High,Active,-,Corrected from C30722 (not found)
 "Block 1 - MCU+Power+USB",C3,"0603 1µF 16V X5R",Generic,C15849,Basic,0.017,Very High,Active,-,Corrected from C15850 (10µF 0805)
