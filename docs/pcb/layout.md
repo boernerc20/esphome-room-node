@@ -57,8 +57,15 @@ The bottom side (no parts) faces the display. All parts face the back of the cas
 
 - **Standoffs:** the display's driver board has parts and its 8-pin connector on its back.
   Use standoffs tall enough to clear the plug: about 10 mm.
-- **Cable:** J3 (JST-PH 8-pin) is on the bottom edge, under U1. Use a short PH-to-PH
-  8-pin cable, pin 1 to pin 1 (see the display sheet notes in `schematic.md`).
+- **Cable:** J3 is a **side-entry** JST-PH 8-pin (S8B-PH-SM4-TB) on the bottom edge,
+  under U1, with its mouth facing out over that edge so the cable runs straight to the
+  display behind the board. The housing front face is 0.52 mm inside the board edge
+  (y = 137.48 against an edge at y = 138.00); it cannot sit flush because the two
+  mounting-tab pads reach y = 137.68 and need the 0.3 mm copper-to-edge clearance.
+  Use a short PH-to-PH 8-pin cable, pin 1 to pin 1 (see the display sheet notes in
+  `schematic.md`). Pin 1 is at x = 121.0, the pad row at y = 130.23; each pin has a
+  via at y = 133.90 behind the pad row, under the housing, with a 2.4 mm F.Cu stub
+  forward into the pad.
 - **U1 antenna** overhangs the top edge, so it sticks out past the display outline by
   about 6 mm. The case must leave room for it. No metal in front of it.
 
@@ -98,9 +105,12 @@ The bottom side (no parts) faces the display. All parts face the back of the cas
   0.2 mm tracks, matched to about 1 mm. USB is Full Speed (12 Mbit/s), so length
   match and impedance are not critical.
 
-- **LDO heat:** the U2 tab sits on a F.Cu +3V3 copper area (about 6 × 3.3 mm, full
-  connection) with 5 vias (0.3 mm drill) to the L3 plane, next to the tab, not in it
-  (no solder wicking). C4/C5 +3V3 pads are on the same area.
+- **LDO heat:** the U2 tab sits on a F.Cu +3V3 copper area (about 6 × 3.3 mm, 20.4 mm²,
+  full connection) with vias to the L3 plane next to the tab, not in it (no solder
+  wicking): **4 × 0.3 mm drill plus 1 × 0.4 mm drill beside the tab, 7 vias in total on
+  the copper area** (the other two are C4's and C5's). C4/C5 +3V3 pads are on the same
+  area. The 0.3 mm column sits at x = 116.3, 0.65 mm clear of the tab copper, so a weak
+  via tent cannot pull solder off the tab.
 - **Amp decoupling:** C21 (0.1 µF) 0.7 mm below VDD pins 7/8, C22 (10 µF) right below it,
   both on the +5V feed to the pins. Each GND pad has its own via to L2.
 
@@ -109,8 +119,29 @@ M2 0.6 mm +5V sections on the LED path widened or rerouted (see +5V above); M3 U
 copper area + vias; M4 AMP_SD under U1 moved to y = 106.4 (0.76 mm from the module's
 GND pad, was 0.15 mm).
 
-**DRC at hand-over:** 0 errors, 0 unconnected, 0 schematic-parity issues. 51 warnings,
-all silkscreen (reference text overlaps pads or other text). Report:
+**Review polish (SQU-32, 2026-10-05)**, on top of the J3 side-entry change:
+
+| Item | Result |
+|---|---|
+| C6 rotated | C6's +3V3 pad now faces U1 pin 2, with a 2.01 mm × 0.3 mm F.Cu track straight to it (was plane-only, 4.5 mm apart). C7 is unchanged: the EN track crosses the corridor between C7 and C6 at y = 104.03, so C7 keeps its own +3V3 plane via. |
+| CC_SENSE lower | The 14.3 mm run across the module at y = 102.76 (2.76 mm below the antenna line) became 12.05 mm at y = 105.90 (5.90 mm below). Only 2.25 mm is left at y = 102.76, at the module pad itself. |
+| C40 GND | **Skipped**, no room — see SQU-32. |
+| Mic hole | The GND via at (109.70, 136.81) moved to (110.45, 137.25), 2.61 mm from the sound hole (was 1.77 mm). Nothing is now within a 2.0 mm radius of the hole on B.Cu, so a gasket sits flat. |
+| Island neck slot | 1.00 × 1.25 mm routed slot at x 150.20–151.20, y 131.35–132.60. The 6.80 mm top neck becomes 5.80 mm. 1.0 mm is the JLC routed-slot minimum and is all that fits between the +3V3 feed at x = 149.7 and the I2C_SCL B.Cu run that crosses the neck. |
+| U3 pin 3/11 vias | Pin 11's via moved from (170.175, 120.75) to (171.90, 120.60): it overlapped the exposed pad by 0.24 mm, now 1.49 mm clear. **Pin 3's via could not move** — see SQU-32. |
+| U2 via column | x 116.0 → 116.3 (see LDO heat above). |
+| +5V widths | Bottom row at y = 127.275 is 1.50 mm, except the 26.19 mm length that passes the U2 tab, which is 1.40 mm (0.175 mm to the tab pad; 1.5 mm would leave 0.125 mm, under the 0.15 mm rule). C1 → C2 → C3 is now 1.20 mm. |
+| U3 pins 7/8 | The 0.8 mm feed stops at y = 123.138, 0.30 mm clear of the pad row; the last 0.70 mm is 0.25 mm, equal to the pad width, so the fillets are even. |
+| Silkscreen | 23 reference fields moved off pads, off other silk and off the board edge. 51 silk warnings → 5. |
+
+`tools/pcb_squ32.py` and `tools/pcb_silk.py` are the one-shot patch scripts that produced
+this state from `f8a871e`. They are coordinate-exact and are not meant to be re-run.
+
+**DRC at hand-over:** 0 errors, 0 unconnected, 0 schematic-parity issues. 5 warnings,
+all silkscreen: 2 are U1's module body outline where the antenna overhangs the top edge
+(the module footprint would have to be edited, which trades them for a
+`lib_footprint_mismatch` warning), and 3 are R9's reference in the R1/R2/R9/R10 cluster,
+where the parts are 1.7 mm apart and there is no free spot for the text. Report:
 `reports/pcb/room-node-drc.rpt`. Pictures: `reports/pcb/room-node-top.png`,
 `room-node-copper-top.png`, `room-node-copper-bottom.png`.
 Gerbers + drill (JLCPCB): `reports/fab/room-node-rev-a-gerbers.zip`.
@@ -123,7 +154,9 @@ Gerbers + drill (JLCPCB): `reports/fab/room-node-rev-a-gerbers.zip`.
    voice button was removed (2026-10-05, wake word only).
 4. Some F.Cu tracks run under U1 (under the module's solder mask). Normal for this
    module, but Iris checks it.
-5. Silkscreen is not tidied.
+5. Silkscreen: the C6/C7/R3/C8 references ended up at x ≈ 121.5, under the module body,
+   where they cannot be read after U1 is fitted. Fine for assembly (the module goes on
+   last), but worth a look at rev B.
 
 ## Placement
 

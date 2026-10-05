@@ -234,7 +234,7 @@ circuit; not for rev A.)
 
 | Ref | Value | Footprint |
 |---|---|---|
-| J3 | 8-pin JST-PH (Waveshare cable) | `Connector_JST:JST_PH_B8B-PH-SM4-TB_1x08-1MP_P2.00mm_Vertical` |
+| J3 | 8-pin JST-PH **side entry** (Waveshare cable) | `Connector_JST:JST_PH_S8B-PH-SM4-TB_1x08-1MP_P2.00mm_Horizontal` |
 | C50 | 0.1 µF | 0603 |
 
 | J3 pin | Waveshare name | Net |
@@ -247,6 +247,12 @@ circuit; not for rev A.)
 | 6 | DC | `EPD_DC` (GPIO13) |
 | 7 | RST | `EPD_RST` (GPIO14) |
 | 8 | BUSY | `EPD_BUSY` (GPIO15) |
+
+**Side entry (Chris, 2026-10-05, SQU-32).** J3 is the horizontal **S8B-PH-SM4-TB**, not the
+top-entry B8B. The board sits on ~10 mm M2 standoffs behind the display, parts side facing
+away from it, so the cable has to leave the board edge towards the display. The connector
+mouth faces out over the **bottom** board edge. Pinout and pin numbering are unchanged:
+pin 1 is still pin 1.
 
 ⚠ Check the pin order and pin count on your cable. Newer Waveshare modules have a
 9th pin (PWR); if yours has it, use a 9-pin connector and tie PWR to `+3V3`.
