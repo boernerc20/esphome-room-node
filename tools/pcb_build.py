@@ -38,34 +38,44 @@ HOLE_INSET = 2.5          # hole centres 2.5 mm from each edge -> 84.5 x 33.0 mm
 # (side entry, mouth over the edge). The LDO took the top-right spot the LED
 # connector left; the display connector's old spot on the bottom edge is now the
 # LED bulk cap C30 / routing channel.
+#
+# SQU-39 floorplan (Chris did not sign off SQU-35: J4 crowded the left edge under J1
+# and the space under U1 was empty). J1 is centred on the left edge, J4 + C30 moved to
+# the bottom edge under U1, left of the AHT20 island, and the test pads sit in a row
+# between U1 and J4. J3, J2, the LDO and amp clusters and the island are unchanged.
+J1_CENTRE_Y = Y0 + H / 2                 # 119.0: centre of J1's pin field and courtyard
+J1_DY = J1_CENTRE_Y - 113.5              # +5.5 mm against SQU-35; U5 moves with J1
 PLACE = {
     # MCU (centre-left, antenna over the top edge)
     'U1': (128.0, Y0 + 6.75, 0),
     'C6': (116.3, 103.0, 180), 'C7': (116.3, 105.2, 180),      # +3V3 pin 2 (SQU-32)
     'R3': (116.3, 107.4, 0), 'C8': (116.3, 109.6, 0),          # EN pin 3
     'R9': (113.8, 103.4, 90), 'R10': (112.1, 103.4, 90),      # mic BCLK / WS, at U1
-    # USB-C, ESD, CC (left edge)
+    # USB-C, ESD, CC (left edge; J1 centred, SQU-39)
     'J1': None,
-    'U5': (114.5, 113.5, 90),
+    'U5': (114.5, 113.5 + J1_DY, 90),
     'R1': (110.6, 105.0, 90), 'R2': (108.8, 105.0, 90),
     'R6': (112.2, 108.0, 90), 'R7': (114.0, 108.0, 90),
-    # LED strip connector + 1000 uF bulk cap: left edge, directly below J1 (SQU-35)
-    'J4': (103.5, 122.3, 0), 'C30': (114.5, 125.8, 0),
-    'C1': (103.6, 128.2, 0), 'C2': (103.6, 130.6, 0),          # USB +5V input caps
-    # Microphone (bottom-left corner, sound hole through the board)
+    # USB +5V input caps, under U5 on the +5V spine (via at (112.65, SPINE_Y))
+    'C1': (113.6, 122.4, 0), 'C2': (113.6, 125.6, 0),
+    # LED strip connector: bottom edge under U1, left of the AHT20 island (SQU-39).
+    # Pin 1 (+5V) on the left, towards C30 and J1; the 1000 uF can sits right next to
+    # it, + pad facing J4, so the bulk cap is at the connector.
+    'J4': (124.0, 133.6, 0), 'C30': (118.0, 132.2, 180),
+    # Microphone (bottom-left corner, sound hole through the board; hole unchanged)
     'MK1': (108.5, 134.8, 0),
-    'C10': (107.4, 130.0, 90), 'C11': (109.9, 130.0, 90),
-    'R11': (112.6, 133.2, 0), 'R8': (112.6, 135.6, 0),
-    # Test pads between U1 and the bottom edge
-    'TP1': (124.3, 124.5, 0), 'TP2': (127.1, 124.5, 0), 'TP3': (129.9, 124.5, 0),
-    'TP4': (132.7, 124.5, 0), 'TP5': (135.5, 124.5, 0), 'TP6': (138.3, 124.5, 0),
-    'TP7': (141.1, 124.5, 0),
+    'C10': (108.6, 131.4, 0), 'C11': (108.6, 128.6, 0),         # +3V3 at MK1 pin 5
+    'R11': (104.0, 128.6, 0), 'R8': (104.0, 131.4, 180),
+    # Test pads in one row between U1 and J4 (TP6 = +5V drops onto the spine)
+    'TP1': (121.0, 127.5, 0), 'TP2': (123.8, 127.5, 0), 'TP3': (126.6, 127.5, 0),
+    'TP4': (129.4, 127.5, 0), 'TP5': (132.2, 127.5, 0), 'TP6': (135.0, 127.5, 0),
+    'TP7': (137.8, 127.5, 0),
     'R30': (135.0, 121.6, 0),                                  # LED data, near U1 pin 23
     # Right of U1: CC sense, BOOT/RESET buttons, pull-ups, status LED
     'C9': (141.2, 102.6, 0), 'TP8': (144.6, 102.6, 0),
     'SW2': (151.0, 106.0, 0), 'SW1': (151.0, 113.4, 0),
     'R4': (142.0, 107.0, 90),
-    'R12': (142.0, 111.6, 90), 'D1': (143.0, 128.6, 0),
+    'R12': (142.0, 111.6, 90), 'D1': (141.6, 127.5, 0),
     # Sensor island (bottom edge, slots on three sides)
     'U6': (152.6, 135.0, 0), 'C40': (149.7, 135.0, 270), 'R40': (157.6, 132.0, 90), 'R41': (159.4, 132.0, 90),
     # LDO (top right, in the space the LED connector left; furthest from U6) (SQU-35).
@@ -83,6 +93,12 @@ PLACE = {
     'J2': (176.3, 133.0, 0),
 }
 
+# Reference fields the footprint default puts somewhere useless: C30 is turned 180, so
+# its label would land below the can, off the bottom edge; the mic cluster is too tight
+# for the silk pass to find spots on its own. (x, y[, text angle])
+REF_AT = {'C30': (118.4, 126.0), 'C11': (108.6, 127.3), 'C10': (108.6, 130.0),
+          'MK1': (105.9, 134.8, 90)}
+
 # AHT20 island: slots (Edge.Cuts) left and right, open at the top for the 4 tracks.
 # No copper pour inside, so board heat does not reach the sensor.
 ISLAND = (148.6, 130.6, 155.4, Y1)      # x0, y0, x1, y1
@@ -99,15 +115,14 @@ NECK_SLOT = (150.5, 131.35, 151.5, 132.6)
 STITCH_PITCH = 5.0
 STITCH_INSET = 1.0
 
-# +5V trunk (SQU-35). TRUNK_Y runs below the J4 pin row and feeds J4 pin 1 and C30;
-# SPINE_Y carries the amp / sensor end of the board along the bottom, clear of the
-# AHT20 island keep-out (y >= 130.60) and of the island's plane vias at y = 129.60.
-# RISER_X is the inlet from J1's VBUS pads down to the trunk (SQU-38): it is the one
-# piece of copper that carries LED + amp + LDO current together, so it is 1.50 mm for
-# its whole length. 110.60 leaves 0.345 mm to J1's A-row pads at a 1.50 mm width.
-TRUNK_Y = 124.6
+# +5V (SQU-39). RISER_X is the inlet from J1's VBUS pads down to the spine (SQU-38):
+# with the spine it carries LED + amp + LDO current together, so it is 1.50 mm. 110.60
+# leaves 0.345 mm to J1's A-row pads at a 1.50 mm width. SPINE_Y runs east just under
+# U1's bottom pad row, 6.6 mm above the AHT20 island (y >= 130.60): it was 2.6 mm
+# above it at y = 128.0. The LED leg leaves the spine at the C30 + pad column (led_x),
+# and drops to C30 and J4 pin 1 at the bottom edge, 25 mm west of the island.
 RISER_X = 110.6
-SPINE_Y = 128.0
+SPINE_Y = 124.0
 SPINE_X1 = 168.0
 
 # SQU-31 M3: the LDO tab sits on its own F.Cu +3V3 area, with the plane vias beside
@@ -287,6 +302,10 @@ def place(dsn):
         rf = fp.Reference()
         rf.SetTextSize(VECTOR2I(mm(0.8), mm(0.8)))
         rf.SetTextThickness(mm(0.15))
+        if ref in REF_AT:
+            rf.SetPosition(VECTOR2I(mm(REF_AT[ref][0]), mm(REF_AT[ref][1])))
+            if len(REF_AT[ref]) > 2:
+                rf.SetTextAngleDegrees(REF_AT[ref][2])
 
     # J1 GND pins: solid to the pours (thermal spokes are blocked by the VBUS loop)
     for p in board.FindFootprintByReference('J1').Pads():
@@ -298,7 +317,7 @@ def place(dsn):
     j1.SetOrientationDegrees(270)
     j1.SetPosition(VECTOR2I(0, 0))
     bb = courtyard_box(j1)
-    j1.SetPosition(VECTOR2I(mm(X0) - bb.GetLeft(), mm(113.5) - bb.GetCenter().y))
+    j1.SetPosition(VECTOR2I(mm(X0) - bb.GetLeft(), mm(J1_CENTRE_Y) - bb.GetCenter().y))
 
     # Mounting holes: M2, on the e-paper module's hole pattern. Board-only.
     for i, (x, y) in enumerate([(X0 + HOLE_INSET, Y0 + HOLE_INSET), (X1 - HOLE_INSET, Y0 + HOLE_INSET),
@@ -415,21 +434,44 @@ def preroute(board, nets):
     xo = mm(RISER_X)
     n = track(board, p5, B, [pad['B9'], pad['A4'], VECTOR2I(xo, pad['A4'].y)], 0.5)
     n += track(board, p5, B, [pad['B4'], pad['A9'], VECTOR2I(xo, pad['A9'].y)], 0.5)
-    # ------------------------------------------------- +5V trunk (SQU-35), hand routed
-    # Everything the board draws passes through the riser: the LED strip (~2 A), the amp
-    # (~0.9 A peak) and the LDO (<= 0.5 A), so it is 1.5 mm from the necks all the way to
-    # the trunk (about 3.2 A at a 10 C rise, IPC-2221, 1 oz external; ~11 C at the 3.4 A
-    # simultaneous worst case). The necks above are the only narrow part of the inlet.
-    # It stays on B.Cu: F.Cu above it is the USB-C pin field, the LED connector's
-    # through-holes and the mic cluster. SQU-38 item 2 widened it from 1.00 mm.
+    # SQU-39: J1 -> U5 USB pair by hand (left to the router, D+ went 22 mm round J1's
+    # shield pads). A6/B6 (D+) and A7/B7 (D-) cross inside the pin field, so D+ joins its
+    # two rows on F.Cu and D- on B.Cu, through J1's own pins (no vias). From the A row
+    # D+ runs on F.Cu between U5's two pad rows into pin 3; D- goes straight into pin 1.
+    u5 = pads('U5')
+    dp, dm = nets['USB_D+_CONN'], nets['USB_D-_CONN']
+    n += track(board, dp, F, [pad['B6'], pad['A6']], 0.2)
+    n += track(board, dm, B, [pad['B7'], pad['A7']], 0.2)
+    ymid = (u5['3'].y + u5['4'].y) // 2
+    jog = ymid - pad['A6'].y                             # 45 degree jog onto ymid
+    xj = u5['1'].x - mm(1.55)
+    n += track(board, dp, F, [pad['A6'], VECTOR2I(xj, pad['A6'].y),
+                              VECTOR2I(xj + jog, ymid), VECTOR2I(u5['3'].x, ymid), u5['3']], 0.2)
+    n += track(board, dm, F, [pad['A7'], VECTOR2I(u5['1'].x - mm(0.75), pad['A7'].y),
+                              u5['1']], 0.2)
+    # U5 VBUS (pin 5, sense only): D+ now owns the gap between U5's pad rows, so pin 5
+    # goes up out of the top row, through a via, and on B.Cu to the top of the riser.
+    v5 = at(u5['5'], dy=-1.5)
+    n += track(board, p5, F, [u5['5'], v5], 0.3)
+    via(board, p5, v5)
+    n += track(board, p5, B, [v5, VECTOR2I(xo, pad['A4'].y)], 0.3)
+    # ------------------------------------------------- +5V trunk (SQU-39), hand routed
+    # Everything the board draws passes through the riser and the first 7.4 mm of the
+    # spine: the LED strip (~2 A), the amp (~0.9 A peak) and the LDO (<= 0.5 A), so it
+    # is 1.5 mm from the necks on (about 3.2 A at a 10 C rise, IPC-2221, 1 oz external;
+    # ~11 C at the 3.4 A simultaneous worst case). The necks above are the only narrow
+    # part of the inlet. All on B.Cu: F.Cu above it is the USB-C pin field, U5 and the
+    # USB pair, C1 / C2 and the test-pad row.
     j4, c30, c20 = pads('J4'), pads('C30'), pads('C20')
+    led_x = T(c30['1'].x)
     n += track(board, p5, B, [(RISER_X, T(pad['A4'].y)), (RISER_X, T(pad['A9'].y)),
-                              (RISER_X, TRUNK_Y)], 1.5)
-    # west to J4 pin 1, clearing the J4 pin row (pads end at y = 123.275)
-    n += track(board, p5, B, [(RISER_X, TRUNK_Y), (T(j4['1'].x), TRUNK_Y), j4['1']], 1.5)
-    # east to the C30 bulk cap, then south to the spine along the bottom
-    n += track(board, p5, B, [(RISER_X, TRUNK_Y), (T(c30['1'].x), TRUNK_Y), c30['1']], 1.5)
-    n += track(board, p5, B, [c30['1'], (T(c30['1'].x), SPINE_Y), (SPINE_X1, SPINE_Y)], 1.5)
+                              (RISER_X, SPINE_Y)], 1.5)
+    # LED leg: along the spine to the C30 + pad column, down to C30 at the bottom edge,
+    # then 6 mm east to J4 pin 1. It never comes nearer the AHT20 island than J4 does.
+    n += track(board, p5, B, [(RISER_X, SPINE_Y), (led_x, SPINE_Y), c30['1']], 1.5)
+    n += track(board, p5, B, [c30['1'], j4['1']], 1.5)
+    # Amp / LDO leg: east along the spine under U1's pad row, then down to C20.
+    n += track(board, p5, B, [(led_x, SPINE_Y), (SPINE_X1, SPINE_Y)], 1.5)
     n += track(board, p5, B, [(SPINE_X1, SPINE_Y), (T(c20['1'].x), SPINE_Y + 3.0),
                               c20['1']], 1.5)
     via(board, p5, VECTOR2I(mm(SPINE_X1), mm(SPINE_Y)), 0.8, 0.4)
@@ -448,20 +490,20 @@ def preroute(board, nets):
     n += track(board, p5, F, [u['2'], at(u['2'], dx=-0.9),
                               (T(u['2'].x) - 0.9, T(c21['1'].y) - 0.4),
                               (T(c21['1'].x), T(c21['1'].y) - 0.4)], 0.25)
-    # TP6 (+5V test point) drops straight onto the spine 3.5 mm below it; left to the
-    # router it takes a 24 mm detour round the amp at 0.6 mm.
+    # TP6 (+5V test point) goes straight up onto the spine 3.5 mm above it; left to the
+    # router it takes a long detour at 0.6 mm.
     tp6 = [p.GetPosition() for p in board.FindFootprintByReference('TP6').Pads()][0]
     n += track(board, p5, F, [tp6, (T(tp6.x), SPINE_Y)], 1.0)
     via(board, p5, VECTOR2I(tp6.x, mm(SPINE_Y)), 0.8, 0.4)
-    # USB input caps C1 / C2 hang off the trunk on the left edge
+    # USB input caps C1 (above the spine) and C2 (below it): one via on the spine in
+    # line with both + pads, 1.6 mm F.Cu stubs up and down.
     c1p = [p.GetPosition() for p in board.FindFootprintByReference('C1').Pads()
            if p.GetNetname() == '+5V'][0]
     c2p = [p.GetPosition() for p in board.FindFootprintByReference('C2').Pads()
            if p.GetNetname() == '+5V'][0]
-    xc, yc = T(j4['1'].x), T(c1p.y) - 1.6
-    n += track(board, p5, B, [(T(j4['1'].x), TRUNK_Y), (xc + 0.1, yc)], 1.0)
-    via(board, p5, VECTOR2I(mm(xc + 0.1), mm(yc)), 0.8, 0.4)
-    n += track(board, p5, F, [(xc + 0.1, yc), c1p, c2p], 0.6)
+    vc = VECTOR2I(c1p.x, mm(SPINE_Y))
+    via(board, p5, vc, 0.8, 0.4)
+    n += track(board, p5, F, [c1p, vc, VECTOR2I(c1p.x, c2p.y), c2p], 0.6)
     # Speaker pair U3 -> J2, side by side (0.25 mm out of the pins, then 0.4 mm)
     j = pads('J2')
     a, b = u['9'], at(u['9'], dx=1.0)
@@ -671,6 +713,17 @@ def router_rules(dsn):
     t = t.replace('    (class Power,Default',
                   '    (class P5V +5V\n      (circuit\n        (use_via "Via[0-3]_800:400_um")\n      )\n'
                   '      (rule\n        (width 600)\n        (clearance 150)\n      )\n    )\n    (class Power,Default', 1)
+    # SQU-39: U5 -> U1 USB pair on F.Cu only (L1 over the L2 GND plane, no vias). The
+    # J1 -> U5 _CONN pair keeps both outer layers: A6/B6 and A7/B7 cross inside the
+    # USB-C pin field, so one of them has to change layer through J1's own pins.
+    t, n = re.subn(r'(\(class USB,Default[^\n(]*?) USB_D\+ ', r'\1 ', t)
+    t, m = re.subn(r'(\(class USB,Default[^\n(]*?) "USB_D-" ', r'\1 ', t)
+    if n != 1 or m != 1:
+        sys.exit('USB_D+/- not in USB class')
+    t = t.replace('    (class USB,Default',
+                  '    (class USB_L1 USB_D+ "USB_D-"\n      (circuit\n        (use_via "Via[0-3]_600:300_um")\n'
+                  '        (use_layer F.Cu)\n      )\n'
+                  '      (rule\n        (width 200)\n        (clearance 150)\n      )\n    )\n    (class USB,Default', 1)
     open(dsn, 'w').write(t)
 
 

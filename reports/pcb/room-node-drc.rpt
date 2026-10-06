@@ -1,8 +1,8 @@
 ** Drc report for room-node.kicad_pcb **
-** Created on 2026-10-06T00:33:15 **
+** Created on 2026-10-06T02:12:23 **
 ** Report includes: Errors, Warnings, Exclusions **
 
-** Found 14 DRC violations **
+** Found 12 DRC violations **
 [silk_edge_clearance]: Silkscreen clipped by board edge (board setup constraints silk clearance 0.1500 mm; actual 0.0000 mm)
     Rule: board setup constraints silk; warning
     @(101.0000 mm, 100.0000 mm): Segment on Edge.Cuts
@@ -11,54 +11,46 @@
     Rule: board setup constraints silk; warning
     @(101.0000 mm, 100.0000 mm): Segment on Edge.Cuts
     @(137.2000 mm, 93.8500 mm): Segment of U1 on F.Silkscreen
-[silk_overlap]: Silkscreen clearance (board setup constraints silk clearance 0.1500 mm; actual 0.0000 mm)
+[silk_overlap]: Silkscreen clearance (board setup constraints silk clearance 0.1500 mm; actual 0.0272 mm)
     Rule: board setup constraints silk; warning
     @(112.7225 mm, 108.2373 mm): Segment of R6 on F.Silkscreen
     @(112.5700 mm, 108.0000 mm): Reference field of R7
-[silk_overlap]: Silkscreen clearance (board setup constraints silk clearance 0.1500 mm; actual 0.0000 mm)
-    Rule: board setup constraints silk; warning
-    @(107.9100 mm, 130.1406 mm): Segment of C10 on F.Silkscreen
-    @(108.4700 mm, 130.0000 mm): Reference field of C11
-[silk_overlap]: Silkscreen clearance (board setup constraints silk clearance 0.1500 mm; actual 0.1373 mm)
-    Rule: board setup constraints silk; warning
-    @(100.9400 mm, 119.8400 mm): Rectangle of J4 on F.Silkscreen
-    @(103.6000 mm, 126.5200 mm): Reference field of C1
-[silk_overlap]: Silkscreen clearance (board setup constraints silk clearance 0.1500 mm; actual 0.0000 mm)
+[silk_overlap]: Silkscreen clearance (board setup constraints silk clearance 0.1500 mm; actual 0.1123 mm)
     Rule: board setup constraints silk; warning
     @(109.3225 mm, 105.2373 mm): Segment of R2 on F.Silkscreen
     @(109.1700 mm, 105.0000 mm): Reference field of R1
 [silk_overlap]: Silkscreen clearance (board setup constraints silk clearance 0.1500 mm; actual 0.1405 mm)
     Rule: board setup constraints silk; warning
-    @(112.6225 mm, 103.6373 mm): Segment of R10 on F.Silkscreen
     @(112.3700 mm, 103.4000 mm): Reference field of R9
-[silk_over_copper]: Silkscreen clipped by solder mask
-    Local override; warning
-    @(112.5700 mm, 108.0000 mm): Reference field of R7
-    @(112.2000 mm, 108.8250 mm): Pad 1 [CC1] of R6 on F.Cu
+    @(112.6225 mm, 103.6373 mm): Segment of R10 on F.Silkscreen
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
     @(112.5700 mm, 108.0000 mm): Reference field of R7
     @(112.2000 mm, 107.1750 mm): Pad 2 [CC_SENSE] of R6 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(109.1700 mm, 105.0000 mm): Reference field of R1
-    @(108.8000 mm, 105.8250 mm): Pad 1 [CC2] of R2 on F.Cu
+    @(112.5700 mm, 108.0000 mm): Reference field of R7
+    @(112.2000 mm, 108.8250 mm): Pad 1 [CC1] of R6 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
     @(110.6700 mm, 103.4000 mm): Reference field of R10
     @(110.6000 mm, 104.1750 mm): Pad 2 [GND] of R1 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
-    @(112.3700 mm, 103.4000 mm): Reference field of R9
-    @(112.1000 mm, 102.5750 mm): Pad 2 [I2S_MIC_WS] of R10 on F.Cu
+    @(109.1700 mm, 105.0000 mm): Reference field of R1
+    @(108.8000 mm, 104.1750 mm): Pad 2 [GND] of R2 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
     @(112.3700 mm, 103.4000 mm): Reference field of R9
     @(112.1000 mm, 104.2250 mm): Pad 1 [Net-(MK1-WS)] of R10 on F.Cu
 [silk_over_copper]: Silkscreen clipped by solder mask
     Local override; warning
+    @(112.3700 mm, 103.4000 mm): Reference field of R9
+    @(112.1000 mm, 102.5750 mm): Pad 2 [I2S_MIC_WS] of R10 on F.Cu
+[silk_over_copper]: Silkscreen clipped by solder mask
+    Local override; warning
     @(109.1700 mm, 105.0000 mm): Reference field of R1
-    @(108.8000 mm, 104.1750 mm): Pad 2 [GND] of R2 on F.Cu
+    @(108.8000 mm, 105.8250 mm): Pad 1 [CC2] of R2 on F.Cu
 
 ** Found 0 unconnected pads **
 

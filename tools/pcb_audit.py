@@ -1,5 +1,6 @@
 #!/usr/bin/env kicadpython
-"""SQU-35 measurements: connector positions, +5V widths, clearances, distances.
+"""SQU-35 / SQU-39 measurements: connector positions, +5V widths and path, clearances,
+distances.
 
     kicadpython tools/pcb_audit.py
 """
@@ -51,16 +52,115 @@ print('J3 pin 1 pad at (%.3f, %.3f), pin 8 at (%.3f, %.3f)'
 print('J4 pin 1 (+5V) at (%.3f, %.3f), pin 2 (data) (%.3f, %.3f), pin 3 (GND) (%.3f, %.3f)'
       % (pads('J4')['1'] + pads('J4')['2'] + pads('J4')['3']))
 
-print('\n== +5V path lengths (pad centre to pad centre) ==')
-P = {r: pads(r) for r in ('J1', 'J4', 'C30', 'C20', 'U3', 'U2', 'C1', 'C2')}
 def d(a, b_):
     return math.dist(a, b_)
-print('J1 VBUS (B4)  -> J4 pin 1      %6.2f mm' % d(P['J1']['B4'], P['J4']['1']))
-print('J1 VBUS (B4)  -> C30 pad 1     %6.2f mm' % d(P['J1']['B4'], P['C30']['1']))
-print('J4 pin 1      -> C30 pad 1     %6.2f mm' % d(P['J4']['1'], P['C30']['1']))
-print('C30 courtyard to J4 courtyard gap  %.3f mm'
-      % (cy('C30')[0] - cy('J4')[2]))
 
+
+print('\n== J1 / J4 / C30 placement (SQU-39) ==')
+j1c = cy('J1')
+pins = [p[1] for k_, p in pads('J1').items() if k_[0] in 'AB']
+print('J1 courtyard centre y %.3f (board centre %.3f); A/B pin field y %.3f-%.3f, centre %.3f'
+      % ((j1c[1] + j1c[3]) / 2, (Y0 + Y1) / 2, min(pins), max(pins), (min(pins) + max(pins)) / 2))
+
+
+def gap(a, b_):
+    ca, cb = cy(a), cy(b_)
+    dx = max(cb[0] - ca[2], ca[0] - cb[2], 0)
+    dy = max(cb[1] - ca[3], ca[1] - cb[3], 0)
+    return math.hypot(dx, dy)
+
+
+def ctr(ref):
+    q = FPS[ref].GetPosition()
+    return (T(q.x), T(q.y))
+
+
+u6 = ctr('U6')
+print('J4 courtyard -> U6 courtyard   %6.2f mm' % gap('J4', 'U6'))
+print('J4 courtyard -> island left slot (x = 147.60)  %6.2f mm' % (147.6 - cy('J4')[2]))
+print('J4 pin 1 (+5V) -> U6 centre    %6.2f mm' % math.dist(pads('J4')['1'], u6))
+print('J4 nearest pad -> U6 centre    %6.2f mm' % min(math.dist(p, u6) for p in pads('J4').values()))
+print('C30 courtyard -> J4 courtyard  %6.2f mm;  C30 + pad -> J4 pin 1 %.2f mm'
+      % (gap('C30', 'J4'), math.dist(pads('C30')['1'], pads('J4')['1'])))
+k = copper_extent('J4')
+print('J4 copper to bottom edge %.3f mm; courtyard to bottom edge %.3f mm'
+      % (Y1 - k[3], Y1 - cy('J4')[3]))
+
+print('\n== +5V J1 -> J4 copper path (SQU-39) ==')
+# Walk the +5V tracks from J1's VBUS pads to J4 pin 1 (shortest path over the track
+# graph), and report each width's share plus the IPC-2221 rise at the LED current.
+seg5 = [t for t in b.GetTracks() if t.Type() == pcbnew.PCB_TRACE_T and t.GetNetname() == '+5V']
+vias5 = [t for t in b.GetTracks() if t.Type() == pcbnew.PCB_VIA_T and t.GetNetname() == '+5V']
+key = lambda q: (round(T(q.x), 3), round(T(q.y), 3))
+adj = {}
+for t in seg5:
+    a_, b2 = key(t.GetStart()), key(t.GetEnd())
+    for u, v in ((a_, b2), (b2, a_)):
+        adj.setdefault(u, []).append((v, T(t.GetLength()), round(T(t.GetWidth()), 2),
+                                      b.GetLayerName(t.GetLayer())))
+for v in vias5:   # layer change: zero length
+    pv = key(v.GetPosition())
+    for u in list(adj):
+        if math.dist(u, pv) < 1e-3 and u != pv:
+            adj.setdefault(u, []).append((pv, 0.0, 0, 'via'))
+            adj.setdefault(pv, []).append((u, 0.0, 0, 'via'))
+import heapq
+src = [n for n in adj if any(math.dist(n, pads('J1')[p]) < 0.4 for p in ('A4', 'A9', 'B4', 'B9'))]
+dst = [n for n in adj if math.dist(n, pads('J4')['1']) < 0.4]
+dist, prev = {}, {}
+h = [(0.0, n) for n in src]
+for _, n in h:
+    dist[n] = 0.0
+while h:
+    d0, u = heapq.heappop(h)
+    if d0 > dist.get(u, 1e9):
+        continue
+    for v, L, w, lay in adj.get(u, []):
+        if d0 + L < dist.get(v, 1e9):
+            dist[v] = d0 + L
+            prev[v] = (u, L, w, lay)
+            heapq.heappush(h, (d0 + L, v))
+end = min(dst, key=lambda n: dist.get(n, 1e9))
+legs, n_ = [], end
+while n_ in prev:
+    u, L, w, lay = prev[n_]
+    legs.append((w, lay, L))
+    n_ = u
+byw2 = {}
+for w, lay, L in legs:
+    if L:
+        byw2[(w, lay)] = byw2.get((w, lay), 0.0) + L
+total = sum(L for _, _, L in legs)
+print('J1 VBUS pad -> J4 pin 1: %.2f mm of copper' % total)
+for (w, lay), L in sorted(byw2.items(), reverse=True):
+    print('    %.2f mm wide on %-5s %6.2f mm' % (w, lay, L))
+
+
+def ipc_rise(i, w_mm, oz=1.0):
+    area = (w_mm / 0.0254) * (1.378 * oz)          # mil^2
+    return (i / (0.048 * area ** 0.725)) ** (1 / 0.44)
+
+
+def mohm(L, w_mm, oz=1.0):
+    return 0.5 * oz ** -1 * L / w_mm                   # 1 oz Cu ~0.5 mOhm/square at 25 C
+
+
+for i in (1.6, 2.0, 3.4):
+    print('  IPC-2221 rise at %.1f A: 1.50 mm %4.1f C, 0.60 mm neck (half each) %4.1f C'
+          % (i, ipc_rise(i, 1.5), ipc_rise(i / 2, 0.6)))
+r = sum(mohm(L, w) for (w, lay), L in byw2.items() if w >= 1.0)
+print('  DC resistance of the >= 1.0 mm part %.1f mOhm -> %.0f mV drop at 1.6 A'
+      % (r, 1.6 * r))
+far = 1e9
+for t in seg5:
+    if T(t.GetWidth()) < 1.0:
+        continue
+    sh = t.GetEffectiveShape(t.GetLayer())
+    isl = pcbnew.SHAPE_RECT(pcbnew.VECTOR2I(pcbnew.FromMM(147.6), pcbnew.FromMM(130.6)),
+                            pcbnew.FromMM(156.4 - 147.6), pcbnew.FromMM(Y1 - 130.6))
+    far = min(far, T(sh.GetClearance(isl)) if hasattr(sh, 'GetClearance') else far)
+print('  nearest wide (>= 1.0 mm) +5V copper to the AHT20 island box: %s'
+      % ('%.2f mm' % far if far < 1e8 else 'n/a'))
 print('\n== +5V track widths ==')
 seg = [t for t in b.GetTracks() if t.Type() == pcbnew.PCB_TRACE_T and t.GetNetname() == '+5V']
 byw = {}
@@ -90,7 +190,7 @@ print('U3 centre -> U6 centre %.2f mm'
 hole = [p for p in FPS['MK1'].Pads() if not p.GetNumber()][0].GetPosition()
 hx, hy = T(hole.x), T(hole.y)
 print('mic sound hole at (%.3f, %.3f); J4 courtyard %.2f mm away (nearest edge)'
-      % (hx, hy, hy - cy('J4')[3]))
+      % (hx, hy, cy('J4')[0] - hx))
 bad = []
 for t in b.GetTracks():
     if t.Type() == pcbnew.PCB_VIA_T:
