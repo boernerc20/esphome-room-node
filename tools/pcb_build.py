@@ -73,8 +73,9 @@ PLACE = {
     # rigid block by (+58.5, -19.9) mm, so the tab copper area and its vias are unchanged.
     'U2': (170.0, 104.6, 0),
     'C3': (163.7, 106.6, 90), 'C4': (175.5, 102.9, 90), 'C5': (177.4, 103.1, 90),
-    # Display connector: right edge, side entry, mouth over the edge (SQU-35)
-    'J3': (184.6, 117.5, 90), 'C50': (177.5, 121.0, 90),
+    # Display connector: right edge, side entry, cable straight out over the edge
+    # (SQU-35; pulled 0.10 mm in for a 0.40 mm tab-copper-to-edge margin, SQU-38)
+    'J3': (184.5, 117.5, 90), 'C50': (177.5, 121.0, 90),
     # Amplifier + speaker (bottom-right)
     'U3': (169.5, 121.0, 0),
     'C21': (170.775, 124.0, 0), 'C22': (171.0, 126.0, 0), 'R20': (166.0, 125.6, 0),
@@ -101,7 +102,11 @@ STITCH_INSET = 1.0
 # +5V trunk (SQU-35). TRUNK_Y runs below the J4 pin row and feeds J4 pin 1 and C30;
 # SPINE_Y carries the amp / sensor end of the board along the bottom, clear of the
 # AHT20 island keep-out (y >= 130.60) and of the island's plane vias at y = 129.60.
+# RISER_X is the inlet from J1's VBUS pads down to the trunk (SQU-38): it is the one
+# piece of copper that carries LED + amp + LDO current together, so it is 1.50 mm for
+# its whole length. 110.60 leaves 0.345 mm to J1's A-row pads at a 1.50 mm width.
 TRUNK_Y = 124.6
+RISER_X = 110.6
 SPINE_Y = 128.0
 SPINE_X1 = 168.0
 
@@ -402,24 +407,28 @@ def preroute(board, nets):
         return VECTOR2I(mm(x), mm(y))
 
     F, B = pcbnew.F_Cu, pcbnew.B_Cu
-    # J1: VBUS pins tied together around the A row (B.Cu)
+    # J1: the four VBUS pads leave the pin field on two 0.5 mm necks (widen() takes them
+    # to 0.6 mm, which is all the 0.7 mm pads on a 0.85 mm pitch leave) and meet the
+    # riser. The necks are in parallel; nothing downstream of them is below 1.50 mm.
     pad = pads('J1')
     p5 = nets['+5V']
-    xo = pad['A4'].x + mm(1.05)
-    n = track(board, p5, pcbnew.B_Cu, [pad['B9'], pad['A4'], VECTOR2I(xo, pad['A4'].y),
-                                       VECTOR2I(xo, pad['A9'].y), pad['A9'], pad['B4']], 0.5)
+    xo = mm(RISER_X)
+    n = track(board, p5, B, [pad['B9'], pad['A4'], VECTOR2I(xo, pad['A4'].y)], 0.5)
+    n += track(board, p5, B, [pad['B4'], pad['A9'], VECTOR2I(xo, pad['A9'].y)], 0.5)
     # ------------------------------------------------- +5V trunk (SQU-35), hand routed
-    # The LED strip draws about 2 A, so the J1 -> J4 / C30 leg is 1.5 mm (about 3.2 A at
-    # a 10 C rise, IPC-2221, 1 oz external). It stays on B.Cu: F.Cu above it is the
-    # USB-C pin field, the LED connector's through-holes and the mic cluster.
+    # Everything the board draws passes through the riser: the LED strip (~2 A), the amp
+    # (~0.9 A peak) and the LDO (<= 0.5 A), so it is 1.5 mm from the necks all the way to
+    # the trunk (about 3.2 A at a 10 C rise, IPC-2221, 1 oz external; ~11 C at the 3.4 A
+    # simultaneous worst case). The necks above are the only narrow part of the inlet.
+    # It stays on B.Cu: F.Cu above it is the USB-C pin field, the LED connector's
+    # through-holes and the mic cluster. SQU-38 item 2 widened it from 1.00 mm.
     j4, c30, c20 = pads('J4'), pads('C30'), pads('C20')
-    xj = T(xo)
-    n += track(board, p5, B, [(xj, T(pad['A9'].y)), (xj, 119.6), (110.6, 120.0)], 0.9)
-    n += track(board, p5, B, [(110.6, 120.0), (110.6, TRUNK_Y)], 1.5)
+    n += track(board, p5, B, [(RISER_X, T(pad['A4'].y)), (RISER_X, T(pad['A9'].y)),
+                              (RISER_X, TRUNK_Y)], 1.5)
     # west to J4 pin 1, clearing the J4 pin row (pads end at y = 123.275)
-    n += track(board, p5, B, [(110.6, TRUNK_Y), (T(j4['1'].x), TRUNK_Y), j4['1']], 1.5)
+    n += track(board, p5, B, [(RISER_X, TRUNK_Y), (T(j4['1'].x), TRUNK_Y), j4['1']], 1.5)
     # east to the C30 bulk cap, then south to the spine along the bottom
-    n += track(board, p5, B, [(110.6, TRUNK_Y), (T(c30['1'].x), TRUNK_Y), c30['1']], 1.5)
+    n += track(board, p5, B, [(RISER_X, TRUNK_Y), (T(c30['1'].x), TRUNK_Y), c30['1']], 1.5)
     n += track(board, p5, B, [c30['1'], (T(c30['1'].x), SPINE_Y), (SPINE_X1, SPINE_Y)], 1.5)
     n += track(board, p5, B, [(SPINE_X1, SPINE_Y), (T(c20['1'].x), SPINE_Y + 3.0),
                               c20['1']], 1.5)
@@ -676,6 +685,7 @@ def route(ses):
                             'Net-(J2-Pin_1)': (0.5, 0.4), 'Net-(J2-Pin_2)': (0.5, 0.4)})
     print('widened %d segments' % widened)
     print('dropped %d unused layer-change vias' % drop_stray_vias(board))
+    print('restored %d M3 tab via drills' % fix_tab_vias(board))
 
     full = [(X0, Y0), (X1, Y0), (X1, Y1), (X0, Y1)]
     zone(board, gnd, pcbnew.F_Cu, full, 0, 'GND fill L1')
@@ -717,6 +727,30 @@ def route(ses):
     board.BuildConnectivity()
     pcbnew.SaveBoard(PCB, board, True)
     print('routed board saved, %d stitching vias' % nvia)
+
+
+def fix_tab_vias(board):
+    """Put the M3 LDO tab vias back to the drills preroute() asked for (SQU-38 item 3).
+
+    The DSN export hands the pre-routed vias to Freerouting, and what comes back in the
+    SES is the router's padstack for the net class, not the one preroute() built: the
+    0.30 mm column came back at 0.40 mm. The reviewed M3 geometry is 4 x 0.30 mm plus
+    1 x 0.40 mm, all 0.60 mm pads, so re-assert it after the import rather than leaving
+    it to the round trip."""
+    tab = [p for p in board.FindFootprintByReference('U2').Pads()
+           if p.GetNumber() == '2' and p.GetSize().y > mm(2)][0].GetPosition()
+    want = {(dx, dy): drill for dx, dy, drill in TAB_VIAS}
+    n = 0
+    for v in [t for t in board.GetTracks() if t.Type() == pcbnew.PCB_VIA_T]:
+        p = v.GetPosition()
+        off = (round(T(p.x - tab.x), 2), round(T(p.y - tab.y), 2))
+        if off in want:
+            v.SetWidth(mm(0.6))
+            v.SetDrill(mm(want[off]))
+            n += 1
+    if n != len(TAB_VIAS):
+        sys.exit('expected %d tab vias after routing, found %d' % (len(TAB_VIAS), n))
+    return n
 
 
 def drop_stray_vias(board):
