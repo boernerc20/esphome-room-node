@@ -950,7 +950,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Connector_JST:JST_XH_B3B-XH-A_1x03_P2.50mm_Vertical"
+		(property "Footprint" "Connector_JST:JST_XH_S3B-XH-A_1x03_P2.50mm_Horizontal"
 			(at 162.56 101.6 0)
 			(hide yes)
 			(show_name no)
@@ -983,7 +983,7 @@
 				)
 			)
 		)
-		(property "MPN" "JST B3B-XH-A"
+		(property "MPN" "JST S3B-XH-A(LF)(SN)"
 			(at 162.56 101.6 0)
 			(hide yes)
 			(show_name no)
@@ -994,7 +994,7 @@
 				)
 			)
 		)
-		(property "LCSC" "TBD"
+		(property "LCSC" "C157928"
 			(at 162.56 101.6 0)
 			(hide yes)
 			(show_name no)
@@ -1489,7 +1489,7 @@
 			)
 		)
 	)
-	(text "J4: 1 = +5V, 2 = DIN, 3 = GND. JST-XH 3 A; full white is ~1.6 A.\nR30 near U1. C30 across J4 pins 1 and 3, at J4.\nStrip: 27 x WS2812B, off-board. No level shifter (works on the breadboard);\nif the strip flickers on rev A, rev B adds a 74AHCT125."
+	(text "J4: 1 = +5V, 2 = DIN, 3 = GND. JST-XH side entry (S3B-XH-A), 3 A; full white is ~1.6 A.\nR30 near U1. C30 across J4 pins 1 and 3, at J4.\nStrip: 27 x WS2812B, off-board. No level shifter (works on the breadboard);\nif the strip flickers on rev A, rev B adds a 74AHCT125."
 		(exclude_from_sim no)
 		(at 25.4 127 0)
 		(effects

@@ -31,7 +31,7 @@ Block,Ref,Part,MPN,LCSC#,JLC_Class,Price@10_est_USD,Stock_est,Lifecycle,Alternat
 "Block 3 - Mic",C11,"0603 100pF C0G 50V",Generic,C14858,Basic,0.009,Very High,Active,-,Corrected from TBD; Samsung CL10C101JB8NNNC
 "Block 4 - LED Ring",R_led,"0603 470Ω 1%",Generic,C23179,Basic,0.002,Very High,Active,-,Corrected from C25727/8 (not found); 470Ω within 330-470Ω spec
 "Block 4 - LED Ring",C_led_bulk,"TH radial 1000µF 16V","SamYoung NHA16V1000M10*16 LO",C2835709,Extended,0.225,High,Active,-,Corrected from C144604 (33Ω resistor)
-"Block 4 - LED Ring",J4,"JST-XH 3-pin TH","JST B3B-XH-A(LF)(SN)",C144394,Extended,0.054,Very High,Active,-,"LED strip connector. 3A rated, 2.5mm pitch. Stock ~85k. Checked 2026-10-01: https://www.lcsc.com/product-detail/C144394.html"
+"Block 4 - LED Ring",J4,"JST-XH 3-pin TH, side entry (right angle)","JST S3B-XH-A(LF)(SN)",C157928,Extended,0.073,Very High,Active,S3B-XH-A-1(LF)(SN) C163036,"LED strip connector, side entry: cable out of the bottom edge (SQU-42). 3A rated, 2.5mm pitch. JLCPCB stock 137025, USD 0.0729 @1-99. Checked 2026-10-06: https://www.lcsc.com/product-detail/C157928.html. Was the vertical B3B-XH-A C144394 until SQU-42."
 "Block 4 - LED Ring",LED_strip,"WS2812B 27px strip",Off-board,-,-,-,-,Active,-,
 "Block 5 - Sensor",U6,"Temp/humidity sensor","AHT20",C2757850,Extended,0.50,High,Active,SHT30,"Symbol and footprint re-imported from LCSC C2757850 via easyeda2kicad (SQU-27). 6-pin DFN-6, pin 1 top-left per Aosong datasheet."
 "Block 5 - Sensor","R40,R41","0603 4.7kΩ 1%",Generic,C23162,Basic,0.003,Very High,Active,-,Corrected from C25920 (7.87k 0402)

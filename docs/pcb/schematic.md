@@ -189,7 +189,7 @@ Mic mute is software only. There is no mute switch.
 |---|---|---|
 | R30 | 470 Ω | 0603 |
 | C30 | 1000 µF 16 V radial | radial THT (see BOM) |
-| J4 | 3-pin connector to the strip | `Connector_JST:JST_XH_B3B-XH-A_1x03_P2.50mm_Vertical` (3 A; full white is ~1.6 A) |
+| J4 | 3-pin connector to the strip | `Connector_JST:JST_XH_S3B-XH-A_1x03_P2.50mm_Horizontal`: JST S3B-XH-A(LF)(SN), side entry, LCSC C157928 (3 A; full white is ~1.6 A). Side entry since SQU-42: the cable leaves flat out of the bottom edge |
 
 - `LED_DIN` (GPIO21) → R30 470 Ω → J4 pin 2 (DIN). R30 near U1.
 - J4 pin 1 → `+5V`. J4 pin 3 → `GND`. C30 across pins 1 and 3, at J4.
