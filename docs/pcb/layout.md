@@ -36,7 +36,7 @@ The 4 copper layers are set in `room-node.kicad_pcb`. The DRC rules below are al
 The Audio and LED patterns use KiCad's auto net names (`Net-(J2-Pin_*)`, `Net-(J4-Pin_2)`).
 If you rename those nets in the schematic, update the pattern in Board Setup → Net Classes.
 
-## Rev A board (placed and routed; connectors moved to the edges 2026-10-05, SQU-35; re-review fixes 2026-10-06, SQU-38; J1 centred and J4 to the bottom edge 2026-10-06, SQU-39)
+## Rev A board (placed and routed; connectors moved to the edges 2026-10-05, SQU-35; re-review fixes 2026-10-06, SQU-38; J1 centred and J4 to the bottom edge 2026-10-06, SQU-39; J4 side entry 2026-10-06, SQU-42)
 
 `tools/pcb_build.py` builds the whole board: outline, holes, slots, parts, planes,
 placement, rule areas, hand-made routes (J1 VBUS, the whole +5V net, the J1 → U5 USB
@@ -106,7 +106,7 @@ everywhere in this file: **looking at the parts side, USB-C on the left**.
 | Connector | Edge | Position | Cable |
 |---|---|---|---|
 | J1 USB-C | left, **centred** (SQU-39) | (109.155, **116.025**) rot −90 (footprint origin = pin A1). Pin field A1–A12 y 116.025–121.975 and courtyard y 113.68–124.32 are both centred on **y = 119.000**, the board centre; it was 113.5 (origin 110.525) | out of the left edge |
-| J4 LED strip (B3B-XH-A, vertical) | **bottom**, under U1, left of the AHT20 island (SQU-39) | (124.000, 133.600) rot 0; pin 1 +5V at x = 124.0, pin 2 data 126.5, pin 3 GND 129.0 | down, off the bottom edge |
+| J4 LED strip (S3B-XH-A, **side entry**, SQU-42) | **bottom**, under U1, left of the AHT20 island (SQU-39) | (124.000, **128.450**) rot 0; pin 1 +5V at x = 124.0, pin 2 data 126.5, pin 3 GND 129.0; mouth facing the bottom edge | straight out of the bottom edge |
 | J3 display (S8B-PH-SM4-TB, side entry) | right | (184.500, 117.500) rot 90; pad row at x = 181.65, pin 1 (181.65, **124.50**) at the bottom, pin 8 at 110.50 | straight out of the right edge |
 | J2 speaker (B2B-PH-SM4-TB) | bottom right | (176.300, 133.000), clear of J3 | up |
 
@@ -122,14 +122,24 @@ everywhere in this file: **looking at the parts side, USB-C on the left**.
 - **J3 pin 1** is hidden under the side-entry housing, so it is marked with a filled
   silkscreen triangle on the board side of the pad row, tip at (179.60, 124.50),
   0.30 mm from pin 1's pad edge and pointing at it.
-- **J4 + C30 (SQU-39).** J4's courtyard runs x 121.00–132.00, y 130.71–137.55: 0.46 mm
-  from the bottom edge (pads 3.43 mm from it). C30 (1000 µF) sits right next to it, turned
-  180° so its + pad faces J4: C30 + pad → J4 pin 1 is **6.16 mm**, courtyards 0.21 mm
-  apart. J4 is a vertical header, so the plug goes in from the parts side and the cable
-  is dressed down over the bottom edge (see open point 10).
-- **J4 to the AHT20 (SQU-39 constraint, ≥ ~15 mm).** J4 courtyard → U6 courtyard
-  **18.81 mm**; J4 courtyard → the island's left slot (x = 147.60) **15.60 mm**; nearest J4
-  pad → U6 centre 23.64 mm; J4 pin 1 (+5V) → U6 centre 28.63 mm.
+- **J4 side entry (SQU-42, Chris).** J4 is now the right-angle THT XH header
+  S3B-XH-A (`Connector_JST:JST_XH_S3B-XH-A_1x03_P2.50mm_Horizontal`, 3 A, LCSC C157928),
+  mouth facing the bottom edge, so the plug goes in from the edge and the cable leaves
+  flat, straight out of the bottom edge. The housing is 11.6 mm deep and its front face
+  sits 9.25 mm in front of the pin row, so the pins are at y = 128.45: housing x
+  121.50–131.50, y 126.10–**137.70**, i.e. the front face is **0.30 mm inside** the edge
+  (y = 138.00); **no body overhang**. The footprint silk ends at y = 137.82, 0.18 mm off
+  the edge (no new silk warning). Only the courtyard crosses the edge, by 0.20 mm
+  (y 125.60–138.20, x 121.00–132.00). The plug itself sticks out past the edge, so the
+  case needs a slot in the bottom wall about 10 mm wide centred on x = 126.5 (pin 2).
+  Pads are 3.55 mm from the edge (pad centre 9.55 mm).
+- **C30 at J4.** C30 (1000 µF) did not move: (118.0, 132.2) rot 180, + pad facing J4,
+  courtyards **0.21 mm** apart. C30 + pad → J4 pin 1 is now **7.08 mm** (was 6.16 mm; J4's
+  pins moved 5.15 mm towards U1). C30's courtyard is 0.31 mm inside the bottom edge;
+  Chris confirmed the case clears it (SQU-17, 2026-10-06).
+- **J4 to the AHT20 (SQU-39 constraint, ≥ ~15 mm), unchanged by SQU-42.** J4 courtyard →
+  U6 courtyard **18.81 mm**; J4 courtyard → the island's left slot (x = 147.60)
+  **15.60 mm**; nearest J4 pad → U6 centre 24.49 mm; J4 pin 1 (+5V) → U6 centre 29.34 mm.
 - **Mic sound hole** stays at (108.500, 135.510) in the bottom-left corner, as does its
   case opening. Nothing had to move it: J4's courtyard is **12.50 mm** to the right of it
   (SQU-39), and the C30 can sits between the two. No **via** is within 2.00 mm of the hole on any layer, enforced by
@@ -147,13 +157,28 @@ everywhere in this file: **looking at the parts side, USB-C on the left**.
 | Left, under U5 | C1 (above) / C2 (below) on the +5V spine via |
 | Bottom-left corner | H3, MK1 mic + C10/C11 at its +3V3 pin, R11/R8 left of them. Sound hole through the board |
 | Centre-left, top edge | U1 module; C6/C7/R3/C8 at its left pins |
-| Under U1 | R30 at U1 pin 23; **TP1–TP7 row** (x 121.0–137.8, y 127.5) and D1 at its end (141.6, 127.5) |
-| Bottom edge under U1 | **C30 1000 µF**, then **J4 LED connector**; 15.6 mm of free board to the island |
+| Under U1 | R30 at U1 pin 23 |
+| Right of J4 | **Test pads in a 2 × 4 block** (SQU-42), 2.8 mm pitch, x 134.0–142.4: top row y 127.5 TP4 RXD0, TP5 +3V3, TP6 +5V, TP7 GND; bottom row y 130.6 TP1 EN, TP2 IO0, TP3 TXD0 and D1 (142.9) |
+| Bottom edge under U1 | **C30 1000 µF**, then **J4 LED connector** (side entry); 15.6 mm to the island, the test-pad block in between |
 | Right of U1 | C9/TP8 (CC sense), SW2 BOOT / SW1 RESET, R4/R12 |
 | Bottom centre | U6 AHT20 + C40 on an island: slots left, right and in the neck; R40/R41 |
 | Right, top | **U2 LDO** (tab on a F.Cu +3V3 copper area with 5 vias to L3), C3/C4/C5 |
 | Right edge | **J3 display connector**, side entry; C50 at its +3V3 pin |
 | Right, lower | U3 amp + C21/C22 at VDD pins 7/8, R20, C20 470 µF, J2 speaker |
+
+**What moved in SQU-42** (Chris: J4 side entry, cable flat out of the bottom edge;
+numbers from `tools/pcb_audit.py` and the footprint geometry):
+
+| Part | From (SQU-39) | To | Reason |
+|---|---|---|---|
+| J4 | B3B-XH-A vertical, (124.0, 133.6) | **S3B-XH-A side entry**, (124.0, 128.45) rot 0 | mouth on the bottom edge, housing front 0.30 mm inside it |
+| TP1–TP3 | x 121.0–126.6, y 127.5 | x 134.0 / 136.8 / 139.6, y 130.6 | the 11.6 mm deep housing covers their old spots |
+| TP4–TP7 | x 129.4–137.8, y 127.5 | x 134.0 / 136.8 / 139.6 / 142.4, y 127.5 | same; TP6 (+5V) stays in the top row and drops straight onto the spine |
+| D1 | (141.6, 127.5) | (142.9, 130.6) | end of the bottom test-pad row; courtyard 2.98 mm from the island slot |
+
+C30, U6 and the island, R30, the mic and every other part did not move. The board was
+rebuilt end to end (`tools/pcb_build.py` place → Freerouting 2.4.1 on Temurin 25 →
+route), so the signal tracks are a fresh router result again (see the EPD table).
 
 **What moved in SQU-39** (Chris: J4 crowded the left edge right under J1, and the space
 under U1 was empty; every number from `tools/pcb_audit.py`):
@@ -191,7 +216,8 @@ four M2 holes did not move.
 | C22 | (171.0, 125.75) | (171.0, 126.0) | 0.20 mm courtyard gap to C21 |
 | J2 | (179.2, 133.0) | (176.3, 133.0) | out from under J3's courtyard |
 
-**Sensor isolation.** SQU-39 moves no heat source nearer U6: J4 and its +5V leg are
+**Sensor isolation.** SQU-42 moves no heat source: J4 keeps its x span and C30 its
+place, and the +5V copper is still 5.85 mm from the island box. SQU-39 moves no heat source nearer U6: J4 and its +5V leg are
 15.60 mm (slot) / 18.81 mm (U6 courtyard) away, and the widest +5V copper (the 1.50 mm
 spine) is now **5.85 mm** above the island box instead of 1.85 mm (spine at y = 128.0).
 From SQU-35: moving the LDO is the change to look at hardest. U2's tab is now
@@ -204,27 +230,28 @@ U2 in the bottom centre would have taken the gap down to about 25 mm. The amp U3
 
 **What got longer.** The display connector is now at the opposite end of the board from
 U1, so the six EPD signals grew from 17.5–33.6 mm (before SQU-35) to **56.84–66.40 mm**,
-measured on the SQU-39 board (`tools/pcb_audit.py`; the SQU-35/38 route was
-55.76–71.91 mm, all with 2 vias):
+measured on the SQU-42 board (`tools/pcb_audit.py`; SQU-39 was 56.84–66.40 mm, the
+SQU-35/38 route 55.76–71.91 mm):
 
 | Net | Length | Vias |
 |---|---|---|
-| EPD_BUSY | **66.40 mm** (longest) | 2 |
-| EPD_CS | 60.66 mm | 2 |
-| EPD_MOSI | 58.74 mm | 4 |
-| EPD_CLK | 57.14 mm | 4 |
-| EPD_RST | 56.90 mm | 2 |
-| EPD_DC | 56.84 mm (shortest) | 2 |
+| EPD_BUSY | **65.46 mm** (longest) | 2 |
+| EPD_MOSI | 61.20 mm | 2 |
+| EPD_CS | 60.48 mm | 2 |
+| EPD_CLK | 57.82 mm | 2 |
+| EPD_RST | 57.06 mm | 4 |
+| EPD_DC | 55.57 mm (shortest) | 2 |
 
-EPD_MOSI and EPD_CLK came back from the router with 4 vias each instead of 2 (two extra
-layer changes, each over the solid L2 GND); harmless at 2 MHz, noted for Iris.
+EPD_RST came back from the router with 4 vias instead of 2 (two extra layer changes,
+each over the solid L2 GND; at SQU-39 it was MOSI and CLK); harmless at 2 MHz and on a
+static reset line, noted for Iris.
 
 ESPHome 2026.9.0's Waveshare driver clocks the panel at 2 MHz (500 ns period) and the
 firmware does not override it, so 72 mm of track with 2 vias over the solid L2 return is
 not a timing problem; it is the direct cost of the short cable (Iris, SQU-37). Verify the
 display at bring-up, with a short display cable. Going the other way, the LED data line
-is now U1 → R30 6.18 mm and R30 → J4 pin 2 **18.38 mm** (was 31.87 mm, 56.85 mm before
-SQU-35); the speaker pair is unchanged (14.14 / 16.12 mm, no vias).
+is now U1 → R30 7.18 mm and R30 → J4 pin 2 **12.53 mm** (SQU-42; 18.38 mm at SQU-39,
+31.87 mm at SQU-35, 56.85 mm before); the speaker pair is unchanged (14.14 / 16.12 mm, no vias).
 
 **Layers**
 
@@ -243,18 +270,19 @@ SQU-35); the speaker pair is unchanged (14.14 / 16.12 mm, no vias).
   | J1 VBUS pads B9→A4 and B4→A9, then out of the pin field to x = 110.60 | B.Cu | 0.60, **two in parallel** | 2 × (1.35 + 1.45) mm | everything, ~half each |
   | **riser** at x = 110.60, y 116.875 → spine at y = 124.0 | B.Cu | **1.50** | 7.13 mm | everything |
   | **spine** x 110.60 → 118.00 (the C30 + pad column) | B.Cu | **1.50** | 7.40 mm | everything |
-  | LED leg: down x = 118.00 to **C30 +**, then to **J4 pin 1** | B.Cu | **1.50** | 8.20 + 6.16 mm | LED strip, up to ~1.6–2 A |
+  | LED leg: down x = 118.00 to **C30 +**, then to **J4 pin 1** | B.Cu | **1.50** | 8.20 + 7.08 mm | LED strip, up to ~1.6–2 A |
   | spine x 118.00 → 168.00 at y = 124.0, then down to C20 pad 1 | B.Cu | **1.50** | 50.00 + 9.84 mm | amp + LDO |
-  | TP6 straight up onto the spine | F.Cu | 1.00 | 3.5 mm | test point |
+  | TP6 straight up onto the spine (TP6 at x = 139.6, SQU-42) | F.Cu | 1.00 | 3.5 mm | test point |
   | spine via → C1 (up) and C2 (down) | F.Cu | 1.00 | 1.60 + 1.60 mm | USB input caps |
   | U5 pin 5 (VBUS sense) up, via, to the riser top | F.Cu + B.Cu | 0.50 + 1.00 | 1.50 + 3.93 mm | ESD clamp, mA |
   | spine via → C22 → C21 → U3 pins 7/8 | F.Cu | 1.00 / 0.80 | — | amp, ~0.9 A peak |
   | spine → up past U3 → U2 pin 3 and C3 | B.Cu + F.Cu | 1.00, 0.60 beside U3 | — | LDO, ≤ 0.5 A |
 
-  **J1 → J4 path (SQU-39), measured on the copper** (`tools/pcb_audit.py`, shortest
-  track path from J1's VBUS pad A9 to J4 pin 1): **26.08 mm**, of which 24.64 mm is
-  1.50 mm wide and 1.45 mm is one of the two parallel 0.60 mm necks (it was ~22 mm from J1
-  to J4 at SQU-35, with J4 next to J1). DC resistance ~8.2 mΩ, **13 mV drop at 1.6 A**.
+  **J1 → J4 path (SQU-42), measured on the copper** (`tools/pcb_audit.py`, shortest
+  track path from J1's VBUS pad A9 to J4 pin 1): **27.00 mm**, of which 25.55 mm is
+  1.50 mm wide and 1.45 mm is one of the two parallel 0.60 mm necks (26.08 mm at SQU-39,
+  ~22 mm at SQU-35 with J4 next to J1). DC resistance ~8.5 mΩ, **14 mV drop at 1.6 A**;
+  IPC-2221 rise 2.1 °C at 1.6 A, 3.4 °C at 2.0 A on the 1.50 mm track.
   The leg never runs along the island: it leaves the spine 29.6 mm west of the island's
   left slot and drops to the bottom edge there.
 
@@ -408,13 +436,12 @@ Gerbers + drill (JLCPCB): `reports/fab/room-node-rev-a-gerbers.zip`.
    side for the display cable, and the LED cable now leaves at the **bottom edge**, under
    U1, about 24–30 mm from the left end (J4 courtyard x 121–132). USB-C stays on the
    left, now centred. The enclosure notes in `docs/enclosure.md` predate both changes.
-10. **SQU-39, open question:** J4 is still the vertical B3B-XH-A, so the plug goes in
-   from the parts side and the cable has to bend over the bottom edge. A side-entry
-   XH header (S3B-XH-A) would point the cable straight out of the bottom edge, but it is
-   a new part (LCSC number, stock, footprint → Nora) and a decision for Chris. Not
-   changed here.
-11. **SQU-39:** C30 (10 mm can) sits on the bottom edge between the mic and J4; its
-   courtyard is 0.31 mm inside the edge. Check the case wall clears the can.
+10. **SQU-39, closed by SQU-42:** J4 is now the side-entry S3B-XH-A (Chris, SQU-17),
+   cable straight out of the bottom edge. The housing front is 0.30 mm inside the edge;
+   the plug sticks out past it, so the case needs a ~10 mm slot in the bottom wall
+   centred on x = 126.5. `docs/enclosure.md` does not have this yet.
+11. **SQU-39, closed:** C30 (10 mm can) sits on the bottom edge between the mic and J4;
+   its courtyard is 0.31 mm inside the edge. Chris: OK, the case clears it (SQU-17).
 
 ## Placement
 
@@ -428,7 +455,7 @@ Gerbers + drill (JLCPCB): `reports/fab/room-node-rev-a-gerbers.zip`.
   right and in the neck, open at the top for the tracks.
 - **USB:** U5 at J1. R6/R7 near J1. C9/TP8 near U1 pin 39.
 - **Amp:** C20/C21/C22 at U3. Short, wide +5V and GND.
-- **LED:** J4 on the bottom edge under U1, at least 15 mm from the AHT20 island, C30 at
+- **LED:** J4 (side entry, mouth on the edge) on the bottom edge under U1, at least 15 mm from the AHT20 island, C30 at
   the connector. R30 stays at U1 pin 23, where a source series resistor belongs.
 - **Display:** J3 on the right edge, side entry, pin 1 marked on the silk. C50 at its
   +3V3 pin.

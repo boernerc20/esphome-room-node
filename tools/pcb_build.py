@@ -61,21 +61,26 @@ PLACE = {
     # LED strip connector: bottom edge under U1, left of the AHT20 island (SQU-39).
     # Pin 1 (+5V) on the left, towards C30 and J1; the 1000 uF can sits right next to
     # it, + pad facing J4, so the bulk cap is at the connector.
-    'J4': (124.0, 133.6, 0), 'C30': (118.0, 132.2, 180),
+    # SQU-42: side entry (S3B-XH-A), mouth facing the bottom edge. The housing front
+    # sits 9.25 mm in front of the pin row: pins at y = 128.45 put it 0.30 mm inside
+    # the edge and keep the footprint's silk 0.18 mm off it.
+    'J4': (124.0, 128.45, 0), 'C30': (118.0, 132.2, 180),
     # Microphone (bottom-left corner, sound hole through the board; hole unchanged)
     'MK1': (108.5, 134.8, 0),
     'C10': (108.6, 131.4, 0), 'C11': (108.6, 128.6, 0),         # +3V3 at MK1 pin 5
     'R11': (104.0, 128.6, 0), 'R8': (104.0, 131.4, 180),
-    # Test pads in one row between U1 and J4 (TP6 = +5V drops onto the spine)
-    'TP1': (121.0, 127.5, 0), 'TP2': (123.8, 127.5, 0), 'TP3': (126.6, 127.5, 0),
-    'TP4': (129.4, 127.5, 0), 'TP5': (132.2, 127.5, 0), 'TP6': (135.0, 127.5, 0),
-    'TP7': (137.8, 127.5, 0),
+    # Test pads (SQU-42): the side-entry J4 body fills x 121-132 from y 125.6 down to
+    # the edge, so the pads sit in a 2 x 4 block right of it, still clear of the island
+    # slot (x = 147.6). TP6 (+5V) is in the top row, so it drops straight onto the spine.
+    'TP4': (134.0, 127.5, 0), 'TP5': (136.8, 127.5, 0), 'TP6': (139.6, 127.5, 0),
+    'TP7': (142.4, 127.5, 0),
+    'TP1': (134.0, 130.6, 0), 'TP2': (136.8, 130.6, 0), 'TP3': (139.6, 130.6, 0),
     'R30': (135.0, 121.6, 0),                                  # LED data, near U1 pin 23
     # Right of U1: CC sense, BOOT/RESET buttons, pull-ups, status LED
     'C9': (141.2, 102.6, 0), 'TP8': (144.6, 102.6, 0),
     'SW2': (151.0, 106.0, 0), 'SW1': (151.0, 113.4, 0),
     'R4': (142.0, 107.0, 90),
-    'R12': (142.0, 111.6, 90), 'D1': (141.6, 127.5, 0),
+    'R12': (142.0, 111.6, 90), 'D1': (142.9, 130.6, 0),
     # Sensor island (bottom edge, slots on three sides)
     'U6': (152.6, 135.0, 0), 'C40': (149.7, 135.0, 270), 'R40': (157.6, 132.0, 90), 'R41': (159.4, 132.0, 90),
     # LDO (top right, in the space the LED connector left; furthest from U6) (SQU-35).
