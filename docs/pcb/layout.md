@@ -228,9 +228,19 @@ J4 pin 2 dropped from 56.85 mm to 31.87 mm and the speaker pair is unchanged
 - **GND / +3V3:** every SMD pad has its own via to its plane (fan-out). GND stitching
   vias on a 5 mm grid and along the edge, 45 of them.
 - **Speaker pair** U3 → J2: 0.4–0.5 mm, side by side, no vias.
-- **USB D±:** about 18–19 mm per line from J1 to U1 (about 9 mm on the MCU side of U5),
-  0.2 mm tracks, matched to about 1 mm. USB is Full Speed (12 Mbit/s), so length
-  match and impedance are not critical.
+- **USB D±:** 0.2 mm tracks, **not length-matched**. Copper length J1 → U5 → U1, pad to
+  pad, excluding U5's internal path (measured in SQU-36):
+
+  | Plug orientation | D+ (J1→U5 + U5→U1) | D− (J1→U5 + U5→U1) | Difference |
+  |---|---:|---:|---:|
+  | A pads | 18.62 + 9.58 = **28.20 mm** | 4.69 + 8.01 = **12.70 mm** | 15.50 mm |
+  | B pads | 17.34 + 9.58 = **26.93 mm** | 6.39 + 8.01 = **14.41 mm** | 12.52 mm |
+
+  An earlier version of this file said "about 18–19 mm per line, matched to about 1 mm";
+  that was wrong. USB is Full Speed only (12 Mbit/s, ~83 ns bit time), where a 15 mm
+  skew is about 0.1 ns, so no timing failure is expected. USB enumeration stays a
+  bring-up test (step 4). A shorter, balanced D+ route is possible as a layout change
+  (before the rev A order or in rev B); Chris decides.
 
 - **LDO heat:** the U2 tab sits on a F.Cu +3V3 copper area (6.2 × 3.3 mm, 20.4 mm², full
   connection) with vias to the L3 plane next to the tab, not in it (no solder wicking):
