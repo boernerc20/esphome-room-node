@@ -10,7 +10,7 @@ editing them would trade a silk warning for a `lib_footprint_mismatch` warning.
 
     kicad-cli pcb drc ... -o drc.rpt && kicadpython tools/pcb_silk.py drc.rpt
 """
-import os, re, sys
+import math, os, re, sys
 import pcbnew
 from pcbnew import FromMM as mm, ToMM as T, VECTOR2I
 
@@ -42,6 +42,21 @@ for fp in fps:
         if g.GetLayer() == pcbnew.F_SilkS:
             fixed.append(box(g, CLR))
 edges = [box(d, EDGE) for d in board.GetDrawings() if d.GetLayer() == pcbnew.Edge_Cuts]
+
+
+# A moved reference must still be nearer its own part's centre than any other part's,
+# or assembly reads it as the neighbour's label. Mounting holes are not labelled parts,
+# so they are not candidate owners.
+CENTRES = {fp.GetReference(): (T(fp.GetPosition().x), T(fp.GetPosition().y))
+           for fp in fps if not re.fullmatch(r'H\d+', fp.GetReference())}
+
+
+def owns(ref, ax, ay):
+    if ref not in CENTRES:
+        return True
+    mine = math.dist((ax, ay), CENTRES[ref])
+    return all(math.dist((ax, ay), c) >= mine - 1e-6
+               for r, c in CENTRES.items() if r != ref)
 # the board rectangle; silkscreen that lands outside it is simply not printed
 BX0, BY0, BX1, BY1 = 100.0 + EDGE, 100.0 + EDGE, 189.5 - EDGE, 138.0 - EDGE
 
@@ -84,6 +99,8 @@ for fp, r in [x for x in refs] * 2:
         """ax/ay = wanted centre of the text box."""
         cand = [ax - w / 2 - CLR, ay - h / 2 - CLR, ax + w / 2 + CLR, ay + h / 2 + CLR]
         if cand[0] < BX0 or cand[1] < BY0 or cand[2] > BX1 or cand[3] > BY1:
+            return None
+        if not owns(ref, ax, ay):
             return None
         for o in fixed:
             if hit(cand, o):

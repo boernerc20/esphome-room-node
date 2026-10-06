@@ -250,9 +250,14 @@ circuit; not for rev A.)
 
 **Side entry (Chris, 2026-10-05, SQU-32).** J3 is the horizontal **S8B-PH-SM4-TB**, not the
 top-entry B8B. The board sits on ~10 mm M2 standoffs behind the display, parts side facing
-away from it, so the cable has to leave the board edge towards the display. The connector
-mouth faces out over the **bottom** board edge. Pinout and pin numbering are unchanged:
-pin 1 is still pin 1.
+away from it, so the cable has to leave the board edge towards the display. Pinout and pin
+numbering are unchanged: pin 1 is still pin 1.
+
+**Edge (Chris, 2026-10-05, SQU-35).** The connector mouth faces out over the **right**
+board edge (looking at the parts side with USB-C on the left), not the bottom edge. Pin 1
+is the **lower** of the eight pads and is marked with a filled triangle on the silkscreen.
+The LED connector J4 moved to the left edge just below USB-C at the same time; see
+`docs/pcb/layout.md`.
 
 ⚠ Check the pin order and pin count on your cable. Newer Waveshare modules have a
 9th pin (PWR); if yours has it, use a 9-pin connector and tie PWR to `+3V3`.
