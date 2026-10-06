@@ -101,8 +101,11 @@ PLACE = {
 # Reference fields the footprint default puts somewhere useless: C30 is turned 180, so
 # its label would land below the can, off the bottom edge; the mic cluster is too tight
 # for the silk pass to find spots on its own. (x, y[, text angle])
+# TP1-TP3: the bottom test-pad row keeps its labels in one line under the pads (SQU-45;
+# the silk pass had dropped TP2's 1.9 mm below the others).
 REF_AT = {'C30': (118.4, 126.0), 'C11': (108.6, 127.3), 'C10': (108.6, 130.0),
-          'MK1': (105.9, 134.8, 90)}
+          'MK1': (105.9, 134.8, 90),
+          'TP1': (134.0, 132.877), 'TP2': (136.8, 132.877), 'TP3': (139.6, 132.877)}
 
 # AHT20 island: slots (Edge.Cuts) left and right, open at the top for the 4 tracks.
 # No copper pour inside, so board heat does not reach the sensor.

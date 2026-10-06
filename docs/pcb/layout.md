@@ -129,14 +129,18 @@ everywhere in this file: **looking at the parts side, USB-C on the left**.
   sits 9.25 mm in front of the pin row, so the pins are at y = 128.45: housing x
   121.50–131.50, y 126.10–**137.70**, i.e. the front face is **0.30 mm inside** the edge
   (y = 138.00); **no body overhang**. The footprint silk ends at y = 137.82, 0.18 mm off
-  the edge (no new silk warning). Only the courtyard crosses the edge, by 0.20 mm
-  (y 125.60–138.20, x 121.00–132.00). The plug itself sticks out past the edge, so the
+  the edge (no new silk warning). Only the courtyard crosses the edge, by 0.15 mm
+  (line centre; y 125.64–138.15, x 121.00–132.00; 0.175 mm with the line width, SQU-45). The plug itself sticks out past the edge, so the
   case needs a slot in the bottom wall about 10 mm wide centred on x = 126.5 (pin 2).
-  Pads are 3.55 mm from the edge (pad centre 9.55 mm).
+  Pad copper is **8.58 mm** from the edge (pad centre 9.55 mm; SQU-45 corrected the
+  earlier "3.55 mm").
 - **C30 at J4.** C30 (1000 µF) did not move: (118.0, 132.2) rot 180, + pad facing J4,
   courtyards **0.21 mm** apart. C30 + pad → J4 pin 1 is now **7.08 mm** (was 6.16 mm; J4's
-  pins moved 5.15 mm towards U1). C30's courtyard is 0.31 mm inside the bottom edge;
-  Chris confirmed the case clears it (SQU-17, 2026-10-06).
+  pins moved 5.15 mm towards U1). Measured on the board (SQU-45; the earlier "0.31 mm"
+  was wrong): can outline (F.Fab, Ø 10.0 mm, centre (115.5, 132.2)) **0.80 mm** inside the
+  bottom edge, courtyard (r 5.25) **0.55 mm**, pad copper **4.80 mm**. A real can up to
+  Ø 10.5 mm still clears the edge by 0.55 mm. Chris confirmed the case clears it
+  (SQU-17, 2026-10-06).
 - **J4 to the AHT20 (SQU-39 constraint, ≥ ~15 mm), unchanged by SQU-42.** J4 courtyard →
   U6 courtyard **18.81 mm**; J4 courtyard → the island's left slot (x = 147.60)
   **15.60 mm**; nearest J4 pad → U6 centre 24.49 mm; J4 pin 1 (+5V) → U6 centre 29.34 mm.
@@ -148,6 +152,68 @@ everywhere in this file: **looking at the parts side, USB-C on the left**.
   planes solid round the mic. The no-copper ring is the separate 0.4 mm
   "MK1 sound hole" keep-out inside the footprint's GND ring.
 
+### Bottom edge: board separation and assembly (SQU-45)
+
+Rev A is 5 boards built by hand (top of this file), so JLCPCB's assembly rule
+("the body of the components and the edge of the board must be equal or greater than
+2.5 mm", [assembly terms](https://jlcpcb.com/help/article/terms-and-conditions-of-jlcpcb-assembly-service))
+does not apply to it. It would apply only if Rev A were ordered **with JLC assembly**.
+How the boards are separated still matters, so the method is written down here.
+**Chris decides the method (via Oscar); nothing has been ordered or uploaded.**
+
+**Every edge has something on it**, not just the bottom one. Measured on the board
+(edge at x 100.0 / 189.5, y 100.0 / 138.0; "body" = F.Fab outline):
+
+| Edge | Part | Body to edge | Courtyard | Copper to edge |
+|---|---|---|---|---|
+| bottom | **J4** S3B-XH-A (THT) | **0.30** | −0.15 (crosses) | pads **8.58** |
+| bottom | **C30** 1000 µF (THT) | **0.80** | 0.55 | pads **4.80** |
+| bottom | C20 470 µF (THT) | 1.35 | 1.12 | pads 4.60 |
+| bottom | U6 AHT20 | 1.45 | 1.22 | pads 1.75 |
+| bottom | MK1 mic | 1.40 | 1.18 | pads 1.68 |
+| bottom | J2 speaker (PH SMD) | 4.20 | 1.22 | tab pads 1.75 |
+| bottom | C40 | 2.15 | 1.50 | pads 1.78 |
+| bottom | H3 / H4 (M2, Waveshare pattern) | – | – | pad ring 1.40 |
+| top | U1 antenna | **overhangs 6.05** | – | pads 1.04 |
+| left | J1 USB-C | 0.50 | 0.02 | pads 3.94 |
+| right | J3 display (side entry) | 0.55 | −0.12 (crosses) | tab pads 0.40 |
+| all | GND / +3V3 pours, L1–L4 | – | – | **0.30** (the rule minimum); edge stitching vias 0.70 |
+
+What follows from that:
+
+- **No V-cut on any edge.** The pours are 0.30 mm from every edge, and JLC's V-cut guide
+  wants at least 0.4 mm from the cut centre to copper. On top of that, U1's antenna hangs
+  6 mm over the top edge, and J4's and J3's courtyards cross the bottom and right edges.
+- **Moving J4 (and C30) 2.5 mm in would not make the board meet JLC's 2.5 mm rule.**
+  C20, U6, MK1, J1, J3 and U1 fail it too, and the M2 holes are fixed by the display.
+  A JLC-assembled board needs a rails/fixture plan for the whole board, not just J4.
+
+**Options**
+
+| | A. Single routed boards, hand assembly **(proposed)** | B. Routed + mouse-bite panel with rails (only for JLC assembly) | C. Placement revision: J4 and C30 2.5 mm in |
+|---|---|---|---|
+| What | 5 single PCBs, outline routed by the fab, no panel, no V-cut. Stencil as already planned. Paste + hot air for SMD, then J4, C30, C20 and J1 THT with an iron. Nothing to depanel. | KiKit-style panel: 2 mm milled gap, mouse-bite tabs only where no part is within 2.5 mm (e.g. bottom edge x 135–145, under the test pads), rails on the long sides; the top rail is kept clear of the antenna overhang (≥ 8 mm gap). J4/C30/C20 hand-soldered after depanelling. | J4 to y 126.25 (front 2.50 mm inside), C30 up 1.70 mm. Re-route the LED legs (Freerouting is not deterministic, so all signals re-route and need a full re-review). |
+| J4 body / copper to the separation path | **0.30 / 8.58 mm** to the routed edge (fab outline tolerance is typically ±0.2 mm, so ≥ 0.10 mm worst case; the housing never overhangs) | 0.30 mm to the board edge, 2.3 mm to the panel frame (2 mm gap); no tab within 2.5 mm of J4 | 2.50 / 10.78 mm |
+| C30 body / copper | **0.80 / 4.80 mm** | 0.80 mm to the edge, 2.8 mm to the frame | 2.50 / 6.50 mm |
+| Edge copper | 0.30 mm, fine for a routed edge | 0.30 mm; mouse-bite tab spots need a local ≥ 0.5 mm copper keep-out (board edit) | unchanged |
+| Cost | none extra | panel design + edge keep-outs at tabs + JLC rail/fixture charges; still breaks the 2.5 mm rule for 8 other parts | a re-route and re-review; the plug mouth sits 2.5 mm inside the board, so the case slot gets deeper and the cable bends over the PCB edge |
+| Fixes | everything that matters for Rev A | lets JLC assemble the SMD parts | nothing on its own (other parts still fail the 2.5 mm rule) |
+
+**Proposal: A for Rev A.** It matches the plan of record (5 boards, hand-built), needs no
+board change, and the routed edge is the only separation path: J4's housing stays
+0.30 mm inside it, its pads 8.58 mm. Order settings to state when Chris orders:
+delivery format **single PCB** (no "panel by JLCPCB", no V-cut), **no PCBA**, stencil
+yes. If a panel is ever forced, it must be **mouse bites, not V-cut**, with no tab on the
+bottom edge between x 110 and 133 (C30 + J4), and J4 is soldered after depanelling.
+B (or a bottom-edge redesign of the whole board) is a Rev B question, if Rev B goes to
+JLC assembly.
+
+**Production files checked (SQU-45):** `reports/fab/room-node-rev-a-gerbers.zip` has one
+outline (`Edge_Cuts`, profile only: board, the island slots and the neck slot), no
+V-score or panel layer, no CPL/position file and no panel. The BOM lists J4 / C30 / C20
+with LCSC numbers for buying, not as JLC-assembly lines. Nothing in `reports/` implies
+JLC assembly or a panel.
+
 **Placement** (looking at the parts side, USB-C on the left):
 
 | Area | Parts |
@@ -158,7 +224,7 @@ everywhere in this file: **looking at the parts side, USB-C on the left**.
 | Bottom-left corner | H3, MK1 mic + C10/C11 at its +3V3 pin, R11/R8 left of them. Sound hole through the board |
 | Centre-left, top edge | U1 module; C6/C7/R3/C8 at its left pins |
 | Under U1 | R30 at U1 pin 23 |
-| Right of J4 | **Test pads in a 2 × 4 block** (SQU-42), 2.8 mm pitch, x 134.0–142.4: top row y 127.5 TP4 RXD0, TP5 +3V3, TP6 +5V, TP7 GND; bottom row y 130.6 TP1 EN, TP2 IO0, TP3 TXD0 and D1 (142.9) |
+| Right of J4 | **Test pads in a 2 × 4 block** (SQU-42), 2.8 mm pitch, x 134.0–142.4: top row y 127.5 TP4 RXD0, TP5 +3V3, TP6 +5V, TP7 GND; bottom row y 130.6 TP1 EN, TP2 IO0, TP3 TXD0 and D1 (142.9). Labels above the top row (y 125.85) and in one line under the bottom row (y 132.88; TP2's was 1.9 mm lower until SQU-45) |
 | Bottom edge under U1 | **C30 1000 µF**, then **J4 LED connector** (side entry); 15.6 mm to the island, the test-pad block in between |
 | Right of U1 | C9/TP8 (CC sense), SW2 BOOT / SW1 RESET, R4/R12 |
 | Bottom centre | U6 AHT20 + C40 on an island: slots left, right and in the neck; R40/R41 |
@@ -408,6 +474,11 @@ ERC 0 errors (1 pre-existing warning: U3's PAD pin is Unspecified against a Powe
 The count was 5 before SQU-35, because the old silk pass was allowed to park a reference
 on a neighbouring part; it is no longer, so labels sit on their own part and overlap
 instead. The readable one is the safer trade.
+
+**SQU-45 re-check** (TP2 reference moved up 1.90 mm into the TP1/TP3 label row; no other
+board change): DRC 0 errors, 0 unconnected, 0 parity issues, the same 12 silkscreen
+warnings (none on TP1–TP7); ERC unchanged; `tools/check_pinout.py` PASS. Only the
+F.Silkscreen Gerber changed.
 
 Report: `reports/pcb/room-node-drc.rpt`. Pictures: `reports/pcb/room-node-top.png`,
 `room-node-bottom.png` (the side that faces the display), `room-node-copper-top.png`,
