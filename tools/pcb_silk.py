@@ -138,7 +138,8 @@ for fp, r in [x for x in refs] * 2:
 
 pcbnew.SaveBoard(PCB, board)
 stuck = [r for r in dict.fromkeys(stuck) if stuck.count(r) > 1]
-print('moved %d reference fields; largest move %.1f mm (%s)'
-      % (len(moved), max(moved.values()), max(moved, key=moved.get)))
+if moved:
+    print('moved %d reference fields; largest move %.1f mm (%s)'
+          % (len(moved), max(moved.values()), max(moved, key=moved.get)))
 print('%s' % ', '.join('%s %.1f' % kv for kv in sorted(moved.items())))
 print('no free spot for %d: %s' % (len(stuck), ', '.join(stuck) or 'none'))
