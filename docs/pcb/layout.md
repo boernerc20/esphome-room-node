@@ -4,9 +4,9 @@ For later, when the schematic is done. Rev A is 5 boards, built by hand.
 
 ## Board
 
-- 4 layers, solid ground plane. ENIG finish. Order a stencil with the boards.
+- 4 layers, solid ground plane. ENIG finish. No stencil (Chris, SQU-45, 2026-10-06).
 - All parts on the top side. 0603 minimum. At least 0.5 mm between passives.
-- Tent the vias under the module pad and the amp pad. Windowpane the stencil on those pads.
+- Tent the vias under the module pad and the amp pad.
 - Readable silkscreen: pin 1 marks, polarity marks, refs.
 
 ## Stack-up and design rules (JLCPCB 4-layer)
@@ -192,18 +192,18 @@ What follows from that:
 
 | | A. Single routed boards, hand assembly **(proposed)** | B. Routed + mouse-bite panel with rails (only for JLC assembly) | C. Placement revision: J4 and C30 2.5 mm in |
 |---|---|---|---|
-| What | 5 single PCBs, outline routed by the fab, no panel, no V-cut. Stencil as already planned. Paste + hot air for SMD, then J4, C30, C20 and J1 THT with an iron. Nothing to depanel. | KiKit-style panel: 2 mm milled gap, mouse-bite tabs only where no part is within 2.5 mm (e.g. bottom edge x 135–145, under the test pads), rails on the long sides; the top rail is kept clear of the antenna overhang (≥ 8 mm gap). J4/C30/C20 hand-soldered after depanelling. | J4 to y 126.25 (front 2.50 mm inside), C30 up 1.70 mm. Re-route the LED legs (Freerouting is not deterministic, so all signals re-route and need a full re-review). |
+| What | 5 single PCBs, outline routed by the fab, no panel, no V-cut. Stencil as already planned. Paste + hot air for SMD, then J4, C30, C20 and J1 THT with an iron. Nothing to depanel. **Chosen without stencil** (below). | KiKit-style panel: 2 mm milled gap, mouse-bite tabs only where no part is within 2.5 mm (e.g. bottom edge x 135–145, under the test pads), rails on the long sides; the top rail is kept clear of the antenna overhang (≥ 8 mm gap). J4/C30/C20 hand-soldered after depanelling. | J4 to y 126.25 (front 2.50 mm inside), C30 up 1.70 mm. Re-route the LED legs (Freerouting is not deterministic, so all signals re-route and need a full re-review). |
 | J4 body / copper to the separation path | **0.30 / 8.58 mm** to the routed edge (fab outline tolerance is typically ±0.2 mm, so ≥ 0.10 mm worst case; the housing never overhangs) | 0.30 mm to the board edge, 2.3 mm to the panel frame (2 mm gap); no tab within 2.5 mm of J4 | 2.50 / 10.78 mm |
 | C30 body / copper | **0.80 / 4.80 mm** | 0.80 mm to the edge, 2.8 mm to the frame | 2.50 / 6.50 mm |
 | Edge copper | 0.30 mm, fine for a routed edge | 0.30 mm; mouse-bite tab spots need a local ≥ 0.5 mm copper keep-out (board edit) | unchanged |
 | Cost | none extra | panel design + edge keep-outs at tabs + JLC rail/fixture charges; still breaks the 2.5 mm rule for 8 other parts | a re-route and re-review; the plug mouth sits 2.5 mm inside the board, so the case slot gets deeper and the cable bends over the PCB edge |
 | Fixes | everything that matters for Rev A | lets JLC assemble the SMD parts | nothing on its own (other parts still fail the 2.5 mm rule) |
 
-**Proposal: A for Rev A.** It matches the plan of record (5 boards, hand-built), needs no
+**Decision (Chris, 2026-10-06): A without stencil.** Proposal was: A for Rev A. It matches the plan of record (5 boards, hand-built), needs no
 board change, and the routed edge is the only separation path: J4's housing stays
 0.30 mm inside it, its pads 8.58 mm. Order settings to state when Chris orders:
-delivery format **single PCB** (no "panel by JLCPCB", no V-cut), **no PCBA**, stencil
-yes. If a panel is ever forced, it must be **mouse bites, not V-cut**, with no tab on the
+delivery format **single PCB** (no "panel by JLCPCB", no V-cut), **no PCBA**, **no
+stencil**. If a panel is ever forced, it must be **mouse bites, not V-cut**, with no tab on the
 bottom edge between x 110 and 133 (C30 + J4), and J4 is soldered after depanelling.
 B (or a bottom-edge redesign of the whole board) is a Rev B question, if Rev B goes to
 JLC assembly.
@@ -534,7 +534,11 @@ Gerbers + drill (JLCPCB): `reports/fab/room-node-rev-a-gerbers.zip`.
 
 ## Assembly
 
-- Hand assembly: paste + stencil + hot air.
+- Hand assembly, no stencil (SQU-45). Paste from a syringe + hot air (or a hot plate) for
+  the parts with pads under the body: **U1 centre GND pad, U3, U6, MK1**. Do these first.
+  The U1 pad vias are 0.2 mm and covered by solder mask on the back, so the pad cannot be
+  soldered from the back with an iron. Then the rest (0603/0805, SOT-223, SOT-23-6, LED,
+  buttons, connectors, C20/C30) with an iron.
 - The module pad and the amp pad cannot be inspected. If the board resets under Wi-Fi or
   the amp cuts out, suspect those joints first.
 - After the mic is fitted: no board wash, no IPA, no ultrasonic. No hot air or air jet into the sound hole.
