@@ -1,33 +1,35 @@
 Ref,Qty/board,Order qty,DigiKey PN,MPN,Manufacturer,Description,Unit price @ order qty,Stock (date checked),Notes
-U1,1,6,(see Notes),ESP32-S3-WROOM-1-N16R8,Espressif Systems,"ESP32-S3 module, 16MB flash/8MB PSRAM, PCB antenna; footprint RF_Module:ESP32-S3-WROOM-1",$6.72,not stocked (2026-10-06),"NOT ON DIGIKEY - verified Octopart https://octopart.com/search?q=ESP32-S3-WROOM-1-N16R8 (Mouser 44,548 @ $6.72, TME 6,300 @ $6.30, Schukat 20,616 @ $4.17). BUY ELSEWHERE (Mouser). DigiKey same-family only: -N16R2 35407-ESP32-S3-WROOM-1-N16R2CT-ND $4.78 ~1,750 - not same RAM, Iris/Chris to confirm variant."
-U2,1,7,AP7361C-33ER-13DICT-ND,AP7361C-33ER-13,Diodes Inc.,LDO 3.3V 1A SOT-223R; footprint SOT-223-3_TabPin2; ER suffix only,$0.52,"1,487 (2026-10-06)","ER suffix confirmed (SOT223R pinout 1=GND,2=OUT,3=IN). Price @7."
-U5,1,7,24518-USBLC6-2SC6CT-ND,USBLC6-2SC6,STMicroelectronics,USB-C ESD protection SOT-23-6; footprint SOT-23-6,$0.91,"16,193 (2026-10-06)",Price @7. Alternate ESD7351.
-J1,1,7,2073-USB4105-GF-ACT-ND,USB4105-GF-A,GCT,USB-C USB2.0 16P SMT receptacle; SUBSTITUTE for USB4085-GF-A,$0.80,"94,984 (2026-10-06)","USB4085-GF-A NOT ON DIGIKEY - verified https://octopart.com/search?q=USB4085-GF-A (Newark $1.16, TME, Rutronik). GCT USB4105-GF-A is a DigiKey drop-in but FOOTPRINT diff vs Connector_USB:USB_C_Receptacle_GCT_USB4085 - IRIS must approve footprint first; else buy USB4085-GF-A from Newark."
-"SW1,SW2",1,12,EG2531CT-ND,TL3342F160QG/TR,E-Switch,Tactile switch SMD SPST-NO 160gf; footprint Button_Switch_SMD:SW_SPST_TL3342,$0.506,"73,081 (2026-10-06)","SW3 removed from rev A - only SW1 RESET, SW2 BOOT. DigiKey lists as TL3342F160QG/TR (same switch, reel). Price @12."
-"R1,R2",2,20,311-RC0603FR-075K1LCT-ND,RC0603FR-075K1L,Yageo,Resistor 0603 5.1k ohm 1% 0.1W; footprint R_0603_1608Metric,$0.02,">80,000 (2026-10-06)",USB CC pads.
-"R3,R4",2,20,311-RC0603FR-0710KLCT-ND,RC0603FR-0710KL,Yageo,Resistor 0603 10k ohm 1% 0.1W,$0.02,">100,000 (2026-10-06)",Boot/voicectrl pullups.
-"R6,R7,R8,R20",4,25,311-RC0603FR-07100KLCT-ND,RC0603FR-07100KL,Yageo,Resistor 0603 100k ohm 1% 0.1W,$0.02,">80,000 (2026-10-06)","R6/R7 CC_SENSE, R8 mic DATA, R20 amp SD_MODE."
-"R9,R10,R11",3,20,311-RC0603FR-0733RLCT-ND,RC0603FR-0733RL,Yageo,Resistor 0603 33 ohm 1% 0.1W,$0.02,">80,000 (2026-10-06)",Mic series.
-R12,1,20,311-RC0603FR-071KLCT-ND,RC0603FR-071KL,Yageo,Resistor 0603 1k ohm 1% 0.1W,$0.02,">100,000 (2026-10-06)",
-R30,1,20,311-RC0603FR-07470RLCT-ND,RC0603FR-07470RL,Yageo,Resistor 0603 470 ohm 1% 0.1W,$0.02,">100,000 (2026-10-06)",LED_DIN series (in 330-470 ohm spec).
-"R40,R41",2,20,311-RC0603FR-074K7LCT-ND,RC0603FR-074K7L,Yageo,Resistor 0603 4.7k ohm 1% 0.1W,$0.02,">100,000 (2026-10-06)",I2C pullups AHT20.
-"C1,C22",2,20,1276-CL21A106KOQNNNECT-ND,CL21A106KOQNNNE,Samsung Electro-Mechanics,MLCC 0805 10uF 16V X5R; footprint C_0805_2012Metric,$0.06,">30,000 (2026-10-06)",VBUS + module bulk.
-"C2,C5,C7,C9,C10,C21,C40,C50",8,50,490-GRM188R71H104KA93DCT-ND,GRM188R71H104KA93D,Murata,MLCC 0603 0.1uF 50V X7R; footprint C_0603_1608Metric,$0.03,">50,000 (2026-10-06)","Generic decoupling, 8/board."
-"C3,C8",2,20,490-GRM188R61C105KA93DCT-ND,GRM188R61C105KA93D,Murata,MLCC 0603 1uF 16V X5R,$0.04,">40,000 (2026-10-06)",
-"C4,C6",2,20,490-GRM21BR60J226ME01LCT-ND,GRM21BR60J226ME01,Murata,MLCC 0805 22uF 10V X5R,$0.10,">20,000 (2026-10-06)",LDO out + module decoupling.
-C11,1,20,490-GRM1885C1H101JA01DCT-ND,GRM1885C1H101JA01D,Murata,MLCC 0603 100pF C0G 50V,$0.03,">50,000 (2026-10-06)",DNP on rev A; hand-solder spare only.
-C20,1,7,493-15233-1-ND,UHE1C471MPD1TD,Nichicon,Al electrolytic 470uF 16V radial D8mm/P3.5mm THT; footprint CP_Radial_D8.0mm_P3.50mm,$0.74,">2,500 (2026-10-06)",Fits 8mm D + 3.5mm pitch. Replaces LCSC SamYoung NXB16V470M8x11.5. Amp bulk.
-C30,1,7,493-4639-1-ND,UKA1C102MPD1TD,Nichicon,Al electrolytic 1000uF 16V radial D10mm/P5.0mm THT; footprint CP_Radial_D10.0mm_P5.00mm,$1.29,">1,200 (2026-10-06)",Fits 10mm D + 5.0mm pitch. Replaces LCSC SamYoung NHA16V1000M10x16. LED bulk at J4.
-U3,1,8,MAX98357AETE+TCT-ND,MAX98357AETE+,Analog Devices,I2S Class-D amp TQFN-16 3x3mm; footprint TQFN-16-1EP_3x3mm_P0.5mm_EP1.23x1.23mm,$4.08,"39,317 (2026-10-06)","Small QFN pads, order 8. Alternate MAX98357BETE+ same footprint."
-J2,1,7,3455-B2B-PH-SM4-TBCT-ND,B2B-PH-SM4-TB(LF)(SN),JST,"JST PH 2-pin SMD female header, vertical; footprint JST_PH_B2B-PH-SM4-TB_1x02-1MP_P2.00mm_Vertical",$0.47,"44,670 (2026-10-06)",Speaker connector.
-MK1,1,8,(see Notes),SPH0645LM4H-B,Knowles / Syntiant,I2S MEMS mic bottom-port LGA-6; footprint Knowles_SPH0645LM4H-6,$1.87,not stocked (2026-10-06),"NOT ON DIGIKEY (bare part) - verified https://octopart.com/search?q=SPH0645LM4H-B (DigiKey only KAS-700-0137 2-pk flex $31.35). BUY ELSEWHERE: Component Stockers USA $1.87 (18.9K), or Syntiant/Knowles direct. Active transition - verify stock at order."
-U6,1,8,(see Notes),AHT20,Aosong,Temp/humidity I2C sensor 3x3mm; footprint room-node:AHT20,$0.76,not stocked (2026-10-06),NOT ON DIGIKEY (bare chip) - verified https://octopart.com/search?q=AHT20 (DigiKey only Adafruit 1528-4566-ND breakout $4.50). BUY ELSEWHERE: LCSC C275785 $0.76. No same-footprint DigiKey drop-in; SHT30 differs - Iris/Felix if substituted.
-D1,1,7,160-1414-1-ND,LTST-C170KGKT,Lite-On,LED green 0805 571nm clear; footprint LED_0805_2012Metric; SUBSTITUTE for KT-0805G,$0.19,"453,352 (2026-10-06)","KT-0805G (523nm) NOT ON DIGIKEY - verified https://octopart.com/search?q=KT-0805G (UnikeyIC only). LTST-C170KGKT: same 0805 footprint, 571nm vs 523nm - Iris confirm colour/lens ok."
-J3,1,7,2455-S8B-PH-SM4-TBCT-ND,S8B-PH-SM4-TB(LF)(SN),JST,"JST PH 8-pin SMD header, SIDE-ENTRY; footprint JST_PH_S8B-PH-SM4-TB_1x08-1MP_P2.00mm_Horizontal",$0.86,368 (2026-10-06),LOW STOCK 368 - order soon. Connects Waveshare e-paper display (was wrongly listed as 24-pin FPC).
-OB-J2-mating,5,6,455-PHR-2-ND,PHR-2,JST,JST PH 2-position housing (pairs with board B2B-PH-SM4-TB),$0.12,in stock (2026-10-06),Standard JST PN; confirm qty/colour at cart.
-OB-J2-contacts,5,12,455-SPH-002T-P0.5S-ND,SPH-002T-P0.5S,JST,"JST PH crimp contact, 24-28 AWG (for J2 mating leads; 2 per board + spare)",$0.03,in stock (2026-10-06),Standard JST crimp contact; needs JST PH crimp tool (WC-100/CY-2).
-OB-J4-mating,5,6,455-XHP-3-ND,XHP-3,JST,JST XH 3-position housing (pairs with board S3B-XH-A),$0.10,in stock (2026-10-06),Standard JST PN; confirm at cart.
-OB-J4-contacts,5,15,455-SXH-001T-P0.6-ND,SXH-001T-P0.6,JST,"JST XH crimp contact, 24-30 AWG (3 per board + spare)",$0.02,in stock (2026-10-06),Standard JST crimp contact.
-OB-J3-8pin-cable,5,5,455-PHR-8-ND,PHR-8,JST,"JST PH 8-position housing + crimp 8x contacts, wire to wire; pin1->pin1 cable ~100mm",$0.25,in stock (2026-10-06),"DIY: 2x PHR-8 + 16 contacts + 8-wire ribbon/harness, straight-through 1<->1. Waveshare e-paper display ships with its own PH-to-PH cable - confirm before ordering extra."
-OB-M2-standoff,5,20,(hardware row),M2 female-female hex standoff 10mm,Keystone/McMaster,M2x10mm standoff (20) for enclosure/backplate mounting,$0.40,n/a (2026-10-06),Not a DigiKey BOM-manager line; add from DigiKey 'Board Spacers/Standoffs' or McMaster-Carr. Waveshare ESP32 module ships BARE (no mounting hardware).
-OB-M2-screws,5,40,(hardware row),M2x6mm pan-head screw,McMaster/DigiKey,M2x6mm screws (40) for the standoffs,$0.10,n/a (2026-10-06),"Add from DigiKey 'Screws, Bolts' or McMaster; 20 standoffs x 2 screws."
+U1,1,6,(see Notes),ESP32-S3-WROOM-1-N16R8,Espressif Systems,"ESP32-S3 module, 16MB flash/8MB PSRAM, PCB antenna; footprint RF_Module:ESP32-S3-WROOM-1",$6.72,not stocked (2026-10-26),NOT ON DIGIKEY. BUY FROM MOUSER. DigiKey carries -N16R2 only (2MB PSRAM). See Second Order below.
+U2,1,7,AP7361C-33ER-13DICT-ND,AP7361C-33ER-13,Diodes Inc.,LDO 3.3V 1A SOT-223R; footprint SOT-223-3_TabPin2; ER suffix only,$0.52,"1,400+ (2026-10-26)",ER suffix confirmed (pinout 1=GND 2=OUT 3=IN).
+U5,1,7,24518-USBLC6-2SC6CT-ND,USBLC6-2SC6,STMicroelectronics,USB-C ESD protection SOT-23-6; footprint SOT-23-6,$0.91,"16,000+ (2026-10-26)",
+J1,1,7,(see Notes),USB4085-GF-A,GCT,USB-C USB2.0 16P SMT receptacle; footprint Connector_USB:USB_C_Receptacle_GCT_USB4085,$1.16,"2,800+ Newark (2026-10-26)",NOT ON DIGIKEY. Order from Mouser (640-USB4085-GF-A) or Newark (51AC8536). See Second Order.
+"SW1,SW2",1,12,EG2531CT-ND,TL3342F160QG/TR,E-Switch,Tactile switch SMD SPST-NO 160gf; footprint SW_TL3342,$0.51,"73,000+ (2026-10-26)",SW1=RESET SW2=BOOT. Reel variant.
+"R1,R2",2,20,311-RC0603FR-075K1LCT-ND,RC0603FR-075K1L,Yageo,Resistor 0603 5.1k 1% 0.1W; footprint R_0603_1608Metric,$0.02,"80,000+ (2026-10-26)",USB CC pads.
+"R3,R4",2,20,311-RC0603FR-0710KLCT-ND,RC0603FR-0710KL,Yageo,Resistor 0603 10k 1% 0.1W,$0.02,"80,000+ (2026-10-26)",Boot/voicectrl pullups.
+"R6,R7,R8,R20",4,25,311-RC0603FR-07100KLCT-ND,RC0603FR-07100KL,Yageo,Resistor 0603 100k 1% 0.1W,$0.02,"80,000+ (2026-10-26)",R6/R7=CC_SENSE R8=mic DATA R20=amp SD_MODE.
+"R9,R10,R11",3,20,311-RC0603FR-0733RLCT-ND,RC0603FR-0733RL,Yageo,Resistor 0603 33R 1% 0.1W,$0.02,"80,000+ (2026-10-26)",Mic series.
+R12,1,20,311-RC0603FR-071KLCT-ND,RC0603FR-071KL,Yageo,Resistor 0603 1k 1% 0.1W,$0.02,"80,000+ (2026-10-26)",
+R30,1,20,311-RC0603FR-07470RLCT-ND,RC0603FR-07470RL,Yageo,Resistor 0603 470R 1% 0.1W,$0.02,"80,000+ (2026-10-26)",LED_DIN series (330-470).
+"R40,R41",2,20,311-RC0603FR-074K7LCT-ND,RC0603FR-074K7L,Yageo,Resistor 0603 4.7k 1% 0.1W,$0.02,"80,000+ (2026-10-26)",I2C pullups AHT20.
+"C1,C22",2,20,1276-CL21A106KOQNNNECT-ND,CL21A106KOQNNNE,Samsung,MLCC 0805 10uF 16V X5R; footprint C_0805_2012Metric,$0.06,"30,000+ (2026-10-26)",VBUS/module bulk.
+"C2,C5,C7,C9,C10,C21,C40,C50",8,50,490-GRM188R71H104KA93DCT-ND,GRM188R71H104KA93D,Murata,MLCC 0603 0.1uF 50V X7R; footprint C_0603_1608Metric,$0.03,"50,000+ (2026-10-26)",Generic decoupling 8/board.
+"C3,C8",2,20,490-GRM188R61C105KA93DCT-ND,GRM188R61C105KA93D,Murata,MLCC 0603 1uF 16V X5R,$0.04,"40,000+ (2026-10-26)",
+"C4,C6",2,20,490-GRM21BR60J226ME01LCT-ND,GRM21BR60J226ME01,Murata,MLCC 0805 22uF 10V X5R,$0.12,"20,000+ (2026-10-26)",LDO out/module decoupling.
+C11,1,20,490-GRM1885C1H101JA01DCT-ND,GRM1885C1H101JA01D,Murata,MLCC 0603 100pF C0G 50V,$0.03,"50,000+ (2026-10-26)",DNP on Rev A; hand-solder spare only.
+C20,1,7,493-15233-1-ND,UHE1C471MPD1TD,Nichicon,Al electrolytic 470uF 16V radial D8mm P3.5mm; footprint CP_Radial_D8.0mm_P3.50mm,$0.74,"2,500+ (2026-10-26)",Replaces LCSC NXB16V470M8x11.5. Amp bulk.
+C30,1,7,493-4639-1-ND,UKA1C102MPD1TD,Nichicon,Al electrolytic 1000uF 16V radial D10mm P5.0mm; footprint CP_Radial_D10.0mm_P5.00mm,$1.29,"1,000+ (2026-10-26)",Replaces LCSC NHA16V1000M10x16. LED bulk.
+U3,1,8,MAX98357AETE+TCT-ND,MAX98357AETE+,Analog Devices,I2S Class-D amp TQFN-16 3x3mm; footprint TQFN-16-1EP_3x3mm_P0.5mm,$4.08,"38,300+ (2026-10-26)",QFN pads under body. Alt MAX98357BETE+ same.
+MK1,1,8,(see Notes),SPH0645LM4H-B,Syntiant/Knowles,I2S MEMS mic bottom-port LGA-6; footprint Knowles_SPH0645LM4H-6,$1.87,not stocked (2026-10-26),NOT ON DIGIKEY. ACTIVE/Production. Drop-in alt SPH0645LU4H-1. See Second Order.
+U6,1,8,(see Notes),AHT20,Aosong,Temp/humidity I2C sensor 3x3mm; footprint AHT20,$0.76,not stocked (2026-10-26),NOT ON DIGIKEY. Mouser has breakout modules only. Buy from LCSC C275785. See Second Order.
+D1,1,7,160-1414-1-ND,LTST-C170KGKT,Lite-On,LED green 0805 571nm clear; footprint LED_0805_2012Metric,$0.19,"453,000+ (2026-10-26)",Replaces KT-0805G (523nm not on DK). Same footprint. Iris confirm colour ok.
+J2,1,7,3455-B2B-PH-SM4-TBCT-ND,B2B-PH-SM4-TB(LF)(SN),JST,JST PH 2-pin SMD vertical header; footprint JST_PH_B2B-PH-SM4-TB_1x02-1MP,$0.47,"42,500+ (2026-10-26)",Speaker connector.
+J3,1,7,2455-S8B-PH-SM4-TBCT-ND,S8B-PH-SM4-TB(LF)(SN),JST,JST PH 8-pin SMD side-entry; footprint JST_PH_S8B-PH-SM4-TB_1x08-1MP_P2.00mm_Horizontal,$0.86,43 (2026-10-26),CRITICAL LOW STOCK! Was 368. Order now. Connects e-paper display.
+J4,1,7,455-S3B-XH-A-ND,S3B-XH-A(LF)(SN),JST,JST XH 3-pin THT R/A header; footprint JST_XH_S3B-XH-A_1x03_P2.50mm_Horizontal,$0.15,0 (1k expected Dec 2026),Board-side LED connector. DigiKey OOS; also Mouser/Newark.
+OB-J2-housing,5,6,455-PHR-2-ND,PHR-2,JST,JST PH 2-position housing (mates B2B-PH-SM4-TB),$0.12,"136,000+ (2026-10-26)",Receptacle for speaker pigtail.
+OB-J2-lead,5,12,455-3082-ND,ASPHSPH24K152,JST,JST PH pre-crimped lead socket-socket 24AWG 6in black,$0.40,"31,000+ (2026-10-26)",2 per pigtail +spare. No crimp tool needed.
+OB-J4-housing,5,6,455-XHP-3-ND,XHP-3,JST,JST XH 3-position housing (mates S3B-XH-A),$0.10,"136,000+ (2026-10-26)",Receptacle for LED pigtail.
+OB-J4-lead,5,18,455-3240-ND,ASXHSXH22K152,JST,JST XH pre-crimped lead socket-socket 22AWG 6in black,$0.81,"13,900+ (2026-10-26)",3 per pigtail +spare. No crimp tool needed.
+OB-J3-housing,5,12,455-PHR-8-ND,PHR-8,JST,JST PH 8-position housing x2 per cable (mates S8B-PH-SM4-TB each end),$0.22,Stock (2026-10-26),2x PHR-8 per cable. Pin1->Pin1 straight-through.
+OB-J3-lead,5,48,455-3358-ND,ASPHSPH24K102,JST,JST PH pre-crimped lead socket-socket 24AWG 4in black,$0.40,Stock (2026-10-26),16 per cable +spare. ~100mm cable. Waveshare may include cable.
+OB-M2-standoff,5,20,(hardware row),M2 female-female hex 10mm,Keystone/any,M2x10mm standoff 20 for enclosure/backplate,$0.40,n/a (2026-10-26),Not on BOM upload. Add from DigiKey or McMaster.
+OB-M2-screws,5,40,(hardware row),M2x6mm pan-head screw,McMaster/DigiKey,M2x6mm screws 40 for standoffs (2 per standoff),$0.10,n/a (2026-10-26),Not on BOM upload. Add from DigiKey or McMaster.
