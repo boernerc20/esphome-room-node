@@ -414,6 +414,34 @@ font:
     size: 14
 
 sensor:
+  # Rev A PCB only: GPIO1/ADC1_CH0 is wired to TP8 (CC_SENSE). GPIO1 is
+  # unwired on the breadboard, so its reading and source label are meaningless
+  # there; this input does not drive any power or LED control.
+  # With only one CC line driven, the other 5.1 kΩ Rd and its 100 kΩ series
+  # resistor pull CC_SENSE down: V_sense = V_active_CC * 105.1 / 205.1
+  # ≈ 0.5124 * V_active_CC. From the plan's CC voltage bands, the sense
+  # bands are 0.128–0.313 V (default), 0.359–0.594 V (1.5 A), and
+  # 0.671–1.045 V (3.0 A). The gaps give 0.34 V and 0.63 V thresholds.
+  # These labels describe the advertised source class, not measured current;
+  # verify ADC error and these narrow gaps against TP8 during Rev A bring-up.
+  - platform: adc
+    pin: GPIO1
+    id: usb_cc_sense
+    name: "USB CC sense"
+    attenuation: 12db
+    update_interval: 10s
+    unit_of_measurement: "V"
+    accuracy_decimals: 3
+    on_value:
+      then:
+        - text_sensor.template.publish:
+            id: usb_source
+            state: !lambda |-
+              if (isnan(x) || x < 0.10f) return {"Unknown"};
+              if (x < 0.34f) return {"Default USB"};
+              if (x < 0.63f) return {"1.5 A"};
+              return {"3.0 A"};
+
   - platform: aht10
     variant: AHT20
     temperature:
@@ -430,6 +458,12 @@ sensor:
   - platform: wifi_signal
     name: "${friendly_name} WiFi Signal"
     update_interval: 60s
+
+text_sensor:
+  # Rev A PCB only; GPIO1 floats on the breadboard (see ADC sensor above).
+  - platform: template
+    id: usb_source
+    name: "USB source"
 
 display:
   - platform: waveshare_epaper
