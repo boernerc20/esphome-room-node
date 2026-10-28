@@ -239,9 +239,14 @@ micro_wake_word:
     channels: 0
     gain_factor: 4
   stop_after_detection: true
+  # 2026-10-28: cutoff was 0.5, far below the model's tuned 0.97, so similar
+  # words also fired. Use the manifest default (0.97, sliding window 5). If it
+  # misses real "Hey Jarvis", lower in 0.01–0.02 steps, not below ~0.90.
   models:
     - model: hey_jarvis
-      probability_cutoff: 0.5
+  # Voice activity model: a detection only counts while speech is present, so
+  # TV noise, music and taps no longer trigger the pipeline.
+  vad:
   on_wake_word_detected:
     - if:
         condition:
@@ -414,6 +419,21 @@ font:
     size: 14
 
 sensor:
+  # Mic level diagnostics: measures the same gain-4 stream the wake word sees.
+  # Passive = only while wake word / VA has the mic open. Use these to tune
+  # gain_factor: room quiet = noise floor, speech peaks must stay below -3 dBFS.
+  - platform: sound_level
+    passive: true
+    measurement_duration: 5s
+    microphone:
+      microphone: mic
+      channels: 0
+      gain_factor: 4
+    peak:
+      name: "${friendly_name} Mic peak"
+    rms:
+      name: "${friendly_name} Mic RMS"
+
   # Rev A PCB only: GPIO1/ADC1_CH0 is wired to TP8 (CC_SENSE). GPIO1 is
   # unwired on the breadboard, so its reading and source label are meaningless
   # there; this input does not drive any power or LED control.
